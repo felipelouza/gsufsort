@@ -23,12 +23,12 @@ Available options:
 ```sh
 --build		(default)
 --load		load from disk FILE[.sa][.da][.lcp][.gsa][.bin]
---sa			[w]	computes SA  using w (def 4) bytes (FILE.w.sa)
---lcp			[w]	computes LCP using w bytes (FILE.w.lcp)
---da			[w]	computes DA  using w bytes (FILE.w.da)
---gsa			[w1][w2]	computes GSA using pairs of (w1, w2) bytes (FILE.w1.w1.gsa)
---bwt			computes BWT using 1 byte (FILE.1.bwt)
---bin			computes T^{cat} using 1 byte (FILE.1.bin)
+--sa		[w]	computes SA  using w (def 4) bytes (FILE.w.sa)
+--lcp		[w]	computes LCP using w bytes (FILE.w.lcp)
+--da		[w]	computes DA  using w bytes (FILE.w.da)
+--gsa		[w1][w2]	computes GSA using pairs of (w1, w2) bytes (FILE.w1.w1.gsa)
+--bwt		computes BWT using 1 byte (FILE.1.bwt)
+--bin		computes T^{cat} using 1 byte (FILE.1.bin)
 --docs		d	number of strings (def all FILE)
 --print		p	print arrays (stdout) A[1,p]
 --output	out	renames output file
@@ -36,7 +36,6 @@ Available options:
 --help		this help message
 ```
 _Notes:_ 
-- default docs = all strings as input.
 - Supported extensions are _.txt_, _.fasta_ and _.fastq_.
 
 ## quick test
@@ -47,15 +46,18 @@ To run a test with docs=3 strings from dataset/input-10000.txt, type:
 ./gsufsort dataset/input-10000.txt --docs 3 --sa --bwt
 ```
 
+```sh
+## store_to_disk ##
+dataset/input-10000.txt.4.sa	76 bytes (n = 19)
+dataset/input-10000.txt.1.bwt	19 bytes (n = 19)
+malloc_count ### exiting, total: 24,676, peak: 13,209, current: 1,033
+```
+
 To see the result (--print 10) stored in disk FILE.4.sa and FILE.1.bwt, type
 
 ```sh
 ./gsufsort dataset/input-10000.txt --sa --bwt --print 10
 ```
-
-## options
-
-Results:
 
 ```sh
 ## load_from_disk ##
@@ -63,15 +65,15 @@ dataset/input-10000.txt.4.sa	76 bytes (n = 19)
 dataset/input-10000.txt.1.bwt	19 bytes (n = 19)
 i	SA	BWT
 0	18	$
-1	6		a
+1	6	a
 2	12	a
-3	17	n
-4	5		n
+3	17      n
+4	5       n
 5	11	b
-6	9		n
+6	9	n
 7	15	n
-8	3		n
-9	7		$
+8	3	n
+9	7	$
 malloc_count ### exiting, total: 10,424, peak: 5,776, current: 1,033
 ```
 
