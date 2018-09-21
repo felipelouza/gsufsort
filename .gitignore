@@ -1,0 +1,11 @@
+*.swp
+*.o
+lib/*.o
+external/*.o
+dataset/*.bin
+dataset/*.sa
+dataset/*.lcp
+dataset/*.da
+dataset/*.gsa
+dataset/*.bwt
+gsufsort
