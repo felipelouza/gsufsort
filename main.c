@@ -112,6 +112,10 @@ int main(int argc, char** argv){
 				if (optarg) printf(" with arg %s", optarg);
 				printf("\n");
 				break;
+			case '1':
+				build=1; break;
+			case '2':
+				load=1; build=0; break;
 			case 'v':
 				verbose++; break;
 			case 'p':
@@ -139,10 +143,6 @@ int main(int argc, char** argv){
 				usage(argv[0]); break;      
 			case 'o':
 				c_output=optarg; output=1; break;
-			case '1':
-				build=1; break;
-			case '2':
-				load=1; build=0; break;
 			case '?':
 				exit(EXIT_FAILURE);
 		}
@@ -167,6 +167,11 @@ int main(int argc, char** argv){
 
 	c_file= strrchr(c_input, '/')+1;
 	c_dir = strndup(c_input, strlen(c_input)-strlen(c_file));
+
+	if(!output){
+		c_output = (char*) malloc(strlen(c_input)+5);
+	  sprintf(c_output, "%s", c_input);
+	}
 
 	if(build){
 
@@ -211,11 +216,6 @@ int main(int argc, char** argv){
 			DA = (int_t*) malloc(n*sizeof(int_t));
 			assert(DA);
 			for(i=0; i<n; i++) DA[i]=-1;
-		}
-	
-		if(!output){
-			c_output = (char*) malloc(strlen(c_input)+5);
-		  sprintf(c_output, "%s", c_input);
 		}
 	
 		if(verbose){
@@ -301,12 +301,12 @@ int main(int argc, char** argv){
 		int_t *GSA_suff = NULL;
 	
 		size_t n=0;
-		if(bin)	n = load_from_disk(&str, NULL, NULL, c_input, "bin", 1, 0);
-		if(sa)	n = load_from_disk(NULL, &SA,	 NULL, c_input, "sa", sa_bytes, 0);
-		if(lcp)	n = load_from_disk(NULL, &LCP, NULL, c_input, "lcp", lcp_bytes, 0);
-		if(da)	n = load_from_disk(NULL, &DA,	 NULL, c_input, "da", da_bytes, 0);
-		if(gsa)	n = load_from_disk(NULL, &GSA_text, &GSA_suff, c_input, "gsa", t_bytes, s_bytes);
-		if(bwt)	n = load_from_disk(&BWT, NULL,	NULL, c_input, "bwt", 1, 0);
+		if(bin)	n = load_from_disk(&str, NULL, NULL, c_output, "bin", 1, 0);
+		if(sa)	n = load_from_disk(NULL, &SA,	 NULL, c_output, "sa", sa_bytes, 0);
+		if(lcp)	n = load_from_disk(NULL, &LCP, NULL, c_output, "lcp", lcp_bytes, 0);
+		if(da)	n = load_from_disk(NULL, &DA,	 NULL, c_output, "da", da_bytes, 0);
+		if(gsa)	n = load_from_disk(NULL, &GSA_text, &GSA_suff, c_output, "gsa", t_bytes, s_bytes);
+		if(bwt)	n = load_from_disk(&BWT, NULL,	NULL, c_output, "bwt", 1, 0);
 	
 		if(print){
 			// output
@@ -355,7 +355,8 @@ int main(int argc, char** argv){
 		fprintf(stderr,"%.6lf\n", time_stop(t_total, c_total));
 	}
 
-	free(c_output);
+	if(!output)
+		free(c_output);
 
 return 0;
 }
