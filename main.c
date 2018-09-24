@@ -70,7 +70,7 @@ int main(int argc, char** argv){
 	extern char *optarg;
 	extern int optind;
 	int c;
-	char *c_dir=NULL, *c_file=NULL, *c_input=NULL, *c_output=NULL;
+	char *c_input=NULL, *c_output=NULL;
 
 	int verbose=0, print=0;
 	int d=0; //number of string
@@ -159,6 +159,7 @@ int main(int argc, char** argv){
 	}
 	else  usage(argv[0]);
 
+
 	if(time){
 	 	time_start(&t_total, &c_total);
 	}
@@ -167,16 +168,6 @@ int main(int argc, char** argv){
 		puts("####");
 		die("choose at least one option  [--sa] [--lcp] [--da] [--gsa] [--bwt] [--bin]");
 		exit(EXIT_FAILURE);
-	}
-
-	c_file= strrchr(c_input, '/');
-	if(c_file==NULL){
-	 	c_file = c_input;
-		c_dir = "./";
-	}
-	else {
-		c_file++;
-		c_dir = strndup(c_input, strlen(c_input)-strlen(c_file));
 	}
 
 	if(!output){
@@ -189,7 +180,6 @@ int main(int argc, char** argv){
 		unsigned char **R;
 		size_t n=0;
 	
-		//file_chdir(c_dir);
 		//disk access
 		R = (unsigned char**) file_load_multiple(c_input, &d, &n);
 	
@@ -231,7 +221,7 @@ int main(int argc, char** argv){
 	
 		if(verbose){
 			printf("########\n");
-			printf("INPUT = %s%s\n", c_dir,c_file);
+			printf("INPUT = %s\n", c_input);
 			printf("OUTPUT = %s", c_output);
 			if(sa) printf("[.sa]");
 			if(lcp)	printf("[.lcp]");

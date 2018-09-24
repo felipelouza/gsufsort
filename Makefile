@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS += -Wall
-#CFLAGS += -g -O0
-CFLAGS += -D_FILE_OFFSET_BITS=64 -m64 -O3 -fomit-frame-pointer -Wno-char-subscripts 
+CFLAGS += -g -O0
+#CFLAGS += -D_FILE_OFFSET_BITS=64 -m64 -O3 -fomit-frame-pointer -Wno-char-subscripts 
 
 LFLAGS = -lm -ldl
 
@@ -49,7 +49,7 @@ compile: main.c ${LIBOBJ}
 	$(CC) -o gsufsort main.c ${LIBOBJ} $(CFLAGS) $(LFLAGS) 
 
 run:
-	./gsufsort $(DIR)$(INPUT) $(DOCS) -v
+	./gsufsort $(DIR)$(INPUT) -v --sa
 
 valgrind:
-	valgrind -q --tool=memcheck --leak-check=full --track-origins=yes --show-leak-kinds=all ./gsufsort $(DIR)$(INPUT) $(DOCS) 
+	valgrind -q --tool=memcheck --leak-check=full --track-origins=yes --show-leak-kinds=all ./gsufsort $(DIR)$(INPUT) --sa -d 100

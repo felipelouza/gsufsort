@@ -1,6 +1,6 @@
 #include "file.h"
 
-#define N_ALLOC 1024
+#define N_ALLOC 2048 
 
 /* Returns the file extension
  */
