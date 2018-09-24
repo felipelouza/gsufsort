@@ -48,6 +48,7 @@ void usage(char *name){
   puts("\t--print  p	print arrays (stdout) A[1,p]");
   puts("\t--output out	renames output file");
   puts("\t--verbose	verbose output");
+  puts("\t--time	output time (sec.)");
   puts("\t--help		this help message");
   exit(EXIT_FAILURE);
 }
@@ -60,7 +61,7 @@ int main(int argc, char** argv){
 	time_t t_start=0;clock_t c_start=0;
 	int_t i;
 
-	int sa=0, lcp=0, da=0, bwt=0, bin=0, gsa=0; //txt
+	int sa=0, lcp=0, da=0, bwt=0, bin=0, gsa=0, time=0; //txt
 	int sa_bytes=sizeof(int_t);
 	int lcp_bytes=sizeof(int_t);
 	int da_bytes=sizeof(int_t);
@@ -95,6 +96,7 @@ int main(int argc, char** argv){
 			{"bin",			no_argument,			 0, 'T'},
     	{"docs",		required_argument, 0, 'd'},
     	{"verbose", no_argument,       0, 'v'},
+    	{"time",		no_argument,       0, 't'},
     	{"help",		no_argument,       0, 'h'},
     	{"output",  required_argument, 0, 'o'},
     	{"build",		no_argument,       0, '1'},
@@ -102,7 +104,7 @@ int main(int argc, char** argv){
     	{0,         0,                 0,  0 }
 		};
 
-		c = getopt_long(argc, argv, "S:vp:d:L:D:GB:Tho:", long_options, &option_index);
+		c = getopt_long(argc, argv, "S:vtp:d:L:D:GB:Tho:", long_options, &option_index);
 
 	 	if (c == -1) break;
 
@@ -118,6 +120,8 @@ int main(int argc, char** argv){
 				load=1; build=0; break;
 			case 'v':
 				verbose++; break;
+			case 't':
+				time++; break;
 			case 'p':
 				print = (int) atoi(optarg); break;
 			case 'S':
@@ -155,7 +159,7 @@ int main(int argc, char** argv){
 	}
 	else  usage(argv[0]);
 
-	if(verbose){
+	if(time){
 	 	time_start(&t_total, &c_total);
 	}
 
@@ -165,8 +169,15 @@ int main(int argc, char** argv){
 		exit(EXIT_FAILURE);
 	}
 
-	c_file= strrchr(c_input, '/')+1;
-	c_dir = strndup(c_input, strlen(c_input)-strlen(c_file));
+	c_file= strrchr(c_input, '/');
+	if(c_file==NULL){
+	 	c_file = c_input;
+		c_dir = "./";
+	}
+	else {
+		c_file++;
+		c_dir = strndup(c_input, strlen(c_input)-strlen(c_file));
+	}
 
 	if(!output){
 		c_output = (char*) malloc(strlen(c_input)+5);
@@ -236,20 +247,21 @@ int main(int argc, char** argv){
 	
 	/********/
 	
-		if(verbose){
+		if(time){
 		 	time_start(&t_start, &c_start);
 			printf("## gsufsort ##\n");
 		}
 	
 		gsacak(str, (uint_t*)SA, LCP, DA, n);
 	
-		if(verbose){
-			fprintf(stderr,"%.6lf\n", time_stop(t_start, c_start));
+		if(time){
+			double d_time = time_stop(t_start, c_start);
+			if(verbose) fprintf(stderr,"%.6lf\n", d_time);
 		}
 	
 	/********/
 	
-		if(verbose){
+		if(time){
 		 	time_start(&t_start, &c_start);
 		}
 		printf("## store_to_disk ##\n");
@@ -262,15 +274,16 @@ int main(int argc, char** argv){
 		if(gsa) store_to_disk(NULL,	DA,		SA,		n, c_output, "gsa", t_bytes, s_bytes);
 		if(bwt) store_to_disk(str,	SA,		NULL,	n, c_output, "bwt", sizeof(char), 0);
 	
-		if(verbose){
-			fprintf(stderr,"%.6lf\n", time_stop(t_start, c_start));
+		if(time){
+			double d_time = time_stop(t_start, c_start);
+			if(verbose) fprintf(stderr,"%.6lf\n", d_time);
 		}
 	
 	/********/
 	
 		if(print){
-			printf("bin = %d\n", bin);
-			print_array(str, SA, LCP, DA, bin, sa, da, bwt, gsa, n, min(n,print));
+			printf("## print ##\n");
+			print_array(str, SA, LCP, DA, bin=1, sa, da, bwt, gsa, n, min(n,print));
 		}
 
 		//free memory
@@ -350,9 +363,10 @@ int main(int argc, char** argv){
 	
 	}
 
-	if(verbose){
-		printf("TOTAL:\n");
-		fprintf(stderr,"%.6lf\n", time_stop(t_total, c_total));
+	if(time){
+		printf("## total ##\n");
+		double d_time = time_stop(t_total, c_total);
+		if(verbose) fprintf(stderr,"%.6lf\n", d_time);
 	}
 
 	if(!output)
