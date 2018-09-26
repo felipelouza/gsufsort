@@ -41,7 +41,7 @@ clean:
 	\rm -f *.o  external/*.o lib/*o external/malloc_count/*.o gsufsort
 
 remove:
-	\rm -f $(DIR)*.bin  $(DIR)*.sa $(DIR)*.da $(DIR)*.lcp $(DIR)*.bwt $(DIR)*.gsa
+	\rm -f $(DIR)*.bin  $(DIR)*.sa $(DIR)*.da $(DIR)*.lcp $(DIR)*.bwt $(DIR)*.gsa $(DIR)*.gesa
 
 ##
 
