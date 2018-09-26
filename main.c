@@ -45,7 +45,7 @@ void usage(char *name){
   puts("\t--bin		computes T^{cat} using 1 byte (FILE.1.bin)");
 
   puts("\t--docs   d	number of strings (def all FILE)");
-  puts("\t--print  p	print arrays (stdout) A[1,p]");
+  puts("\t--print  [p]	print arrays (stdout) A[1,p] (def. p=N)");
   puts("\t--output out	renames output file");
   puts("\t--verbose	verbose output");
   puts("\t--time	output time (sec.)");
@@ -74,6 +74,7 @@ int main(int argc, char** argv){
 
 	int verbose=0, print=0;
 	int d=0; //number of string
+	int p=0; //print A[1,p]
 	int output=0; //output
 
 	int build=1; 
@@ -87,7 +88,7 @@ int main(int argc, char** argv){
 		int option_index = 0;
 
 		static struct option long_options[] = {
-    	{"print",		required_argument, 0, 'p'},
+    	{"print",		optional_argument, 0, 'P'},
 			{"sa",			optional_argument, 0, 'S'},
 			{"lcp",			optional_argument, 0, 'L'},
 			{"da",			optional_argument, 0,	'D'},
@@ -104,7 +105,7 @@ int main(int argc, char** argv){
     	{0,         0,                 0,  0 }
 		};
 
-		c = getopt_long(argc, argv, "S:vtp:d:L:D:GB:Tho:", long_options, &option_index);
+		c = getopt_long(argc, argv, "S:vtP:d:L:D:GB:Tho:", long_options, &option_index);
 
 	 	if (c == -1) break;
 
@@ -122,8 +123,9 @@ int main(int argc, char** argv){
 				verbose++; break;
 			case 't':
 				time++; break;
-			case 'p':
-				print = (int) atoi(optarg); break;
+			case 'P':
+				if (!optarg && argv[optind] != NULL && argv[optind][0] != '-') p = (int) atoi(argv[optind++]);
+				print=1; break;
 			case 'S':
 				if (!optarg && argv[optind] != NULL && argv[optind][0] != '-') sa_bytes	= (int) atoi(argv[optind++]);
 				sa=1; break;
@@ -273,7 +275,8 @@ int main(int argc, char** argv){
 	
 		if(print){
 			printf("## print ##\n");
-			print_array(str, SA, LCP, DA, bin=1, sa, da, bwt, gsa, n, min(n,print));
+			if(!p)p=n;
+			print_array(str, SA, LCP, DA, bin=1, sa, da, bwt, gsa, n, min(n,p));
 		}
 
 		//free memory
