@@ -34,23 +34,21 @@ void usage(char *name){
   puts("Extensions supported: .txt .fasta .fastq");
   puts("Available options:");
 
-  puts("\t--build		 (default)");
-  puts("\t--load		 load from disk FILE[.sa][.da][.lcp][.gsa][.bin]");
-
-  puts("\t--sa   [w]	 computes SA  using w (def 4) bytes (FILE.w.sa)");
-  puts("\t--lcp  [w]	 computes LCP (FILE.w.lcp)");
-  puts("\t--da   [w]	 computes DA  (FILE.w.da)");
-  puts("\t--gsa  [w][y] 	 computes GSA using pairs of (w1, w2) bytes (FILE.w.y.gsa)");
-  puts("\t--gesa [w][y][z] computes GESA = (GSA,LCP) (FILE.w.y.z.gesa)");
-  puts("\t--bwt		 computes BWT using 1 byte (FILE.1.bwt)");
-  puts("\t--bin		 computes T^{cat} (FILE.1.bin)");
-
-  puts("\t--docs   d	 number of strings (def all FILE)");
-  puts("\t--print  [p]	 print arrays (stdout) A[1,p] (def. p=N)");
-  puts("\t--output out	 renames output file");
-  puts("\t--verbose	 verbose output");
-  puts("\t--time		 output time (sec.)");
-  puts("\t--help		 this help message");
+	puts("\t--build	              (default)");
+	puts("\t--load                load from disk FILE[.sa][.da][.lcp][.gsa][.bin]");
+	puts("\t--sa    [w]           computes SA  using w (def 4) bytes (FILE.w.sa)");
+	puts("\t--lcp   [w]           computes LCP (FILE.w.lcp)");
+	puts("\t--da    [w]           computes DA  (FILE.w.da)");
+	puts("\t--gsa   [w1][w2]      computes GSA=(text, suff) using pairs of (w1, w2) bytes (FILE.w1.w2.gsa)");
+	puts("\t--gesa  [w1][w2][w3]  computes GESA=(GSA.text, GSA.suff, LCP, BWT) (FILE.w1.w2.w3.1.gesa)");
+	puts("\t--bwt                 computes BWT using 1 byte (FILE.1.bwt)");
+	puts("\t--bin                 computes T^{cat} (FILE.1.bin)");
+	puts("\t--docs    d           number of strings (def all FILE)");
+	puts("\t--print   p           print arrays (stdout) A[1,p]");
+	puts("\t--output  outfile     renames output file");
+	puts("\t--verbose             verbose output");
+	puts("\t--time                output time (seconds)");
+	puts("\t--help                this help message");
   exit(EXIT_FAILURE);
 }
 
@@ -272,7 +270,7 @@ int main(int argc, char** argv){
 		if(lcp) store_to_disk(NULL, LCP,	NULL,	NULL, n, c_output, "lcp",	lcp_bytes, 0, 0);
 		if(da)	store_to_disk(NULL, DA,		NULL,	NULL, n, c_output, "da",	da_bytes,	 0, 0);
 		if(gsa) store_to_disk(NULL,	DA,		SA,		NULL, n, c_output, "gsa", t_bytes, s_bytes, 0);
-		if(gesa) store_to_disk(NULL,DA,		SA,		LCP,  n, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
+		if(gesa) store_to_disk(str ,DA,		SA,		LCP,  n, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
 		if(bwt) store_to_disk(str,	SA,		NULL,	NULL, n, c_output, "bwt", sizeof(char), 0, 0);
 	
 		if(time){
@@ -285,7 +283,7 @@ int main(int argc, char** argv){
 		if(print){
 			printf("## print ##\n");
 			if(!p)p=n;
-			print_array(str, SA, LCP, DA, bin=1, sa, da, bwt, gsa || gesa, n, min(n,p));
+			print_array(str, SA, LCP, DA, bin=1, sa, da, bwt || gesa, gsa || gesa, n, min(n,p));
 		}
 
 		//free memory
@@ -304,7 +302,7 @@ int main(int argc, char** argv){
 			if(lcp)	printf("LCP = %d bytes\n", lcp_bytes);
 			if(da)	printf("DA  = %d bytes\n", da_bytes);
 			if(gsa)	printf("GSA = (%d, %d) bytes\n", t_bytes, s_bytes);
-			if(gesa)	printf("GESA = (%d, %d, %d) bytes\n", t_bytes, s_bytes, lcp_bytes);
+			if(gesa)	printf("GESA = (%d, %d, %d, 1) bytes\n", t_bytes, s_bytes, lcp_bytes);
 			printf("########\n");
 		}
 	
@@ -322,18 +320,19 @@ int main(int argc, char** argv){
 		if(lcp)	n = load_from_disk(NULL, &LCP, NULL, NULL, c_output, "lcp", lcp_bytes, 0, 0);
 		if(da)	n = load_from_disk(NULL, &DA,	 NULL, NULL, c_output, "da", da_bytes, 0, 0);
 		if(gsa)	n = load_from_disk(NULL, &GSA_text, &GSA_suff, NULL, c_output, "gsa", t_bytes, s_bytes, 0);
-		if(gesa)	n = load_from_disk(NULL, &GSA_text, &GSA_suff, &LCP, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
+		if(gesa)	n = load_from_disk(&BWT, &GSA_text, &GSA_suff, &LCP, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
 		if(bwt)	n = load_from_disk(&BWT, NULL,	NULL, NULL, c_output, "bwt", 1, 0, 0);
 	
 		if(print){
+			printf("## print ##\n");
 			// output
 			printf("i\t");
 			if(sa)  printf("SA\t");
 			if(da)  printf("DA\t");
-			if(LCP) printf("LCP\t");
 			if(gsa) printf("GSA\t\t");
 			if(gesa) printf("GESA\t\t");
-			if(bwt) printf("BWT\t");
+			if(LCP) printf("LCP\t");
+			if(bwt || gesa) printf("BWT\t");
 			if(bin)	printf("suffixes");
 			printf("\n");
 
@@ -342,9 +341,9 @@ int main(int argc, char** argv){
 	  	  printf("%" PRIdN "\t",i);
 			  if(sa)  printf("%" PRIdN "\t",SA[i]);
 				if(da)  printf("%" PRIdN "\t",DA[i]);
-				if(LCP) printf("%" PRIdN "\t",LCP[i]);
 				if(gsa || gesa) printf("(%" PRIdN ", %" PRIdN ")   \t", GSA_text[i], GSA_suff[i]);
-				if(bwt) printf("%c\t",BWT[i]);
+				if(LCP) printf("%" PRIdN "\t",LCP[i]);
+				if(bwt || gesa) printf("%c\t",BWT[i]);
 				if(bin && sa){
 					int_t j=SA[i];
 					while(j<n){
@@ -389,12 +388,15 @@ int store_to_disk(unsigned char *str, int_t *A, int_t *B,  int_t *C, size_t n, c
 	if(strcmp(ext, "gsa")==0)
 	  sprintf(c_out, "%s.%d.%d.%s", c_file, wsize1, wsize2, ext);
 	else if(strcmp(ext, "gesa")==0)
-	  sprintf(c_out, "%s.%d.%d.%d.%s", c_file, wsize1, wsize2, wsize3, ext);
+	  sprintf(c_out, "%s.%d.%d.%d.1.%s", c_file, wsize1, wsize2, wsize3, ext);
 	else
 		sprintf(c_out, "%s.%d.%s", c_file, wsize1, ext);
   FILE *f_out = file_open(c_out, "wb");
 
-	printf("%s\t%zu bytes (n = %zu)\n", c_out, n*(wsize1+wsize2+wsize3), n);
+	size_t wsize = wsize1+wsize2+wsize3;
+	if(strcmp(ext, "gesa")==0) wsize++;
+
+	printf("%s\t%zu bytes (n = %zu)\n", c_out, n*wsize, n);
 
 	size_t i;
 	if(strcmp(ext, "gsa")==0){
@@ -407,9 +409,15 @@ int store_to_disk(unsigned char *str, int_t *A, int_t *B,  int_t *C, size_t n, c
 	else if(strcmp(ext, "gesa")==0){
 		for(i=0; i<n; i++){
 			int_t value = (A[i]==0)?B[i]:B[i]-B[A[i]]-1; //DA==A, SA==B
+			//GSA
 			fwrite(&A[i], wsize1, 1, f_out);
 			fwrite(&value, wsize2, 1, f_out);
+			//LCP
 			fwrite(&C[i], wsize3, 1, f_out);
+			//BWT
+			char c = (B[i])? str[B[i]-1]-1:'#'; //SA==B
+			if(c==0) c = '$';
+			fwrite(&c, sizeof(char), 1, f_out);
 		}
 	}
 	else if(strcmp(ext, "bwt")==0){
@@ -445,14 +453,17 @@ size_t load_from_disk(unsigned char **str, int_t **A, int_t **B, int_t **C, char
 	if(strcmp(ext, "gsa")==0)
 		sprintf(c_in, "%s.%d.%d.%s", c_file, wsize1, wsize2, ext);
 	else if(strcmp(ext, "gesa")==0)
-	  sprintf(c_in, "%s.%d.%d.%d.%s", c_file, wsize1, wsize2, wsize3, ext);
+	  sprintf(c_in, "%s.%d.%d.%d.1.%s", c_file, wsize1, wsize2, wsize3, ext);
 	else
 		sprintf(c_in, "%s.%d.%s", c_file, wsize1, ext);
 
   FILE *f_in = file_open(c_in, "rb");
   size_t size = file_size(f_in);
                                                             
-  size_t n = size/(wsize1+wsize2);
+	size_t wsize = wsize1+wsize2+wsize3;
+	if(strcmp(ext, "gesa")==0) wsize++;
+
+  size_t n = size/wsize;
 
 	printf("%s\t%zu bytes (n = %zu)\n", c_in, size, n);
 
@@ -469,6 +480,9 @@ size_t load_from_disk(unsigned char **str, int_t **A, int_t **B, int_t **C, char
 		if(C!=NULL){
 			*C = (int_t*) malloc(n*sizeof(int_t));
 		}
+		if(strcmp(ext, "gesa")==0){
+			*str = (unsigned char*) malloc(n*sizeof(unsigned char));
+		}
 		size_t i;
 		for(i=0; i<n; i++){
 			int_t value=0;
@@ -479,9 +493,15 @@ size_t load_from_disk(unsigned char **str, int_t **A, int_t **B, int_t **C, char
 				fread(&value, wsize2, 1, f_in);
 				(*B)[i] = (int_t) value;
 			}
+			//LCP (gesa)
 			if(C){
 				fread(&value, wsize3, 1, f_in);
 				(*C)[i] = (int_t) value;
+			}
+			//BWT (gesa)
+			if(strcmp(ext, "gesa")==0){
+				fread(&value, sizeof(char), 1, f_in);
+				(*str)[i] = (char) value;
 			}
 		}
 	}
