@@ -15,25 +15,26 @@ make compile
 Given a string collection in a single file FILE.
 
 ```sh
-./gsufsort FILE [--sa [w]] [--sa [w]] [--lcp [w]] [--da [w]] [--da [w1][w2]] [--bwt] [--bin] [--docs d] [--print p] [--output out]
+./gsufsort FILE [--sa [w]] [--sa [w]] [--lcp [w]] [--da [w]] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print p] [--output out]
 ```
 
 Available options:
 
 ```sh
---build		(default)
---load		load from disk FILE[.sa][.da][.lcp][.gsa][.bin]
---sa		[w]	computes SA  using w (def 4) bytes (FILE.w.sa)
---lcp		[w]	computes LCP using w bytes (FILE.w.lcp)
---da		[w]	computes DA  using w bytes (FILE.w.da)
---gsa		[w1][w2]	computes GSA using pairs of (w1, w2) bytes (FILE.w1.w1.gsa)
---bwt		computes BWT using 1 byte (FILE.1.bwt)
---bin		computes T^{cat} using 1 byte (FILE.1.bin)
---docs		d	number of strings (def all FILE)
---print		p	print arrays (stdout) A[1,p]
---output	out	renames output file
---verbose	verbose output
---help		this help message
+--build	              (default)
+--load                load from disk FILE[.sa][.da][.lcp][.gsa][.bin]
+--sa    [w]           computes SA  using w (def 4) bytes (FILE.w.sa)
+--lcp   [w]           computes LCP (FILE.w.lcp)
+--da    [w]           computes DA  (FILE.w.da)
+--gsa   [w1][w2]      computes GSA=(text, suff) using pairs of (w1, w2) bytes (FILE.w1.w2.gsa)
+--gesa  [w1][w2][w3]  computes GESA=(GSA, LCP, BWT) (FILE.w1.w2.w3.1.gesa)
+--bwt                 computes BWT using 1 byte (FILE.1.bwt)
+--bin                 computes T^{cat} (FILE.1.bin)
+--docs    d           number of strings (def all FILE)
+--print   p           print arrays (stdout) A[1,p]
+--output  outfile     renames output file
+--verbose             verbose output
+--help                this help message
 ```
 _Notes:_ 
 - Supported extensions are _.txt_, _.fasta_ and _.fastq_.
