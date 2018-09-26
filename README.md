@@ -15,7 +15,7 @@ make compile
 Given a string collection in a single file FILE.
 
 ```sh
-./gsufsort FILE [--sa [w]] [--sa [w]] [--lcp [w]] [--da [w]] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print p] [--output out]
+./gsufsort FILE [--sa [w]] [--sa [w]] [--lcp [w]] [--da [w]] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--output out]
 ```
 
 Available options:
@@ -31,7 +31,7 @@ Available options:
 --bwt                 computes BWT using 1 byte (FILE.1.bwt)
 --bin                 computes T^{cat} (FILE.1.bin)
 --docs    d           number of strings (def all FILE)
---print   p           print arrays (stdout) A[1,p]
+--print   [p]         print arrays (stdout) A[1,min(p,N)]
 --output  outfile     renames output file
 --verbose             verbose output
 --help                this help message
@@ -54,10 +54,10 @@ dataset/input-10000.txt.1.bwt	19 bytes (n = 19)
 malloc_count ### exiting, total: 24,676, peak: 13,209, current: 1,033
 ```
 
-To see the result (--print 10) stored in disk FILE.4.sa and FILE.1.bwt, type
+To see the result (--print 10) stored in disk FILE.4.sa and FILE.1.bwt, use **--load** option:
 
 ```sh
-./gsufsort dataset/input-10000.txt --sa --bwt --print 10
+./gsufsort dataset/input-10000.txt --sa --bwt --load --print 10
 ```
 
 ```sh
