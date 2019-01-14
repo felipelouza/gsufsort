@@ -436,10 +436,14 @@ int store_to_disk(unsigned char *str, int_t *A, int_t *B,  int_t *C, size_t n, c
     }
   }
   else if(strcmp(ext, "bwt")==0){
-    for(i=0; i<n; i++){
-      char c = (A[i])? str[A[i]-1]-1:'#'; //SA==A
-      if(c==0) c = '$';
-      fwrite(&c, wsize1, 1, f_out);
+    for(i=0; i<n; i++){ //SA==A
+      #if LAST_END
+        char c = (A[i])? str[A[i]-1]:0; 
+        c = (c==1)?c:c-1; //separators = 1, and terminator = 0
+      #else
+        char c = (A[i])? str[A[i]-1]-1:0; //separators = 0, no terminator
+      #endif
+      fwrite(&c, wsize1, 1, f_out); 
     }
   }
   else if(strcmp(ext, "bin")==0){
