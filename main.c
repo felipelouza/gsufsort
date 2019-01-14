@@ -24,6 +24,10 @@
   #define DEBUG 0 
 #endif
 
+#ifndef LAST_END
+  #define LAST_END 0
+#endif
+
 int store_to_disk(unsigned char *str, int_t *A, int_t *B, int_t *C, size_t n, char* c_file, char *ext, int wsize1, int wsize2, int wsize3);
 size_t load_from_disk(unsigned char **str, int_t **A, int_t **B, int_t **C, char* c_file, char *ext, int wsize1, int wsize2, int wsize3);
 
@@ -264,14 +268,25 @@ int main(int argc, char** argv){
     }
     printf("## store_to_disk ##\n");
   
-    //store to disk
-    if(bin)  store_to_disk(str, NULL, NULL,  NULL, n, c_output, "bin",  sizeof(char), 0, 0);
-    if(sa)  store_to_disk(NULL, SA,   NULL,  NULL, n, c_output, "sa",  sa_bytes,   0, 0);
-    if(lcp) store_to_disk(NULL, LCP,  NULL,  NULL, n, c_output, "lcp",  lcp_bytes, 0, 0);
-    if(da)  store_to_disk(NULL, DA,   NULL,  NULL, n, c_output, "da",  da_bytes,   0, 0);
-    if(gsa) store_to_disk(NULL, DA,   SA,    NULL, n, c_output, "gsa", t_bytes, s_bytes, 0);
-    if(gesa) store_to_disk(str, DA,   SA,    LCP,  n, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
-    if(bwt) store_to_disk(str,  SA,   NULL,  NULL, n, c_output, "bwt", sizeof(char), 0, 0);
+    #if LAST_END  
+      //store to disk
+      if(bin) store_to_disk(str, NULL, NULL,  NULL, n, c_output, "bin",  sizeof(char), 0, 0);
+      if(sa)  store_to_disk(NULL, SA,   NULL, NULL, n, c_output, "sa",  sa_bytes,   0, 0);
+      if(lcp) store_to_disk(NULL, LCP,  NULL, NULL, n, c_output, "lcp", lcp_bytes, 0, 0);
+      if(da)  store_to_disk(NULL, DA,   NULL, NULL, n, c_output, "da",  da_bytes,   0, 0);
+      if(gsa) store_to_disk(NULL, DA,   SA,   NULL, n, c_output, "gsa", t_bytes, s_bytes, 0);
+      if(gesa) store_to_disk(str, DA,   SA,   LCP,  n, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
+      if(bwt) store_to_disk(str,  SA,   NULL, NULL, n, c_output, "bwt", sizeof(char), 0, 0);
+    #else
+      //store to disk (+1 ignores last terminator)
+      if(bin) store_to_disk(str, NULL, NULL,  NULL, n-1, c_output, "bin",  sizeof(char), 0, 0);
+      if(sa)  store_to_disk(NULL, SA+1,   NULL,  NULL,  n-1, c_output, "sa",  sa_bytes,   0, 0);
+      if(lcp) store_to_disk(NULL, LCP+1,  NULL,  NULL,  n-1, c_output, "lcp", lcp_bytes, 0, 0);
+      if(da)  store_to_disk(NULL, DA+1,   NULL,  NULL,  n-1, c_output, "da",  da_bytes,   0, 0);
+      if(gsa) store_to_disk(NULL, DA+1,   SA+1,  NULL,  n-1, c_output, "gsa", t_bytes, s_bytes, 0);
+      if(gesa) store_to_disk(str, DA+1,   SA+1,  LCP+1, n-1, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
+      if(bwt) store_to_disk(str,  SA+1,   NULL,  NULL,  n-1, c_output, "bwt", sizeof(char), 0, 0);
+    #endif
   
     if(time){
       double d_time = time_stop(t_start, c_start);
@@ -316,11 +331,11 @@ int main(int argc, char** argv){
   
     size_t n=0;
     if(bin)  n = load_from_disk(&str, NULL, NULL, NULL, c_output, "bin", 1, 0, 0);
-    if(sa)  n = load_from_disk(NULL,  &SA,  NULL, NULL, c_output, "sa", sa_bytes, 0, 0);
+    if(sa)   n = load_from_disk(NULL,  &SA,  NULL, NULL, c_output, "sa", sa_bytes, 0, 0);
     if(lcp)  n = load_from_disk(NULL, &LCP, NULL, NULL, c_output, "lcp", lcp_bytes, 0, 0);
-    if(da)  n = load_from_disk(NULL,  &DA,  NULL, NULL, c_output, "da", da_bytes, 0, 0);
+    if(da)   n = load_from_disk(NULL,  &DA,  NULL, NULL, c_output, "da", da_bytes, 0, 0);
     if(gsa)  n = load_from_disk(NULL, &GSA_text, &GSA_suff, NULL, c_output, "gsa", t_bytes, s_bytes, 0);
-    if(gesa)  n = load_from_disk(&BWT,&GSA_text, &GSA_suff, &LCP, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
+    if(gesa) n = load_from_disk(&BWT,&GSA_text, &GSA_suff, &LCP, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
     if(bwt)  n = load_from_disk(&BWT, NULL,  NULL, NULL, c_output, "bwt", 1, 0, 0);
   
     if(print){
