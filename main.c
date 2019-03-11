@@ -28,6 +28,8 @@
   #define LAST_END 0
 #endif
 
+#define WORD (size_t)(pow(256,sizeof(int_t))/2.0)
+
 int store_to_disk(unsigned char *str, int_t *A, int_t *B, int_t *C, size_t n, char* c_file, char *ext, int wsize1, int wsize2, int wsize3);
 size_t load_from_disk(unsigned char **str, int_t **A, int_t **B, int_t **C, char* c_file, char *ext, int wsize1, int wsize2, int wsize3);
 
@@ -51,8 +53,8 @@ void usage(char *name){
   puts("\t--print   p           print arrays (stdout) A[1,p]");
   puts("\t--output  outfile     renames output file");
   puts("\t--verbose             verbose output");
-  puts("\t--lcp_max             outputs maximum LCP (from FILE.w.lcp)");
-  puts("\t--lcp_avg             outputs average LCP (from FILE.w.lcp)");
+  puts("\t--lcp_max             outputs maximum LCP");
+  puts("\t--lcp_avg             outputs average LCP");
   puts("\t--time                output time (seconds)");
   puts("\t--help                this help message");
   exit(EXIT_FAILURE);
@@ -201,6 +203,14 @@ int main(int argc, char** argv){
   
     //disk access
     R = (unsigned char**) file_load_multiple(c_input, &d, &n);
+
+		if(n>pow(2,3) && (sizeof(int_t)<8)){
+      fprintf(stderr, "####\n");
+			fprintf(stderr, "ERROR: INPUT LARGER THAN %.1lf GB (%.1lf GB)\n", WORD/pow(2,30), n/pow(2,30));
+		  fprintf(stderr, "PLEASE USE %s-64\n", argv[0]);
+      fprintf(stderr, "####\n");
+	    exit(EXIT_FAILURE);
+		}
   
     //concatenate all string
     unsigned char *str = cat_all(R, d, &n, verbose);

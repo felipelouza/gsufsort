@@ -7,7 +7,7 @@ This software builds SA, LCP, DA, GSA and BWT for **string collections** using g
 ```sh
 git clone https://bitbucket.org/louza/gsufsort/ 
 cd gsufsort
-make compile
+make 
 ```
 
 ## run
@@ -32,12 +32,17 @@ Available options:
 --bin                 computes T^{cat} (FILE.1.bin)
 --docs    d           number of strings (def all FILE)
 --print   [p]         print arrays (stdout) A[1,min(p,N)]
+--lcp_max             outputs maximum LCP
+--lcp_avg             outputs average LCP
+--time                output time (seconds)
 --output  outfile     renames output file
 --verbose             verbose output
 --help                this help message
 ```
 _Notes:_ 
 - Supported extensions are _.txt_, _.fasta_ and _.fastq_.
+
+- For inputs larger than 2GB, use _gsufsort-64_
 
 ## quick test
 
