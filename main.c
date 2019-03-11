@@ -51,6 +51,8 @@ void usage(char *name){
   puts("\t--print   p           print arrays (stdout) A[1,p]");
   puts("\t--output  outfile     renames output file");
   puts("\t--verbose             verbose output");
+  puts("\t--lcp_max             outputs maximum LCP (from FILE.w.lcp)");
+  puts("\t--lcp_avg             outputs average LCP (from FILE.w.lcp)");
   puts("\t--time                output time (seconds)");
   puts("\t--help                this help message");
   exit(EXIT_FAILURE);
@@ -64,7 +66,7 @@ int main(int argc, char** argv){
   time_t t_start=0;clock_t c_start=0;
   int_t i;
 
-  int sa=0, lcp=0, da=0, bwt=0, bin=0, gsa=0, gesa=0, time=0; //txt
+  int sa=0, lcp=0, da=0, bwt=0, bin=0, gsa=0, gesa=0, lcp_max=0, lcp_avg=0, time=0; //txt
   int sa_bytes=sizeof(int_t);
   int lcp_bytes=sizeof(int_t);
   int da_bytes=sizeof(int_t);
@@ -91,21 +93,23 @@ int main(int argc, char** argv){
     int option_index = 0;
 
     static struct option long_options[] = {
-      {"print",    optional_argument, 0, 'P'},
+      {"print",   optional_argument, 0, 'P'},
       {"sa",      optional_argument, 0, 'S'},
-      {"lcp",      optional_argument, 0, 'L'},
-      {"da",      optional_argument, 0,  'D'},
-      {"gsa",      optional_argument, 0, 'g'},
-      {"bwt",      no_argument,       0, 'B'},
-      {"bin",      no_argument,       0, 'T'},
+      {"lcp",     optional_argument, 0, 'L'},
+      {"da",      optional_argument, 0, 'D'},
+      {"gsa",     optional_argument, 0, 'g'},
+      {"bwt",     no_argument,       0, 'B'},
+      {"bin",     no_argument,       0, 'T'},
       {"docs",    required_argument, 0, 'd'},
       {"verbose", no_argument,       0, 'v'},
       {"time",    no_argument,       0, 't'},
       {"help",    no_argument,       0, 'h'},
       {"output",  required_argument, 0, 'o'},
-      {"build",    no_argument,       0, '1'},
+      {"build",   no_argument,       0, '1'},
       {"load",    no_argument,       0, '2'},
       {"gesa",    optional_argument, 0, 'G'},
+      {"lcp_max", optional_argument, 0, 'M'},
+      {"lcp_avg", optional_argument, 0, 'A'},
       {0,         0,                 0,  0 }
     };
 
@@ -154,6 +158,10 @@ int main(int argc, char** argv){
         gesa=1; break;
       case 'd':
         d = (int) atoi(optarg); break;
+      case 'M':
+        lcp=2; lcp_max=1; break;
+      case 'A':
+        lcp=2; lcp_avg=1; break;
       case 'h':
         usage(argv[0]); break;      
       case 'o':
@@ -272,7 +280,7 @@ int main(int argc, char** argv){
       //store to disk
       if(bin) store_to_disk(str, NULL, NULL,  NULL, n, c_output, "bin",  sizeof(char), 0, 0);
       if(sa)  store_to_disk(NULL, SA,   NULL, NULL, n, c_output, "sa",  sa_bytes,   0, 0);
-      if(lcp) store_to_disk(NULL, LCP,  NULL, NULL, n, c_output, "lcp", lcp_bytes, 0, 0);
+      if(lcp==1) store_to_disk(NULL, LCP,  NULL, NULL, n, c_output, "lcp", lcp_bytes, 0, 0);
       if(da)  store_to_disk(NULL, DA,   NULL, NULL, n, c_output, "da",  da_bytes,   0, 0);
       if(gsa) store_to_disk(NULL, DA,   SA,   NULL, n, c_output, "gsa", t_bytes, s_bytes, 0);
       if(gesa) store_to_disk(str, DA,   SA,   LCP,  n, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
@@ -281,7 +289,7 @@ int main(int argc, char** argv){
       //store to disk (+1 ignores last terminator)
       if(bin) store_to_disk(str, NULL, NULL,  NULL, n-1, c_output, "bin",  sizeof(char), 0, 0);
       if(sa)  store_to_disk(NULL, SA+1,   NULL,  NULL,  n-1, c_output, "sa",  sa_bytes,   0, 0);
-      if(lcp) store_to_disk(NULL, LCP+1,  NULL,  NULL,  n-1, c_output, "lcp", lcp_bytes, 0, 0);
+      if(lcp==1) store_to_disk(NULL, LCP+1,  NULL,  NULL,  n-1, c_output, "lcp", lcp_bytes, 0, 0);
       if(da)  store_to_disk(NULL, DA+1,   NULL,  NULL,  n-1, c_output, "da",  da_bytes,   0, 0);
       if(gsa) store_to_disk(NULL, DA+1,   SA+1,  NULL,  n-1, c_output, "gsa", t_bytes, s_bytes, 0);
       if(gesa) store_to_disk(str, DA+1,   SA+1,  LCP+1, n-1, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
@@ -300,6 +308,17 @@ int main(int argc, char** argv){
       if(!p)p=n;
       print_array(str, SA, LCP, DA, bin=1, sa, da, bwt || gesa, gsa || gesa, n, min(n,p));
     }
+
+		if(lcp_max || lcp_avg){
+			int_t max=0;
+			double avg=0.0;
+      for(i=0; i<n; i++){
+				if(LCP[i]>max) max=LCP[i];
+				avg+=(double)LCP[i]/(double)n;
+			}
+			if(lcp_max) printf("LCP max: %" PRIdN "\n", max);
+			if(lcp_avg) printf("LCP avg: %.2lf\n", avg);
+		}
 
     //free memory
     free(str);
@@ -338,6 +357,18 @@ int main(int argc, char** argv){
     if(gesa) n = load_from_disk(&BWT,&GSA_text, &GSA_suff, &LCP, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
     if(bwt)  n = load_from_disk(&BWT, NULL,  NULL, NULL, c_output, "bwt", 1, 0, 0);
   
+
+		if(lcp_max || lcp_avg){
+			int_t max=0;
+			double avg=0.0;
+      for(i=0; i<n; i++){
+				if(LCP[i]>max) max=LCP[i];
+				avg+=(double)LCP[i]/(double)n;
+			}
+			if(lcp_max) printf("LCP max: %" PRIdN "\n", max);
+			if(lcp_avg) printf("LCP avg: %.2lf\n", avg);
+		}
+
     if(print){
       printf("## print ##\n");
       // output
