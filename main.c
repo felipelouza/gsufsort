@@ -204,13 +204,13 @@ int main(int argc, char** argv){
     //disk access
     R = (unsigned char**) file_load_multiple(c_input, &d, &n);
 
-		if(n>pow(2,3) && (sizeof(int_t)<8)){
+    if(n>pow(2,3) && (sizeof(int_t)<8)){
       fprintf(stderr, "####\n");
-			fprintf(stderr, "ERROR: INPUT LARGER THAN %.1lf GB (%.1lf GB)\n", WORD/pow(2,30), n/pow(2,30));
-		  fprintf(stderr, "PLEASE USE %s-64\n", argv[0]);
+      fprintf(stderr, "ERROR: INPUT LARGER THAN %.1lf GB (%.1lf GB)\n", WORD/pow(2,30), n/pow(2,30));
+      fprintf(stderr, "PLEASE USE %s-64\n", argv[0]);
       fprintf(stderr, "####\n");
-	    exit(EXIT_FAILURE);
-		}
+      exit(EXIT_FAILURE);
+    }
   
     //concatenate all string
     unsigned char *str = cat_all(R, d, &n, verbose);
@@ -319,16 +319,16 @@ int main(int argc, char** argv){
       print_array(str, SA, LCP, DA, bin=1, sa, da, bwt || gesa, gsa || gesa, n, min(n,p));
     }
 
-		if(lcp_max || lcp_avg){
-			int_t max=0;
-			double avg=0.0;
+    if(lcp_max || lcp_avg){
+      int_t max=0;
+      double avg=0.0;
       for(i=0; i<n; i++){
-				if(LCP[i]>max) max=LCP[i];
-				avg+=(double)LCP[i]/(double)n;
-			}
-			if(lcp_max) printf("LCP max: %" PRIdN "\n", max);
-			if(lcp_avg) printf("LCP avg: %.2lf\n", avg);
-		}
+        if(LCP[i]>max) max=LCP[i];
+        avg+=(double)LCP[i]/(double)n;
+      }
+      if(lcp_max) printf("LCP max: %" PRIdN "\n", max);
+      if(lcp_avg) printf("LCP avg: %.2lf\n", avg);
+    }
 
     //free memory
     free(str);
@@ -368,16 +368,16 @@ int main(int argc, char** argv){
     if(bwt)  n = load_from_disk(&BWT, NULL,  NULL, NULL, c_output, "bwt", 1, 0, 0);
   
 
-		if(lcp_max || lcp_avg){
-			int_t max=0;
-			double avg=0.0;
+    if(lcp_max || lcp_avg){
+      int_t max=0;
+      double avg=0.0;
       for(i=0; i<n; i++){
-				if(LCP[i]>max) max=LCP[i];
-				avg+=(double)LCP[i]/(double)n;
-			}
-			if(lcp_max) printf("LCP max: %" PRIdN "\n", max);
-			if(lcp_avg) printf("LCP avg: %.2lf\n", avg);
-		}
+        if(LCP[i]>max) max=LCP[i];
+        avg+=(double)LCP[i]/(double)n;
+      }
+      if(lcp_max) printf("LCP max: %" PRIdN "\n", max);
+      if(lcp_avg) printf("LCP avg: %.2lf\n", avg);
+    }
 
     if(print){
       printf("## print ##\n");
