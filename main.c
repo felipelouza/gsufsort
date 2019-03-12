@@ -204,7 +204,7 @@ int main(int argc, char** argv){
     //disk access
     R = (unsigned char**) file_load_multiple(c_input, &d, &n);
 
-    if(n>pow(2,3) && (sizeof(int_t)<8)){
+    if(n>pow(2,30) && (sizeof(int_t)<8)){
       fprintf(stderr, "####\n");
       fprintf(stderr, "ERROR: INPUT LARGER THAN %.1lf GB (%.1lf GB)\n", WORD/pow(2,30), n/pow(2,30));
       fprintf(stderr, "PLEASE USE %s-64\n", argv[0]);
