@@ -33,7 +33,10 @@ FILE* file_open(char *c_file, const char * c_mode){
 	FILE* f_in;
 	
 	f_in = fopen(c_file, c_mode);
-	if (!f_in) perror ("file_open");
+	if(!f_in){
+    fprintf(stderr, "%s\n", c_file);
+    perror ("file_open");
+  }
 
 	fseek(f_in, 0, SEEK_SET);
 	

@@ -15,8 +15,14 @@ make
 Given a string collection in a single file FILE.
 
 ```sh
-./gsufsort FILE [--sa [w]] [--sa [w]] [--lcp [w]] [--da [w]] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--output out]
+./gsufsort FILE [--sa [w]] [--sa [w]] [--lcp [w]] [--da [w]] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--lcp_max] [--lcp_avg] [--lcp_cat [k]] [--output out]
 ```
+
+_Notes:_ 
+- For inputs **larger than 2GB**, use _gsufsort-64_
+
+- Supported extensions are _.txt_, _.fasta_ and _.fastq_.
+
 
 Available options:
 
@@ -34,15 +40,12 @@ Available options:
 --print   [p]         print arrays (stdout) A[1,min(p,N)]
 --lcp_max             outputs maximum LCP-value
 --lcp_avg             outputs average LCP-value
+--lcp_cat k           outputs k-truncated LCP array (FILE.w.lcp)
 --time                outputs time (in seconds)
 --output  outfile     renames output file
 --verbose             verbose output
 --help                this help message
 ```
-_Notes:_ 
-- Supported extensions are _.txt_, _.fasta_ and _.fastq_.
-
-- For inputs larger than 2GB, use _gsufsort-64_
 
 ## quick test
 
