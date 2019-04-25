@@ -111,7 +111,7 @@ unsigned char* cat_all(unsigned char** R, int k, size_t *n, int verbose){
 		for(j=0; j<m; j++){
 			if(R[i][j]<255) str[l++] = R[i][j]+1;
 		}
-		str[l++] = 1; //add 1 as separator
+    if(m) str[l++] = 1; //add 1 as separator (ignores empty entries)
 	}
 
 	str[l++]=0;
@@ -120,7 +120,7 @@ unsigned char* cat_all(unsigned char** R, int k, size_t *n, int verbose){
 	}
 	*n = l;
 
-//	if(verbose)	printf("longest string = %d\n", max);
+  if(verbose) printf("longest string = %" PRIdN "\n", max);
 
 return str;
 }

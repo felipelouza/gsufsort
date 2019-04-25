@@ -55,7 +55,7 @@ void usage(char *name){
   puts("\t--verbose             verbose output");
   puts("\t--lcp_max             outputs maximum LCP");
   puts("\t--lcp_avg             outputs average LCP");
-  puts("\t--lcp_cat k           outputs k-truncated LCP array (FILE.w.lcp)");
+  puts("\t--trlcp   k           outputs k-truncated LCP array (FILE.w.lcp)");
   puts("\t--time                output time (seconds)");
   puts("\t--help                this help message");
   exit(EXIT_FAILURE);
@@ -69,7 +69,7 @@ int main(int argc, char** argv){
   time_t t_start=0;clock_t c_start=0;
   int_t i;
 
-  int sa=0, lcp=0, da=0, bwt=0, bin=0, gsa=0, gesa=0, lcp_max=0, lcp_avg=0, lcp_cat=0,time=0; //txt
+  int sa=0, lcp=0, da=0, bwt=0, bin=0, gsa=0, gesa=0, lcp_max=0, lcp_avg=0, trlcp=0,time=0; //txt
   int sa_bytes=sizeof(int_t);
   int lcp_bytes=sizeof(int_t);
   int da_bytes=sizeof(int_t);
@@ -113,7 +113,7 @@ int main(int argc, char** argv){
       {"gesa",    optional_argument, 0, 'G'},
       {"lcp_max", optional_argument, 0, 'M'},
       {"lcp_avg", optional_argument, 0, 'A'},
-      {"lcp_cat", required_argument, 0, 'c'},
+      {"trlcp",   required_argument, 0, 'c'},
       {0,         0,                 0,  0 }
     };
 
@@ -167,7 +167,7 @@ int main(int argc, char** argv){
       case 'A':
         lcp_avg=1; break;
       case 'c':
-        lcp_cat = (int) atoi(optarg);
+        trlcp = (int) atoi(optarg);
         lcp=1; break;
       case 'h':
         usage(argv[0]); break;      
@@ -291,8 +291,8 @@ int main(int argc, char** argv){
     }
     printf("## store_to_disk ##\n");
   
-    if(lcp_cat){
-      for(i=0; i<n; i++) if(LCP[i]>lcp_cat) LCP[i]=lcp_cat;
+    if(trlcp){
+      for(i=0; i<n; i++) if(LCP[i]>trlcp) LCP[i]=trlcp;
     }
 
     #if LAST_END  
@@ -379,8 +379,8 @@ int main(int argc, char** argv){
     if(gesa) n = load_from_disk(&BWT,&GSA_text, &GSA_suff, &LCP, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
     if(bwt)  n = load_from_disk(&BWT, NULL,  NULL, NULL, c_output, "bwt", 1, 0, 0);
   
-    if(lcp_cat){
-      for(i=0; i<n; i++) if(LCP[i]>lcp_cat) LCP[i]=lcp_cat;
+    if(trlcp){
+      for(i=0; i<n; i++) if(LCP[i]>trlcp) LCP[i]=trlcp;
     }
 
     if(lcp_max || lcp_avg){
