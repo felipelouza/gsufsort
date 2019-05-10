@@ -128,7 +128,7 @@ return str;
 
 /**********************************************************************/
 
-int print_array(unsigned char *str, int_t *SA, int_t *LCP, int_t *DA, int bin, int sa, int da, int bwt, int gsa, size_t n, size_t m){
+int print_array(unsigned char *str, int_da *DA, int_t *SA, int_t *LCP, int bin, int da, int sa, int bwt, int gsa, size_t n, size_t m){
 
 	size_t i,j;
 
@@ -146,10 +146,10 @@ int print_array(unsigned char *str, int_t *SA, int_t *LCP, int_t *DA, int bin, i
 
 		printf("%zu\t",i);
 		if(sa) 	printf("%" PRIdN "\t",SA[i]);
-		if(da)	printf("%" PRIdN "\t",DA[i]);
+		if(da)	printf("%" PRIdA "\t",DA[i]);
 		if(LCP)	printf("%" PRIdN "\t",LCP[i]);
 		if(gsa){
-			printf("(%" PRIdN ", ", DA[i]);
+			printf("(%" PRIdA ", ", DA[i]);
 			int_t value = (DA[i]==0)?SA[i]:SA[i]-SA[DA[i]]-1;
 			printf("%" PRIdN ")   \t", value);
 		}

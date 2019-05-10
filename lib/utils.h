@@ -13,6 +13,8 @@
 #include <inttypes.h>
 #include <math.h>
 
+#include "../external/gsacak.h"
+
 #ifndef UCHAR_SIZE
 #define UCHAR_SIZE 256
 #endif
@@ -63,7 +65,7 @@ int_t print_char(char* A, int_t n);
 unsigned char* cat(unsigned char* s1, unsigned char* s2, size_t *n);
 unsigned char* cat_all(unsigned char** R, int k, size_t *n, int verbose);
 
-int print_array(unsigned char *str, int_t *SA, int_t *LCP, int_t *DA, int bin, int sa, int da, int bwt, int gsa, size_t n, size_t m);
+int print_array(unsigned char *str, int_da *DA, int_t *SA, int_t *LCP, int bin, int da, int sa, int bwt, int gsa, size_t n, size_t m);
 
 /**********************************************************************/
 
