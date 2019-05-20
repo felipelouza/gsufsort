@@ -25,8 +25,8 @@ rankbv_t*
 rankbv_create_A(uint64_t* A,size_t n,uint32_t f)
 {
     rankbv_t* rbv = rankbv_create(n,f);
-    size_t ints = n/RBVW+1;
-    for (size_t i=0; i<ints; i++) {
+    size_t ints = n/RBVW+1, i;
+    for (i=0; i<ints; i++) {
         size_t block = i/rbv->factor;
         rbv->S[(block+1)+(block*rbv->factor)+(i%rbv->factor)] = A[i];
         /*rbv->S[i+(i/rbv->factor)+1] = A[i];*/
@@ -92,7 +92,8 @@ rankbv_ones(rankbv_t* rbv)
 void
 rankbv_print(rankbv_t* rbv)
 {
-    for (size_t i = 0; i < rbv->n; ++i) {
+    size_t i;
+    for (i = 0; i < rbv->n; ++i) {
         if (rankbv_getbit(rbv,i)) printf("1");
         else printf("0");
     }
