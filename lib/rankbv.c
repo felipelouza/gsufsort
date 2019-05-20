@@ -2,6 +2,15 @@
 
 #include "string.h"
 
+
+inline void rankbv_setbit(rankbv_t* rbv,size_t i)
+{
+    size_t bs = i/rbv->s;
+    size_t block = bs + i/RBVW + 1;
+    rbv->S[block] |= (1LL<<(i%RBVW));
+}
+
+
 inline size_t
 rankbv_length(rankbv_t* rbv)
 {
@@ -35,14 +44,6 @@ rankbv_getdata(rankbv_t* rbv)
     size_t num_sblocks = rankbv_numsblocks(rbv);
     return (uint64_t*)(((char*)rbv) + sizeof(rankbv_t) +
                        (sizeof(uint64_t)*num_sblocks));
-}
-
-inline void
-rankbv_setbit(rankbv_t* rbv,size_t i)
-{
-    size_t bs = i/rbv->s;
-    size_t block = bs + i/RBVW + 1;
-    rbv->S[block] |= (1LL<<(i%RBVW));
 }
 
 inline int

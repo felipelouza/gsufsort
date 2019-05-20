@@ -32,7 +32,8 @@ size_t    rankbv_select1(rankbv_t* rbv,size_t x);
 size_t    rankbv_ones(rankbv_t* rbv);
 void      rankbv_print(rankbv_t* rbv);
 
-inline void rankbv_setbit(rankbv_t* rbv,size_t i);
+void rankbv_setbit(rankbv_t* rbv,size_t i);
+
 
 /* save/load */
 size_t    rankbv_spaceusage(rankbv_t* rbv);
