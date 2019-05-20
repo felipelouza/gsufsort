@@ -18,9 +18,9 @@
 
 #include "lib/utils.h"
 #include "lib/file.h"
-#include "lib/rankbv.h"
 #include "external/gsacak.h"
 //#include "lib/document_array.hpp"
+#include "lib/rankbv.h"
 
 #ifndef DEBUG
   #define DEBUG 0 
