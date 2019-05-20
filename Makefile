@@ -1,21 +1,31 @@
 CC = gcc
-CFLAGS += -Wall
-#CFLAGS += -g -O0
-CFLAGS += -D_FILE_OFFSET_BITS=64 -m64 -O3 -fomit-frame-pointer -Wno-char-subscripts 
+CXX = /usr/bin/c++ 
+LIB_DIR = ${HOME}/lib
+INC_DIR = ${HOME}/include
 
-LFLAGS = -lm -ldl
+#CCLIB= -lstdc++ -lsdsl  -I$(INC_DIR) -L$(LIB_DIR)
+LFLAGS = -lm -ldl -mpopcnt
+
+CFLAGS += -Wall
+CFLAGS += -D_FILE_OFFSET_BITS=64 -m64 -O3 -fomit-frame-pointer -Wno-char-subscripts $(CCLIB)
+
+MY_CXX_FLAGS= -std=c++11 -Wall -Wextra  -DNDEBUG -Wno-ignored-qualifiers 
+MY_CXX_OPT_FLAGS= -O3 -ffast-math -funroll-loops -m64 -fomit-frame-pointer -D_FILE_OFFSET_BITS=64
+CXX_FLAGS=$(MY_CXX_FLAGS) $(MY_CXX_OPT_FLAGS) -I$(INC_DIR) -L$(LIB_DIR) $(LFLAGS)
 
 ##
 
 LIBOBJ = \
 	lib/file.o\
 	lib/utils.o\
+	lib/rankbv.o\
 	external/gsacak.o\
 	external/malloc_count/malloc_count.o
 	
 LIBOBJ_64 = \
 	lib/file.64.o\
 	lib/utils.64.o\
+	lib/rankbv.64.o\
 	external/gsacak.64.o\
 	external/malloc_count/malloc_count.64.o
 
@@ -23,10 +33,11 @@ LIBOBJ_64 = \
 
 DEBUG = 0
 M64 = 0
+LIGHT = 1
 
 ##
 
-DEFINES = -DDEBUG=$(DEBUG) 
+DEFINES = -DDEBUG=$(DEBUG) -DLIGHT=$(LIGHT)
 
 CFLAGS += $(DEFINES)
 
@@ -49,7 +60,15 @@ clean:
 remove:
 	\rm -f $(DIR)*.bin  $(DIR)*.sa $(DIR)*.da $(DIR)*.lcp $(DIR)*.bwt $(DIR)*.gsa $(DIR)*.gesa
 
-##
+###
+#
+#document_array: 
+#	$(CXX) $(CXX_FLAGS) -c lib/document_array.cpp -o lib/document_array.o -DM64=0
+#
+#document_array.64: 
+#	$(CXX) $(CXX_FLAGS) -c lib/document_array.cpp -o lib/document_array.64.o -DM64=0
+#
+###
 
 %.o: %.c
 	 $(CC) $(CFLAGS) -c -o $@ $< -DM64=0
