@@ -19,8 +19,8 @@
 #include "lib/utils.h"
 #include "lib/file.h"
 #include "external/gsacak.h"
-//#include "lib/document_array.hpp"
 #include "lib/rankbv.h"
+//#include "lib/document_array.hpp"
 
 #ifndef DEBUG
   #define DEBUG 0 
@@ -263,10 +263,7 @@ int main(int argc, char** argv){
     rankbv_t* rbv = NULL;
 
     if(da || gsa || gesa){
-    #if LIGHT
-      rbv = rankbv_create(n,0);
-      //for(i=0; i<n; i++) DA[i]=-1;
-    #else
+    #if LIGHT == 0
       DA = (int_da*) malloc(n*sizeof(int_da));
       assert(DA);
       //for(i=0; i<n; i++) DA[i]=-1;
@@ -296,13 +293,31 @@ int main(int argc, char** argv){
   /********/
   
     if(time){
-       time_start(&t_start, &c_start);
+      time_start(&t_start, &c_start);
       printf("## gsufsort ##\n");
     }
 
     #if LIGHT
+      gsacak(str, (uint_t*)SA, LCP, NULL, n);
+
+      //free LCP
+      if(trlcp){
+        for(i=0; i<n; i++) if(LCP[i]>trlcp) LCP[i]=trlcp;
+      }
+      if(lcp){
+        printf("## store_to_disk ##\n");
+        #if LAST_END  
+          store_to_disk(NULL, NULL, NULL, NULL, LCP,  n, c_output,  "lcp",  0, 0, lcp_bytes);
+        #else
+          store_to_disk(NULL, NULL,  NULL, NULL,  LCP+1, n-1, c_output, "lcp",  0, 0, lcp_bytes);
+        #endif
+      }
+      if(lcp && !lcp_avg && !lcp_max) free(LCP);
+      /**/
+
+      //compute DA
       if(da || gsa || gesa){
-        gsacak(str, (uint_t*)SA, LCP, NULL, n);
+        rbv = rankbv_create(n,0);
         int_t i=0;
         for(;i<n-1;i++) if(str[i]==1) rankbv_setbit(rbv,i+1);
         rankbv_build(rbv);
@@ -321,17 +336,18 @@ int main(int argc, char** argv){
     if(time){
        time_start(&t_start, &c_start);
     }
-    printf("## store_to_disk ##\n");
+    #if LIGHT
+      if(!lcp)
+    #endif
+        printf("## store_to_disk ##\n");
   
-    if(trlcp){
-      for(i=0; i<n; i++) if(LCP[i]>trlcp) LCP[i]=trlcp;
-    }
-
     #if LAST_END  
       //store to disk
       if(bin) store_to_disk(str,  NULL, NULL, NULL,  NULL, n, c_output, "bin",  sizeof(char), 0, 0);
       if(sa)  store_to_disk(NULL, NULL, NULL, SA,   NULL, n, c_output,  "sa",   0, sa_bytes, 0);
-      if(lcp) store_to_disk(NULL, NULL, NULL, NULL, LCP,  n, c_output,  "lcp",  0, 0, lcp_bytes);
+      #if LIGHT == 0
+        if(lcp) store_to_disk(NULL, NULL, NULL, NULL, LCP,  n, c_output,  "lcp",  0, 0, lcp_bytes);
+      #endif
       if(da)  store_to_disk(NULL, DA,   rbv,  SA,   NULL, n, c_output,  "da",   da_bytes, 0, 0);
       if(gsa) store_to_disk(NULL, DA,   rbv,  SA,   NULL, n, c_output,  "gsa",  t_bytes, s_bytes, 0);
       if(gesa) store_to_disk(str, DA,   rbv,  SA,   LCP,  n, c_output,  "gesa", t_bytes, s_bytes, lcp_bytes);
@@ -340,7 +356,9 @@ int main(int argc, char** argv){
       //store to disk (+1 ignores last terminator)
       if(bin) store_to_disk(str,  NULL,  NULL, NULL,  NULL,  n-1, c_output, "bin",  sizeof(char), 0, 0);
       if(sa)  store_to_disk(NULL, NULL,  NULL, SA+1,  NULL,  n-1, c_output, "sa",   0, sa_bytes, 0);
-      if(lcp) store_to_disk(NULL, NULL,  NULL, NULL,  LCP+1, n-1, c_output, "lcp",  0, 0, lcp_bytes);
+      #if LIGHT == 0
+        if(lcp) store_to_disk(NULL, NULL,  NULL, NULL,  LCP+1, n-1, c_output, "lcp",  0, 0, lcp_bytes);
+      #endif
       if(da)  store_to_disk(NULL, DA+1,  rbv,  SA+1,  NULL,  n-1, c_output, "da",   da_bytes, 0, 0);
       if(gsa) store_to_disk(NULL, DA+1,  rbv,  SA+1,  NULL,  n-1, c_output, "gsa",  t_bytes, s_bytes, 0);
       if(gesa) store_to_disk(str, DA+1,  rbv,  SA+1,  LCP+1, n-1, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
@@ -377,7 +395,11 @@ int main(int argc, char** argv){
     //free memory
     free(str);
     free(SA);
-    if(lcp || gesa || lcp_max || lcp_avg) free(LCP);
+    #if LIGHT
+      if(gesa || lcp_max || lcp_avg) free(LCP);
+    #else
+      if(lcp || gesa || lcp_max || lcp_avg) free(LCP);
+    #endif
     if(da || gsa || gesa){
       #if LIGHT
         rankbv_free(rbv);
