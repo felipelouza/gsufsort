@@ -31,7 +31,10 @@
 #endif
 
 #ifndef LIGHT 
-  #define LIGHT 0
+  #define LIGHT 1
+  #ifndef SDSL 
+    #define SDSL 1
+  #endif
 #endif
 
 #define WORD (size_t)(pow(256,sizeof(int_t))/2.0)
@@ -39,7 +42,7 @@
 int store_to_disk(unsigned char *str, int_da *DA, rankbv_t* rbv, int_t *SA,  int_t *LCP, size_t n, char* c_file, char *ext, int wsize1, int wsize2, int wsize3); 
 size_t load_from_disk(unsigned char **str, int_da **DA, int_t **SA, int_t **LCP, char* c_file, char *ext, int wsize1, int wsize2, int wsize3);
 
-//int document_array_wrapper(unsigned char *str, uint_t *SA, int_da *DA, int_t n);
+int document_array_wrapper(unsigned char *str, uint_t *SA, int_da *DA, int_t n, int_t d);
 
 /******************************************************************************/
 
@@ -312,15 +315,20 @@ int main(int argc, char** argv){
           store_to_disk(NULL, NULL,  NULL, NULL,  LCP+1, n-1, c_output, "lcp",  0, 0, lcp_bytes);
         #endif
       }
-      if(lcp && !lcp_avg && !lcp_max) free(LCP);
+      if(lcp && !gesa && !lcp_avg && !lcp_max) free(LCP);
       /**/
 
       //compute DA
       if(da || gsa || gesa){
-        rbv = rankbv_create(n,0);
-        int_t i=0;
-        for(;i<n-1;i++) if(str[i]==1) rankbv_setbit(rbv,i+1);
-        rankbv_build(rbv);
+        #if SDSL
+          DA = (int_da*) malloc(n*sizeof(int_da));
+          document_array_wrapper(str, (uint_t*)SA, DA, n, d);
+        #else
+          rbv = rankbv_create(n,0);
+          int_t i=0;
+          for(;i<n-1;i++) if(str[i]==1) rankbv_setbit(rbv,i+1);
+          rankbv_build(rbv);
+        #endif
       }
     #else
       gsacak(str, (uint_t*)SA, LCP, DA, n);
@@ -402,7 +410,11 @@ int main(int argc, char** argv){
     #endif
     if(da || gsa || gesa){
       #if LIGHT
-        rankbv_free(rbv);
+        #if SDSL
+          free(DA);
+        #else
+          rankbv_free(rbv);
+        #endif
       #else
         free(DA);
       #endif
@@ -540,7 +552,11 @@ int store_to_disk(unsigned char *str, int_da *DA, rankbv_t* rbv, int_t *SA,  int
   if(strcmp(ext, "gsa")==0){
     for(i=0; i<n; i++){
       #if LIGHT
-        int_t da_value = rankbv_rank1(rbv,SA[i]);
+        #if SDSL
+          int_t da_value = DA[i];
+        #else
+          int_t da_value = rankbv_rank1(rbv,SA[i]);
+        #endif
       #else
         int_t da_value = DA[i];
       #endif
@@ -553,7 +569,11 @@ int store_to_disk(unsigned char *str, int_da *DA, rankbv_t* rbv, int_t *SA,  int
     for(i=0; i<n; i++){
       //GSA
       #if LIGHT
-        int_t da_value = rankbv_rank1(rbv,SA[i]);
+        #if SDSL
+          int_t da_value = DA[i];
+        #else
+          int_t da_value = rankbv_rank1(rbv,SA[i]);
+        #endif
       #else
         int_t da_value = DA[i];
       #endif
@@ -593,7 +613,11 @@ int store_to_disk(unsigned char *str, int_da *DA, rankbv_t* rbv, int_t *SA,  int
   else if(strcmp(ext, "da")==0){
     for(i=0; i<n; i++){
       #if LIGHT
-        int_t da_value = rankbv_rank1(rbv,SA[i]);
+        #if SDSL
+          int_t da_value = DA[i];
+        #else
+          int_t da_value = rankbv_rank1(rbv,SA[i]);
+        #endif
       #else
         int_t da_value = DA[i];
       #endif

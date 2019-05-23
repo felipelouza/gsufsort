@@ -3,15 +3,18 @@ CXX = /usr/bin/c++
 LIB_DIR = ${HOME}/lib
 INC_DIR = ${HOME}/include
 
-#CCLIB= -lstdc++ -lsdsl  -I$(INC_DIR) -L$(LIB_DIR)
-LFLAGS = -lm -ldl -mpopcnt
+#WFLAGS= -Wall -Wextra  -DNDEBUG -Wno-ignored-qualifiers
+WFLAGS= -Wall 
+OPT_FLAGS= -O3 -ffast-math -funroll-loops -m64 -fomit-frame-pointer -D_FILE_OFFSET_BITS=64
+CCLIB= -lstdc++ -lsdsl  -I$(INC_DIR) -L$(LIB_DIR)
+LFLAGS = -lm -ldl 
+#-mpopcnt
 
-CFLAGS += -Wall
-CFLAGS += -D_FILE_OFFSET_BITS=64 -m64 -O3 -fomit-frame-pointer -Wno-char-subscripts $(CCLIB)
+CFLAGS = $(WFLAGS) $(OPT_FLAGS) 
+CFLAGS += $(LFLAGS)
 
-MY_CXX_FLAGS= -std=c++11 -Wall -Wextra  -DNDEBUG -Wno-ignored-qualifiers 
-MY_CXX_OPT_FLAGS= -O3 -ffast-math -funroll-loops -m64 -fomit-frame-pointer -D_FILE_OFFSET_BITS=64
-CXX_FLAGS=$(MY_CXX_FLAGS) $(MY_CXX_OPT_FLAGS) -I$(INC_DIR) -L$(LIB_DIR) $(LFLAGS)
+CXX_FLAGS = -std=c++11 $(WFLAGS) $(OPT_FLAGS)
+CXX_FLAGS += -I$(INC_DIR) -L$(LIB_DIR) $(LFLAGS)
 
 ##
 
@@ -34,10 +37,11 @@ LIBOBJ_64 = \
 DEBUG = 0
 M64 = 0
 LIGHT = 1
+SDSL = 1
 
 ##
 
-DEFINES = -DDEBUG=$(DEBUG) -DLIGHT=$(LIGHT)
+DEFINES = -DDEBUG=$(DEBUG) -DLIGHT=$(LIGHT) -DSDSL=$(SDSL)
 
 CFLAGS += $(DEFINES)
 
@@ -61,13 +65,13 @@ remove:
 	\rm -f $(DIR)*.bin  $(DIR)*.sa $(DIR)*.da $(DIR)*.lcp $(DIR)*.bwt $(DIR)*.gsa $(DIR)*.gesa
 
 ###
-#
-#document_array: 
-#	$(CXX) $(CXX_FLAGS) -c lib/document_array.cpp -o lib/document_array.o -DM64=0
-#
-#document_array.64: 
-#	$(CXX) $(CXX_FLAGS) -c lib/document_array.cpp -o lib/document_array.64.o -DM64=0
-#
+
+document_array: 
+	$(CXX) $(CXX_FLAGS) -c lib/document_array.cpp -o lib/document_array.o -DM64=0
+
+document_array.64: 
+	$(CXX) $(CXX_FLAGS) -c lib/document_array.cpp -o lib/document_array.64.o -DM64=0
+
 ###
 
 %.o: %.c
@@ -78,11 +82,11 @@ remove:
 
 ##
 
-compile: main.c ${LIBOBJ} 
-	$(CC) -o gsufsort main.c ${LIBOBJ} $(CFLAGS) $(LFLAGS) -DM64=0
+compile: main.c ${LIBOBJ} document_array 
+	$(CC) -o gsufsort main.c ${LIBOBJ} lib/document_array.o $(CFLAGS) $(CCLIB) -DM64=0
 
-compile-64: main.c ${LIBOBJ_64} 
-	$(CC) -o gsufsort-64 main.c ${LIBOBJ_64} $(CFLAGS) $(LFLAGS)  -DM64=1 
+compile-64: main.c ${LIBOBJ_64} document_array.64 
+	$(CC) -o gsufsort-64 main.c ${LIBOBJ_64} lib/document_array.64.o $(CFLAGS) $(CCLIB) -DM64=1 
 
 run:
 	./gsufsort $(DIR)$(INPUT) -v --sa
