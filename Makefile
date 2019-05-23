@@ -70,7 +70,7 @@ document_array:
 	$(CXX) $(CXX_FLAGS) -c lib/document_array.cpp -o lib/document_array.o -DM64=0
 
 document_array.64: 
-	$(CXX) $(CXX_FLAGS) -c lib/document_array.cpp -o lib/document_array.64.o -DM64=0
+	$(CXX) $(CXX_FLAGS) -c lib/document_array.cpp -o lib/document_array.64.o -DM64=1
 
 ###
 
