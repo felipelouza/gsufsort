@@ -15,7 +15,7 @@ make
 Given a string collection in a single file FILE.
 
 ```sh
-./gsufsort FILE [--sa [w]] [--sa [w]] [--lcp [w]] [--da [w]] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--lcp_max] [--lcp_avg] [--trlcp [k]] [--output out]
+./gsufsort FILE [--sa [w]] [--sa [w]] [--lcp [w]] [--da [w]] [--ligth] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--lcp_max] [--lcp_avg] [--trlcp [k]] [--output out]
 ```
 
 _Notes:_ 
@@ -33,6 +33,7 @@ Available options:
 --lcp   [w]           computes LCP (FILE.w.lcp)
 --da    [w]           computes DA  (FILE.w.da)
 --gsa   [w1][w2]      computes GSA=(text, suff) using pairs of (w1, w2) bytes (FILE.w1.w2.gsa)
+--light               runs lightweight algorithm to compute DA (also GSA)
 --gesa  [w1][w2][w3]  computes GESA=(GSA, LCP, BWT) (FILE.w1.w2.w3.1.gesa)
 --bwt                 computes BWT using 1 byte (FILE.1.bwt)
 --bin                 computes T^{cat} (FILE.1.bin)
