@@ -316,7 +316,7 @@ int main(int argc, char** argv){
 
       //compute DA
       if(da || gsa || gesa){
-        rbv = rankbv_create(n,0);
+        rbv = rankbv_create(n,2);
         int_t i=0;
         for(;i<n-1;i++) if(str[i]==1) rankbv_setbit(rbv,i+1);
         rankbv_build(rbv);

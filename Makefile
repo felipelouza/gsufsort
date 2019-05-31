@@ -42,9 +42,6 @@ DEFINES = -DDEBUG=$(DEBUG)
 
 CFLAGS += $(DEFINES)
 
-all: compile
-
-
 ##
 
 DIR = dataset/
