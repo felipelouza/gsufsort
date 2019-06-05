@@ -243,11 +243,15 @@ int main(int argc, char** argv){
     int_t *SA = NULL;
     SA = (int_t*) malloc(n*sizeof(int_t));
     assert(SA);
+    int_t i;
+    for(i=0; i<n; i++) SA[i]=0;
+
   
     int_t *LCP = NULL;  
     if(lcp || gesa || lcp_max || lcp_avg){
       LCP = (int_t*) malloc(n*sizeof(int_t));
       assert(LCP);
+      for(i=0; i<n; i++) LCP[i]=0;
     }
   
     int_da *DA = NULL;  
@@ -257,6 +261,7 @@ int main(int argc, char** argv){
       if(light==0){
         DA = (int_da*) malloc(n*sizeof(int_da));
         assert(DA);
+        for(i=0; i<n; i++) DA[i]=0;
       }
     }
   
