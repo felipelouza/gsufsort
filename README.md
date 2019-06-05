@@ -58,9 +58,9 @@ To run a test with docs=3 strings from dataset/input-10000.txt, type:
 
 ```sh
 ## store_to_disk ##
-dataset/input-10000.txt.4.sa	76 bytes (n = 19)
-dataset/input-10000.txt.1.bwt	19 bytes (n = 19)
-malloc_count ### exiting, total: 24,676, peak: 13,209, current: 1,033
+dataset/input-10000.txt.4.sa	72 bytes (n = 18)
+dataset/input-10000.txt.1.bwt	18 bytes (n = 18)
+malloc_count ### exiting, total: 32,859, peak: 21,420, current: 1,024
 ```
 
 To see the result (--print 10) stored in disk FILE.4.sa and FILE.1.bwt, use **--load** option:
@@ -74,17 +74,17 @@ To see the result (--print 10) stored in disk FILE.4.sa and FILE.1.bwt, use **--
 dataset/input-10000.txt.4.sa	76 bytes (n = 19)
 dataset/input-10000.txt.1.bwt	19 bytes (n = 19)
 i	SA	BWT
-0	18	$
-1	6	a
-2	12	a
-3	17      n
-4	5       n
-5	11	b
-6	9	n
-7	15	n
-8	3	n
-9	7	$
-malloc_count ### exiting, total: 10,424, peak: 5,776, current: 1,033
+0	6	a
+1	12	a
+2	17      n
+3	5       n
+4	11	b
+5	9	n
+6	15	n
+7	3	n
+8	7	$
+9	13	$
+malloc_count ### exiting, total: 10,438, peak: 5,790, current: 1,024
 ```
 
 ## references
