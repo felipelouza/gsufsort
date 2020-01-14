@@ -56,6 +56,7 @@ void usage(char *name){
   puts("\t--output  outfile     renames output file");
   puts("\t--verbose             verbose output");
   puts("\t--lcp_max             outputs maximum LCP");
+  puts("\t--lcp_max_text        outputs maximum LCP (text)");
   puts("\t--lcp_avg             outputs average LCP");
   puts("\t--trlcp   k           outputs k-truncated LCP array (FILE.w.lcp)");
   puts("\t--time                output time (seconds)");
@@ -75,7 +76,7 @@ int main(int argc, char** argv){
   time_t t_start=0;clock_t c_start=0;
   int_t i;
 
-  int sa=0, lcp=0, da=0, bwt=0, bin=0, gsa=0, gesa=0, lcp_max=0, lcp_avg=0, trlcp=0, time=0; //txt
+  int sa=0, lcp=0, da=0, bwt=0, bin=0, gsa=0, gesa=0, lcp_max=0, lcp_max_text=0, lcp_avg=0, trlcp=0, time=0; //txt
   int sa_bytes=sizeof(int_t);
   int lcp_bytes=sizeof(int_t);
   int da_bytes=sizeof(int_t);
@@ -116,6 +117,7 @@ int main(int argc, char** argv){
       {"light",   no_argument,       0, 'l'},
       {"gesa",    optional_argument, 0, 'G'},
       {"lcp_max", optional_argument, 0, 'M'},
+      {"lcp_max_text", optional_argument, 0, 'W'},
       {"lcp_avg", optional_argument, 0, 'A'},
       {"trlcp",   required_argument, 0, 'c'},
       {0,         0,                 0,  0 }
@@ -170,6 +172,8 @@ int main(int argc, char** argv){
         d = (int) atoi(optarg); break;
       case 'M':
         lcp_max=1; break;
+      case 'W':
+        lcp_max_text=1; break;
       case 'A':
         lcp_avg=1; break;
       case 'c':
@@ -248,7 +252,7 @@ int main(int argc, char** argv){
 
   
     int_t *LCP = NULL;  
-    if(lcp || gesa || lcp_max || lcp_avg){
+    if(lcp || gesa || lcp_max || lcp_avg || lcp_max_text){
       LCP = (int_t*) malloc(n*sizeof(int_t));
       assert(LCP);
       for(i=0; i<n; i++) LCP[i]=0;
@@ -308,12 +312,13 @@ int main(int argc, char** argv){
           store_to_disk(NULL, NULL,  NULL, NULL,  LCP+1, n-1, c_output, "lcp",  0, 0, lcp_bytes);
         #endif
       }
-      if(lcp && !gesa && !lcp_avg && !lcp_max && !print) free(LCP);
+      if(lcp && !gesa && !lcp_avg && !lcp_max && !lcp_max_text && !print) free(LCP);
       else if(verbose){ 
         printf("WARNING: LCP[1,N] not freed because of: ");
         if(gesa) printf("--gesa ");
         if(lcp_avg) printf("--lcp_avg ");
         if(lcp_max) printf("--lcp_max ");
+        if(lcp_max_text) printf("--lcp_max_text ");
         if(print) printf("--print ");
         printf("\n");
       }
@@ -381,17 +386,27 @@ int main(int argc, char** argv){
       print_array(str, DA, rbv, light, SA, LCP, bin=1, da, sa, bwt || gesa, gsa || gesa, n, min(n,p));
     }
 
-    if(lcp_max || lcp_avg){
-      int_t max=0,total=n;
+    if(lcp_max || lcp_avg || lcp_max_text){
+      int_t max=0,total=n, j=0;
       double avg=0.0;
       #if LAST_END == 0
         total=n-1;
       #endif
       for(i=0; i<n; i++){
-        if(LCP[i]>max) max=LCP[i];
+        if(LCP[i]>max){
+          max=LCP[i];
+          j=i;
+        }
         avg+=(double)LCP[i]/(double)total;
       }
       if(lcp_max) printf("LCP max: %" PRIdN "\n", max);
+      if(lcp_max_text){
+        printf("Longest LCP: "); 
+        for(i=SA[j]; i<SA[j]+max && str[i]!=1; i++){
+          printf("%c", str[i]-1);
+        }
+        printf("\n");
+      }
       if(lcp_avg) printf("LCP avg: %lf\n", avg);
     }
 
@@ -399,10 +414,10 @@ int main(int argc, char** argv){
     free(str);
     free(SA);
     if(light){
-      if(gesa || lcp_max || lcp_avg) free(LCP);
+      if(gesa || lcp_max || lcp_avg || lcp_max_text) free(LCP);
     }
     else{
-      if(lcp || gesa || lcp_max || lcp_avg) free(LCP);
+      if(lcp || gesa || lcp_max || lcp_avg || lcp_max_text) free(LCP);
     }
     if(da || gsa || gesa){
       if(light)
@@ -446,14 +461,29 @@ int main(int argc, char** argv){
       for(i=0; i<n; i++) if(LCP[i]>trlcp) LCP[i]=trlcp;
     }
 
-    if(lcp_max || lcp_avg){
-      int_t max=0;
+    if(lcp_max || lcp_avg || lcp_max_text){
+      int_t max=0, j=0;
       double avg=0.0;
       for(i=0; i<n; i++){
-        if(LCP[i]>max) max=LCP[i];
+        if(LCP[i]>max){
+          max=LCP[i];
+          j=i;
+        }
         avg+=(double)LCP[i]/(double)n;
       }
       if(lcp_max) printf("LCP max: %" PRIdN "\n", max);
+      if(lcp_max_text){
+        if(LCP && SA && str){
+          printf("Longest LCP: "); 
+          for(i=SA[j]; i<SA[j]+max && str[i]!=1; i++){
+            printf("%c", str[i]);
+          }
+          printf("\n");
+        }
+        else{
+          printf("ERROR: --lcp_max_text needs --bin, --sa and --lcp.\n");
+        }
+      }
       if(lcp_avg) printf("LCP avg: %lf\n", avg);
     }
 

@@ -15,7 +15,7 @@ make
 Given a string collection in a single file FILE.
 
 ```sh
-./gsufsort FILE [--sa [w]] [--sa [w]] [--lcp [w]] [--da [w]] [--ligth] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--lcp_max] [--lcp_avg] [--trlcp [k]] [--output out]
+./gsufsort FILE [--sa [w]] [--sa [w]] [--lcp [w]] [--da [w]] [--ligth] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--lcp_max] [--lcp_max_text] [--lcp_avg] [--trlcp [k]] [--output out]
 ```
 
 _Notes:_ 
@@ -40,6 +40,7 @@ Available options:
 --docs    d           number of strings (def all FILE)
 --print   [p]         print arrays (stdout) A[1,min(p,N)]
 --lcp_max             outputs maximum LCP-value
+--lcp_max_text        outputs maximum LCP-value (text)
 --lcp_avg             outputs average LCP-value
 --trlcp   k           outputs k-truncated LCP array (FILE.w.lcp)
 --time                outputs time (in seconds)
