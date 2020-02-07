@@ -23,6 +23,9 @@ _Notes:_
 
 - Supported extensions are _.txt_, _.fasta_ and _.fastq_.
 
+- Strings are separated per '\0' (new line) in _.txt_.
+
+- gsufsort supports **ASCII alphabet**, with values _0_ and _1_ reserved.
 
 Available options:
 
