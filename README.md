@@ -98,7 +98,7 @@ i	SA	BWT
 malloc_count ### exiting, total: 10,438, peak: 5,790, current: 1,024
 ```
 
-## authors:
+## authors
 
 * [Felipe Louza](https://github.com/felipelouza)
 * [Guilherme Telles](https://github.com/gptelles)
