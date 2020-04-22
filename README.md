@@ -1,6 +1,6 @@
 # gsufsort: 
 
-This software builds SA, LCP, DA, GSA and BWT for **string collections**. The algorithm [gsaca-k](https://github.com/felipelouza/gsa-is) is at the core of gsufsort.
+This software builds SA, LCP, DA, GSA and BWT for **string collections**. 
 
 ## install
 
@@ -90,6 +90,12 @@ i	SA	BWT
 9	13	$
 malloc_count ### exiting, total: 10,438, peak: 5,790, current: 1,024
 ```
-## thanks:
 
-Thanks to @antmarakis by helpful suggestions.
+## remarks
+
+* The algorithm [gsaca-k](https://github.com/felipelouza/gsa-is) is at the core of gsufsort to compute SA, LCP and DA.
+* For inputs larger than 2GB, _gsufsort_ uses 21N bytes to compute SA, LCP and DA, while its _lightweight_ version (option ``--light``) uses 17N bytes.
+
+## thanks
+
+Thanks to [antmarakis](https://github.com/antmarakis) by helpful suggestions.
