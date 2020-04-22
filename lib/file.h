@@ -9,6 +9,11 @@
 
 #include "utils.h"
 
+#if GZ==1
+  #include <zlib.h>
+  #include "../external/kseq/kseq.h"
+  KSEQ_INIT(gzFile, gzread)
+#endif
 
 
 /*******************************************************************/

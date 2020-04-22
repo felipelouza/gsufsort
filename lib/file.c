@@ -1,11 +1,33 @@
 #include "file.h"
 
 #define N_ALLOC 2048 
+#if GZ
+  #define GZ_BUFF 10485760 //10MB for each string line (in txt files)
+#endif
 
 /* Returns the file extension
  */
-const char *get_filename_ext(const char *filename) {                                                  
-    const char *dot = strrchr(filename, '.');                                                         
+const char *get_filename_ext(const char *filename) {
+ 
+    char *dot = strrchr(filename, '.');
+
+    if(!dot || dot == filename) return "";                                                            
+    return dot + 1;                                                                                   
+}   
+
+/*******************************************************************/
+/* Returns gz file extension
+ */
+const char *get_gz_ext(const char *filename) {
+ 
+    char *dot = strrchr(filename, '.');
+
+    char *tmp = dot;
+    *tmp = '#';
+
+    dot = strrchr(filename, '.');
+    *tmp = '.';
+    
     if(!dot || dot == filename) return "";                                                            
     return dot + 1;                                                                                   
 }   
@@ -91,7 +113,13 @@ return c_buffer;
 /*******************************************************************/
 
 // read line by line
-char** load_multiple_txt(FILE* f_in, int *k, size_t *n) {
+char** load_multiple_txt(char *c_file, int *k, size_t *n) {
+
+	FILE* f_in = file_open(c_file, "rb");
+	if(!f_in){
+    fprintf (stderr, "file_open of '%s' failed: %s.\n", c_file, strerror (errno));
+    exit (EXIT_FAILURE);
+  }
 
   int n_alloc = N_ALLOC;
 	char **c_buffer = (char**) malloc(n_alloc*sizeof(char*));
@@ -114,12 +142,19 @@ char** load_multiple_txt(FILE* f_in, int *k, size_t *n) {
       c_buffer = (char**) realloc(c_buffer, n_alloc*sizeof(char*));
 		}
 	}
+	fclose(f_in);
 
 return c_buffer;
 }
 
 // read sequences separeted by '@' line
-char** load_multiple_fastq(FILE* f_in, int *k, size_t *n){
+char** load_multiple_fastq(char *c_file, int *k, size_t *n){
+
+	FILE* f_in = file_open(c_file, "rb");
+	if(!f_in){
+    fprintf (stderr, "file_open of '%s' failed: %s.\n", c_file, strerror (errno));
+    exit (EXIT_FAILURE);
+  }
 
   int n_alloc = N_ALLOC;
 	char **c_buffer = (char**) malloc(n_alloc*sizeof(char*));
@@ -155,12 +190,21 @@ char** load_multiple_fastq(FILE* f_in, int *k, size_t *n){
       c_buffer = (char**) realloc(c_buffer, n_alloc*sizeof(char*));
 		}
 	}
+	fclose(f_in);
 
 return c_buffer;
 }
 
+/*******************************************************************/
+
 // read sequences separeted by '>' line
-char** load_multiple_fasta(FILE* f_in, int *k, size_t *n){
+char** load_multiple_fasta(char *c_file, int *k, size_t *n){
+
+	FILE* f_in = file_open(c_file, "rb");
+	if(!f_in){
+    fprintf (stderr, "file_open of '%s' failed: %s.\n", c_file, strerror (errno));
+    exit (EXIT_FAILURE);
+  }
 
   int n_alloc = N_ALLOC;
 	char **c_buffer = (char**) malloc(n_alloc*sizeof(char*));
@@ -213,9 +257,86 @@ char** load_multiple_fasta(FILE* f_in, int *k, size_t *n){
       c_buffer = (char**) realloc(c_buffer, n_alloc*sizeof(char*));
 		}
 	}
+	fclose(f_in);
 
 return c_buffer;
 }
+
+/*******************************************************************/
+//loads fasta and fastq compressed files (gz)
+#if GZ
+char** load_multiple_gz(char *c_file, int *k, size_t *n){
+
+  int n_alloc=N_ALLOC;
+	char **c_buffer = (char**) malloc(n_alloc*sizeof(char*));
+  
+  gzFile fp; 
+  int i, l;
+
+  fp = gzopen(c_file, "r"); // STEP 2: open the file handler
+	if(!fp){
+    fprintf (stderr, "gzopen of '%s' failed: %s.\n", c_file, strerror (errno));
+    exit (EXIT_FAILURE);
+  }
+
+	const char *type = get_gz_ext(c_file);
+
+  if(strcmp(type, "txt.gz")==0){
+
+    char *buf = (char*) malloc(GZ_BUFF*sizeof(char));
+
+ 	  for(i=0; i<*k; i++){
+
+      if(gzgets(fp, buf, GZ_BUFF-1)==Z_NULL){//EOF
+        *k=i;
+        break;
+      }
+      size_t len = strlen(buf);
+
+  		c_buffer[i] = (char*) malloc((len+1)*sizeof(char));
+			strcpy(&c_buffer[i][0], buf);
+	  	(*n) += len+1;
+
+	  	c_buffer[i][len-1] = 0;
+      
+	  	if(i==n_alloc-1){
+	  		n_alloc+=N_ALLOC;
+        c_buffer = (char**) realloc(c_buffer, n_alloc*sizeof(char*));
+	  	}
+    }
+
+    free(buf);
+
+  }
+  else{ //fasta, fa, fastq, fq
+
+    kseq_t *seq = kseq_init(fp); // STEP 3: initialize seq  
+ 	  for(i=0; i<*k; i++){
+
+      if((l = kseq_read(seq)) < 0){
+	  		*k = i;
+        break;
+      }
+      int len = strlen(seq->seq.s);  
+	  	c_buffer[i] = (char*) malloc((len+1)*sizeof(char));
+
+	  	strcpy(&c_buffer[i][0], seq->seq.s);
+
+	  	c_buffer[i][len] = 0;
+	  	(*n) += len+1;
+
+	  	if(i==n_alloc-1){
+	  		n_alloc+=N_ALLOC;
+        c_buffer = (char**) realloc(c_buffer, n_alloc*sizeof(char*));
+	  	}
+	  }
+    kseq_destroy(seq); // STEP 5: destroy seq
+  }
+  gzclose(fp); // STEP 6: close the file handler  
+
+return c_buffer;
+}
+#endif
 
 /*******************************************************************/
 
@@ -225,30 +346,34 @@ char** file_load_multiple(char* c_file, int *k, size_t *n) {
  * .txt   - strings per line
  * .fasta - strings separated by '>' line
  * .fastq - strings separated by four lines
+ * .gz    - use kseq parser to extract sequences
  */
 
-	FILE* f_in = file_open(c_file, "rb");
-	if(!f_in) return 0;
-
 	const char *type = get_filename_ext(c_file);
+
 	char **c_buffer = NULL; // = (char**) malloc(k*sizeof(char*));
 
 	if(*k==0) *k=INT_MAX;
 
 	if(strcmp(type,"txt") == 0)
-		c_buffer = load_multiple_txt(f_in, k, n);
+		c_buffer = load_multiple_txt(c_file, k, n);
 
-	else if(strcmp(type,"fasta") == 0)
-		c_buffer = load_multiple_fasta(f_in, k, n);
+	else if(strcmp(type,"fasta") == 0 || strcmp(type,"fa") == 0)
+		c_buffer = load_multiple_fasta(c_file, k, n);
 
-	else if(strcmp(type,"fastq") == 0)
-		c_buffer = load_multiple_fastq(f_in, k, n);
+	else if(strcmp(type,"fastq") == 0 || strcmp(type,"fq") == 0)
+		c_buffer = load_multiple_fastq(c_file, k, n);
+
+  #if GZ
+	else if(strcmp(type,"gz") == 0)
+		c_buffer = load_multiple_gz(c_file, k, n);
+  #endif
+
 	else{
 		printf("Error: file not recognized (.txt, .fasta, .fastq)\n");
 		return 0;
 	}
 
-	fclose(f_in);
 
 return c_buffer;
 }

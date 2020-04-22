@@ -4,7 +4,7 @@ LIB_DIR = ${HOME}/lib
 INC_DIR = ${HOME}/include
 
 #WFLAGS= -Wall -Wextra  -DNDEBUG -Wno-ignored-qualifiers
-WFLAGS= -Wall 
+WFLAGS= -Wall -Wno-unused-function 
 OPT_FLAGS= -O3 -ffast-math -funroll-loops -m64 -fomit-frame-pointer -D_FILE_OFFSET_BITS=64
 #CCLIB= -lstdc++ -lsdsl  -I$(INC_DIR) -L$(LIB_DIR)
 LFLAGS = -lm -ldl -mpopcnt
@@ -39,9 +39,13 @@ M64 = 0
 ##
 
 DEFINES = -DDEBUG=$(DEBUG) 
+GZ = 1
 
-CFLAGS += $(DEFINES)
+CFLAGS += $(DEFINES) -DGZ=$(GZ)
 
+ifeq ($(GZ),1)
+	CFLAGS += -lz
+endif
 ##
 
 DIR = dataset/
