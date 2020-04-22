@@ -1,6 +1,6 @@
 # gsufsort: 
 
-This software builds SA, LCP, DA, GSA and BWT for **string collections** using gsacak algorithm \[1\].
+This software builds SA, LCP, DA, GSA and BWT for **string collections**. The algorithm [gsaca-k](https://github.com/felipelouza/gsa-is) is at the core of gsufsort.
 
 ## install
 
@@ -90,11 +90,6 @@ i	SA	BWT
 9	13	$
 malloc_count ### exiting, total: 10,438, peak: 5,790, current: 1,024
 ```
+## thanks:
 
-## references
-
-\[1\] 
-Louza, Felipe A., Gog, Simon, Telles, Guilherme P. (2017). 
-Inducing enhanced suffix arrays for string collections. 
-Theor. Comput. Sci. 678: 22-39, [github](https://github.com/felipelouza/gsa-is).
-
+Thanks to @antmarakis by helpful suggestions.
