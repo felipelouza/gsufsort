@@ -1,14 +1,16 @@
 # gsufsort: 
 
-This software is a fast, portable, and lightweight tool for constructing the **suffix array** (SA) and related data  structures for **string collections**, such as the **LCP array**, the **document array** (DA), the **generalized suffix array** (GSA) and the **Burrows-Wheeler transform** (BWT). 
+This software is an implementation of _gsufsort_, a fast, portable, and lightweight tool for constructing the **suffix array** (SA) and related data indexing structures for **string collections**. 
 
-The software runs in linear time and works in internal memory (the computed data strutures are written to disk). 
+The algorithms run in linear time and work in internal memory (the computed data strutures are written to disk). 
 
-- Supported extensions: _.txt_, _.fasta_ and _.fastq_.
+Given an input collection with _d_ strings, _gsufsort_ outputs the:
 
-- **gzipped input data** (extension _.gz_) are also supported.
-
-- For inputs **larger than 2GB**, use _gsufsort-64_
+* Suffix array (SA)
+* LCP-array (LCP)
+* Document array (DA)
+* Burrows-Wheeler transform (BWT)
+* Generalized suffix array (GSA)
 
 ## install
 
@@ -28,11 +30,15 @@ Given a string collection in a single file FILE.
 
 _Notes:_ 
 
-- Strings are separated per '\0' (new line) in _.txt_.
+- Supported extensions: _.txt_, _.fasta_ (or _.fa_) and _.fastq_ (or _.fq_).
 
-- gsufsort supports **ASCII alphabet**, with values _0_ and _1_ reserved.
+- **gzipped input data** (extension _.gz_) are also supported.
 
-- For inputs **larger than 2GB**, _gsufsort-64_ uses **21N bytes** to compute SA, LCP and DA, while its _lightweight_ version (option ``--light``) uses **17N bytes**.
+- Strings are separated per '\0' (new line) in _.txt_ files.
+
+- gsufsort supports **ASCII alphabet**, so that values _0_ and _1_ reserved.
+
+- For inputs **larger than 2GB**, use _gsufsort-64_
 
 Available options:
 
@@ -108,8 +114,9 @@ malloc_count ### exiting, total: 10,438, peak: 5,790, current: 1,024
 
 ## remarks
 
-* The optimal algorithm [gsaca-k](https://github.com/felipelouza/gsa-is) is at the core of _gsufsort_ to compute SA, LCP and DA.
+* The linear time algorithm [gsaca-k](https://github.com/felipelouza/gsa-is) is at the core of _gsufsort_. In particular, it is used to compute arrays SA, LCP and DA.
 
+* For inputs **larger than 2GB**, _gsufsort-64_ uses **21N bytes** to compute SA, LCP and DA, while its _lightweight_ version (option ``--light``) uses **17N bytes**.
 
 ## thanks
 
