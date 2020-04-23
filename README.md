@@ -2,15 +2,17 @@
 
 This software is an implementation of **_gsufsort_**, a fast, portable, and lightweight tool for constructing the **suffix array** and related data structures for **string collections**. 
 
-The software runs works in internal memory (the computed data structures are written to disk). 
+The software runs in internal memory (the computed data structures are written to disk). 
 
-Given an input collection with _d_ strings, **_gsufsort_** can compute:
+Given an string collection, **_gsufsort_** can compute the:
 
-- ``--sa: Suffix array``
-- ``--lcp: LCP-array``
-- ``--da: Document array``
-- ``--bwt: Burrows-Wheeler transform``
-- ``--gsa: Generalized suffix array``
+- Suffix array (SA)
+- LCP-array (LCP)
+- k-truncated LCP-array (k-LCP)
+- Document array (DA)
+- Burrows-Wheeler transform (BWT)
+- Generalized suffix array (GSA)
+- Generalized enhanced suffix array (GESA)
 
 ## install
 
@@ -22,10 +24,10 @@ make
 
 ## run
 
-Given a string collection in a single file FILE.
+Given a string collection in a single file FILENAME.
 
 ```sh
-./gsufsort FILE [--sa [w]] [--sa [w]] [--lcp [w]] [--da [w]] [--ligth] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--lcp_max] [--lcp_max_text] [--lcp_avg] [--trlcp [k]] [--output out]
+./gsufsort FILENAME [--sa [w]] [--sa [w]] [--lcp [w]] [--da [w]] [--ligth] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--lcp_max] [--lcp_max_text] [--lcp_avg] [--trlcp [k]] [--output out]
 ```
 
 _Notes:_ 
@@ -44,21 +46,21 @@ Available options:
 
 ```sh
 --build	              (default)
---load                load from disk FILE[.sa][.da][.lcp][.gsa][.bin]
---sa    [w]           computes SA  using w (def 4) bytes (FILE.w.sa)
---lcp   [w]           computes LCP (FILE.w.lcp)
---da    [w]           computes DA  (FILE.w.da)
---gsa   [w1][w2]      computes GSA=(text, suff) using pairs of (w1, w2) bytes (FILE.w1.w2.gsa)
+--load                load from disk FILENAME[.sa][.da][.lcp][.gsa][.bin]
+--sa    [w]           computes SA  using w (def 4) bytes (FILENAME.w.sa)
+--lcp   [w]           computes LCP (FILENAME.w.lcp)
+--da    [w]           computes DA  (FILENAME.w.da)
+--gsa   [w1][w2]      computes GSA=(text, suff) using pairs of (w1, w2) bytes (FILENAME.w1.w2.gsa)
 --light               runs lightweight algorithm to compute DA (also GSA)
---gesa  [w1][w2][w3]  computes GESA=(GSA, LCP, BWT) (FILE.w1.w2.w3.1.gesa)
---bwt                 computes BWT using 1 byte (FILE.1.bwt)
---bin                 computes T^{cat} (FILE.1.bin)
---docs    d           number of strings (def all FILE)
+--gesa  [w1][w2][w3]  computes GESA=(GSA, LCP, BWT) (FILENAME.w1.w2.w3.1.gesa)
+--bwt                 computes BWT using 1 byte (FILENAME.1.bwt)
+--bin                 computes T^{cat} (FILENAME.1.bin)
+--docs    d           number of strings (def all FILENAME)
 --print   [p]         print arrays (stdout) A[1,min(p,N)]
 --lcp_max             outputs maximum LCP-value
 --lcp_max_text        outputs maximum LCP-value (text)
 --lcp_avg             outputs average LCP-value
---trlcp   k           outputs k-truncated LCP array (FILE.w.lcp)
+--trlcp   k           outputs k-truncated LCP array (FILENAME.w.lcp)
 --time                outputs time (in seconds)
 --output  outfile     renames output file
 --verbose             verbose output
@@ -80,7 +82,7 @@ dataset/input-10000.txt.1.bwt	18 bytes (n = 18)
 malloc_count ### exiting, total: 32,859, peak: 21,420, current: 1,024
 ```
 
-To see the result (--print 10) stored in disk FILE.4.sa and FILE.1.bwt, use **--load** option:
+To see the result (--print 10) stored in disk FILENAME.4.sa and FILENAME.1.bwt, use **--load** option:
 
 ```sh
 ./gsufsort dataset/input-10000.txt --sa --bwt --load --print 10
