@@ -27,22 +27,10 @@ make
 Given a string collection in a single file FILENAME.
 
 ```sh
-./gsufsort FILENAME [--sa [w]] [--sa [w]] [--lcp [w]] [--da [w]] [--ligth] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--lcp_max] [--lcp_max_text] [--lcp_avg] [--trlcp [k]] [--output out]
+./gsufsort FILENAME [options]
 ```
 
-_Notes:_ 
-
-- Supported extensions: _.txt_, _.fasta_ (or _.fa_) and _.fastq_ (or _.fq_).
-
-- **gzipped input data** (extension _.gz_) are also supported.
-
-- Strings are separated per '\0' (new line) in _.txt_ files.
-
-- gsufsort supports **ASCII alphabet**, so that values _0_ and _1_ reserved.
-
-- For inputs **larger than 2GB**, use _gsufsort-64_
-
-Available options:
+#### Available options
 
 ```sh
 --build	              (default)
@@ -67,44 +55,116 @@ Available options:
 --help                this help message
 ```
 
-## quick test
-
-To run a test with docs=3 strings from dataset/input-10000.txt, type:
+#### Command
 
 ```sh
-./gsufsort dataset/input-10000.txt --docs 3 --sa --bwt
+./gsufsort FILENAME [--sa [w]] [--lcp [w]] [--da [w]] [--ligth] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--lcp_max] [--lcp_max_text] [--lcp_avg] [--trlcp [k]] [--output out]
+```
+
+#### Input files 
+
+- **Supported extensions**: _.txt_, _.fasta_ (or _.fa_) and _.fastq_ (or _.fq_).
+
+- **gzipped input data** (extension _.gz_) are also supported.
+
+- Strings are separated per '\0' (new line) in _.txt_ files.
+
+- _gsufsort_ supports **ASCII alphabet**, so that values _0_ and _1_ reserved.
+
+- For inputs **larger than 2GB**, use _gsufsort-64_
+
+
+## quick test
+
+To run a test with _docs=3_ strings from _dataset/input.txt, type:
+
+```sh
+./gsufsort dataset/input.txt --docs 3 --sa --bwt
 ```
 
 ```sh
 ## store_to_disk ##
-dataset/input-10000.txt.4.sa	72 bytes (n = 18)
-dataset/input-10000.txt.1.bwt	18 bytes (n = 18)
+dataset/input.txt.4.sa	72 bytes (n = 18)
+dataset/input.txt.1.bwt	18 bytes (n = 18)
 malloc_count ### exiting, total: 32,859, peak: 21,420, current: 1,024
 ```
 
-To see the result (--print 10) stored in disk FILENAME.4.sa and FILENAME.1.bwt, use **--load** option:
+To see the result (option ``--print``) stored in disk ``FILENAME.4.sa`` and ``FILENAME.1.bwt``, use **--load** option:
 
 ```sh
-./gsufsort dataset/input-10000.txt --sa --bwt --load --print 10
+./gsufsort dataset/input.txt --sa --bwt --load --print
 ```
 
 ```sh
 ## load_from_disk ##
-dataset/input-10000.txt.4.sa	76 bytes (n = 19)
-dataset/input-10000.txt.1.bwt	19 bytes (n = 19)
-i	SA	BWT
-0	6	a
-1	12	a
-2	17      n
-3	5       n
-4	11	b
-5	9	n
-6	15	n
-7	3	n
-8	7	$
-9	13	$
+dataset/input.txt.4.sa	76 bytes (n = 19)
+dataset/input.txt.1.bwt	19 bytes (n = 19)
+i	SA	BWT	suffixes
+0	18	$	#
+1	6	a	$
+2	12	a	$
+3	17	n	$
+4	5	n	a$
+5	11	b	a$
+6	9	n	aba$
+7	15	n	an$
+8	3	n	ana$
+9	7	$	anaba$
+10	13	$	anan$
+11	1	b	anana$
+12	10	a	ba$
+13	0	#	banana$
+14	16	a	n$
+15	4	a	na$
+16	8	a	naba$
+17	14	a	nan$
+18	2	a	nana$
 malloc_count ### exiting, total: 10,438, peak: 5,790, current: 1,024
 ```
+
+In particular, the BWT output (``FILENAME.1.bwt``) is written in ASCII format, which can be opened in terminal:
+
+```sh
+vim dataset/input.txt.1.bwt
+```
+
+```sh
+aannbnnn��ba�aaaaa
+```
+
+Suffix array output (``FILENAME.4.sa``) is written in binary format, each integer takes ``w`` bytes (default ``w`` is 4).
+
+```sh
+ls -la dataset/input.txt.4.sa
+```
+
+```sh
+-rw-rw-r--. 1 louza louza 72 Apr 23 08:25 dataset/input.txt.4.sa
+```
+
+## remarks
+
+* The linear time algorithm [gsaca-k](https://github.com/felipelouza/gsa-is) is at the core of _gsufsort_. In particular, it is used to compute SA, LCP and DA.
+
+* For inputs **larger than 2GB**, _gsufsort-64_ uses **21N bytes** to compute SA, LCP and DA (GESA).
+
+### working memory (in bytes)
+
+| version   | 32 bits | 64 bits |
+|-----------|:-------:|:-------:|
+| SA        |    5N   |    9N   |
+| SA+LCP    |    9N   |   17N   |
+| SA+LCP+DA |   13N   |   21N   |
+| SA+DA     |    9N   |   13N   |
+| GSA       |    9N   |   13N   |
+| GESA      |   13N   |   21N   |
+
+### _lightweight_ version
+
+* There is a _lightweight_ version of _gsufsort_ (option ``--light``) that computes DA using a bitvector during the output to disk. 
+
+* For inputs **larger than 2GB**, the _lightweight_ version uses **17N bytes** to compute SA, LCP and DA (GESA).
+
 
 ## authors
 
@@ -113,12 +173,6 @@ malloc_count ### exiting, total: 10,438, peak: 5,790, current: 1,024
 * [Simon Gog](https://github.com/simongog)
 * [Nicola Prezza](https://github.com/nicolaprezza)
 * [Giovanna Rosone](https://github.com/giovannarosone/)
-
-## remarks
-
-* The linear time algorithm [gsaca-k](https://github.com/felipelouza/gsa-is) is at the core of _gsufsort_. In particular, it is used to compute arrays SA, LCP and DA.
-
-* For inputs **larger than 2GB**, _gsufsort-64_ uses **21N bytes** to compute SA, LCP and DA, while its _lightweight_ version (option ``--light``) uses **17N bytes**.
 
 ## thanks
 
