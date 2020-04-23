@@ -351,6 +351,8 @@ int main(int argc, char** argv){
       if(!lcp)
         printf("## store_to_disk ##\n");
     }
+    else
+      printf("## store_to_disk ##\n");
   
     #if LAST_END  
       //store to disk
