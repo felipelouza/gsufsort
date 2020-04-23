@@ -1,21 +1,21 @@
 # gsufsort: 
 
-This software is an implementation of **_gsufsort_**, a fast, portable, and lightweight tool for constructing the **suffix array** (SA) and related data indexing structures for **string collections**. 
+This software is an implementation of **_gsufsort_**, a fast, portable, and lightweight tool for constructing the **suffix array** and related data structures for **string collections**. 
 
-The algorithms run in linear time and work in internal memory (the computed data strutures are written to disk). 
+The software runs works in internal memory (the computed data structures are written to disk). 
 
 Given an input collection with _d_ strings, **_gsufsort_** can compute:
 
-* ``--sa:  Suffix array``
-* ``--da:  Document array``
-* ``--lcp: LCP-array``
-* ``--bwt: Burrows-Wheeler transform``
-* ``--gsa: Generalized suffix array``
+- ``--sa: Suffix array``
+- ``--lcp: LCP-array``
+- ``--da: Document array``
+- ``--bwt: Burrows-Wheeler transform``
+- ``--gsa: Generalized suffix array``
 
 ## install
 
 ```sh
-git clone https://bitbucket.org/louza/gsufsort/ 
+git clone https://github.com/felipelouza/gsufsort.git
 cd gsufsort
 make 
 ```
