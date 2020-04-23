@@ -6,13 +6,13 @@ The software runs in internal memory (the computed data structures are written t
 
 Given an string collection, **_gsufsort_** can compute the:
 
-- Suffix array (SA)
-- LCP-array (LCP)
-- k-truncated LCP-array (k-LCP)
-- Document array (DA)
-- Burrows-Wheeler transform (BWT)
-- Generalized suffix array (GSA)
-- Generalized enhanced suffix array (GESA)
+- [x] Suffix array (SA)
+- [x] LCP-array (LCP)
+- [x] k-truncated LCP-array (k-LCP)
+- [x] Document array (DA)
+- [x] Burrows-Wheeler transform (BWT)
+- [x] Generalized suffix array (GSA)
+- [x] Generalized enhanced suffix array (GESA)
 
 ## install
 
@@ -76,7 +76,7 @@ Given a string collection in a single file FILENAME.
 
 ## quick test
 
-To run a test with _docs=3_ strings from _dataset/input.txt, type:
+To run a test with _docs=3_ strings from _dataset/input.txt_, type:
 
 ```sh
 ./gsufsort dataset/input.txt --docs 3 --sa --bwt
@@ -97,8 +97,8 @@ To see the result (option ``--print``) stored in disk ``FILENAME.4.sa`` and ``FI
 
 ```sh
 ## load_from_disk ##
-dataset/input.txt.4.sa	76 bytes (n = 19)
-dataset/input.txt.1.bwt	19 bytes (n = 19)
+dataset/input.txt.4.sa	72 bytes (n = 18)
+dataset/input.txt.1.bwt	18 bytes (n = 18)
 i	SA	BWT	suffixes
 0	18	$	#
 1	6	a	$
@@ -122,6 +122,8 @@ i	SA	BWT	suffixes
 malloc_count ### exiting, total: 10,438, peak: 5,790, current: 1,024
 ```
 
+### output files
+
 In particular, the BWT output (``FILENAME.1.bwt``) is written in ASCII format, which can be opened in terminal:
 
 ```sh
@@ -142,13 +144,28 @@ ls -la dataset/input.txt.4.sa
 -rw-rw-r--. 1 louza louza 72 Apr 23 08:25 dataset/input.txt.4.sa
 ```
 
+### gzipped input files
+_gsufsort_ also supports gzipped input files uzing ``zlib`` and ``kseq`` libriries:
+
+```sh
+./gsufsort gz/input.txt.gz --docs 3 --sa --bwt
+```
+
+```sh
+## store_to_disk ##
+gz/input.txt.gz.4.sa	72 bytes (n = 18)
+gz/input.txt.gz.1.bwt	18 bytes (n = 18)
+malloc_count ### exiting, total: 10,578,270, peak: 10,566,937, current: 1,024
+```
+
+
 ## remarks
 
 * The linear time algorithm [gsaca-k](https://github.com/felipelouza/gsa-is) is at the core of _gsufsort_. In particular, it is used to compute SA, LCP and DA.
 
 * For inputs **larger than 2GB**, _gsufsort-64_ uses **21N bytes** to compute SA, LCP and DA (GESA).
 
-### working memory (in bytes)
+#### working memory (in bytes)
 
 | version   | 32 bits | 64 bits |
 |-----------|:-------:|:-------:|
@@ -159,9 +176,9 @@ ls -la dataset/input.txt.4.sa
 | GSA       |    9N   |   13N   |
 | GESA      |   13N   |   21N   |
 
-### _lightweight_ version
+#### _lightweight_ version
 
-* There is a _lightweight_ version of _gsufsort_ (option ``--light``) that computes DA using a bitvector during the output to disk. 
+* There is a _lightweight_ version of _gsufsort_ (option ``--light``) to compute DA using a bitvector during the output to disk, which saves **4N bytes**. 
 
 * For inputs **larger than 2GB**, the _lightweight_ version uses **17N bytes** to compute SA, LCP and DA (GESA).
 
