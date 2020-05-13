@@ -35,7 +35,7 @@ Given a string collection in a single file FILENAME.
 ```sh
 --build	              (default)
 --load                load from disk FILENAME[.sa][.da][.lcp][.gsa][.bin]
---sa    [w]           computes SA  using w (def 4) bytes (FILENAME.w.sa)
+--sa    [w]           computes SA  (default) using w (def 4) bytes (FILENAME.w.sa)
 --lcp   [w]           computes LCP (FILENAME.w.lcp)
 --da    [w]           computes DA  (FILENAME.w.da)
 --gsa   [w1][w2]      computes GSA=(text, suff) using pairs of (w1, w2) bytes (FILENAME.w1.w2.gsa)
@@ -83,6 +83,7 @@ To run a test with _docs=3_ strings from _dataset/input.txt_, type:
 ```
 
 ```sh
+## gsufsort ##
 ## store_to_disk ##
 dataset/input.txt.4.sa	72 bytes (n = 18)
 dataset/input.txt.1.bwt	18 bytes (n = 18)
@@ -131,7 +132,7 @@ vim dataset/input.txt.1.bwt
 ```
 
 ```sh
-aannbnnn��ba�aaaaa
+aannbnnn��ba\0aaaaa
 ```
 
 Suffix array output (``FILENAME.4.sa``) is written in binary format, each integer takes ``w`` bytes (default ``w`` is 4).
@@ -145,13 +146,21 @@ ls -la dataset/input.txt.4.sa
 ```
 
 ### gzipped input files
-_gsufsort_ also supports gzipped input files uzing ``zlib`` and ``kseq`` libriries:
+_gsufsort_ also supports gzipped input files uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries:
+
+```sh
+make clean
+make GZ=1
+```
+
+Then, run:
 
 ```sh
 ./gsufsort gz/input.txt.gz --docs 3 --sa --bwt
 ```
 
 ```sh
+## gsufsort ##
 ## store_to_disk ##
 gz/input.txt.gz.4.sa	72 bytes (n = 18)
 gz/input.txt.gz.1.bwt	18 bytes (n = 18)

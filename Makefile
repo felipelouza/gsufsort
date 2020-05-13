@@ -39,7 +39,7 @@ M64 = 0
 ##
 
 DEFINES = -DDEBUG=$(DEBUG) 
-GZ = 1
+GZ = 0
 
 CFLAGS += $(DEFINES) -DGZ=$(GZ)
 

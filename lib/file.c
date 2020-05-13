@@ -371,7 +371,7 @@ char** file_load_multiple(char* c_file, int *k, size_t *n) {
 
 	else{
 		printf("Error: file not recognized (.txt, .fasta, .fastq)\n");
-		return 0;
+    exit (EXIT_FAILURE);
 	}
 
 

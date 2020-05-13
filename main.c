@@ -44,7 +44,7 @@ void usage(char *name){
 
   puts("\t--build               (default)");
   puts("\t--load                load from disk FILE[.sa][.da][.lcp][.gsa][.bin]");
-  puts("\t--sa    [w]           computes SA  using w (def 4) bytes (FILE.w.sa)");
+  puts("\t--sa    [w]           computes SA (default) using w (def 4) bytes (FILE.w.sa)");
   puts("\t--lcp   [w]           computes LCP (FILE.w.lcp)");
   puts("\t--da    [w]           computes DA  (FILE.w.da)");
   puts("\t--gsa   [w1][w2]      computes GSA=(text, suff) using pairs of (w1, w2) bytes (FILE.w1.w2.gsa)");
@@ -202,9 +202,8 @@ int main(int argc, char** argv){
   }
 
   if(!bwt && !bin && !sa && !lcp && !da && !gsa && !bwt && !gesa){
-    puts("####");
-    die("choose at least one option  [--sa] [--lcp] [--da] [--gsa] [--gesa] [--bwt] [--bin]");
-    exit(EXIT_FAILURE);
+    //die("choose at least one option  [--sa] [--lcp] [--da] [--gsa] [--gesa] [--bwt] [--bin]");
+    sa=1;//default
   }
 
   if(!output){
@@ -293,9 +292,10 @@ int main(int argc, char** argv){
   
   /********/
   
+    printf("## gsufsort ##\n");
+
     if(time){
       time_start(&t_start, &c_start);
-      printf("## gsufsort ##\n");
     }
 
     if(light){
