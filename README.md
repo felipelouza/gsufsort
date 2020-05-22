@@ -59,7 +59,7 @@ Given a string collection in a single file FILENAME.
 #### Command
 
 ```sh
-./gsufsort FILENAME [--sa [w]] [--lcp [w]] [--da [w]] [--ligth] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--lcp_max] [--lcp_max_text] [--lcp_avg] [--trlcp [k]] [--output out]
+./gsufsort FILENAME [--sa [w]] [--lcp [w]] [--da [w]] [--ligth] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--lcp_max] [--lcp_max_text] [--lcp_avg] [--trlcp [k]] [--output out] [--qs]
 ```
 
 #### Input files 
@@ -70,9 +70,9 @@ Given a string collection in a single file FILENAME.
 
 - Strings are separated per '\0' (new line) in _.txt_ files.
 
-- _gsufsort_ supports **ASCII alphabet**, so that values _0_ and _1_ reserved.
+- **_gsufsort_** supports **ASCII alphabet**, so that values _0_ and _1_ reserved.
 
-- For inputs **larger than 2GB**, use _gsufsort-64_
+- For inputs **larger than 2GB**, use **_gsufsort-64_**
 
 
 ## quick test
@@ -148,7 +148,7 @@ ls -la dataset/input.txt.4.sa
 
 ### gzipped input files
 
-_gsufsort_ also supports gzipped input files uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries:
+**_gsufsort_** also supports gzipped input files uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries:
 
 ```sh
 make clean
@@ -171,7 +171,9 @@ malloc_count ### exiting, total: 10,578,270, peak: 10,566,937, current: 1,024
 
 ### additional features 
 
-_gsufsort_ can output (command ``--qs``, only for ``.fastq`` and ``.fq``) _Quality Scores_ (QS) permuted according to the BWT symbols:
+**_gsufsort_** can also output (command ``--qs``) the _Quality Scores_ (QS) permuted according to the BWT symbols:
+
+This option is valid only for ``.fastq`` or ``.fq`` files.
 
 For example, given the first DNA read in ``dataset/reads.fastq``:
 
@@ -186,7 +188,7 @@ AGTTAGGACTATTCGAACATTATGTCACAAACGTGATGTCACAAAGCCGAATTGTCTGGAGTTAAGACTATACGAACATT
 Then, run:
 
 ```sh
-./gsufsort dataset/reads.fastq -d 1 --bwt --qs --print 10
+./gsufsort dataset/reads.fastq --docs 1 --bwt --qs
 ```
 
 ```sh
@@ -194,30 +196,18 @@ Then, run:
 ## store_to_disk ##
 dataset/reads.fastq.1.bwt	102 bytes (n = 102)
 dataset/reads.fastq.1.qs	102 bytes (n = 102)
-## print ##
-i	BWT	suffixes
-0	$	#
-1	C	$
-2	G	AAACAAACGTGATGTCAC$
-3	C	AAACGTGATGTCAC$
-4	C	AAACGTGATGTCACAAAGCCGAATTGTCTGGAGTTAAGACTATACGAACATTATGAAACAAACGTGATGTCAC$
-5	C	AAAGCCGAATTGTCTGGAGTTAAGACTATACGAACATTATGAAACAAACGTGATGTCAC$
-6	A	AACAAACGTGATGTCAC$
-7	G	AACATTATGAAACAAACGTGATGTCAC$
-8	G	AACATTATGTCACAAACGTGATGTCACAAAGCCGAATTGTCTGGAGTTAAGACTATACGAACATTATGAAACAAACGTGATGTCAC$
-9	A	AACGTGATGTCAC$
 malloc_count ### exiting, total: 54,754, peak: 37,719, current: 1,024
 
 ```
 
-The QS permuted sequence is written at ``FILENAME.1.qs``:
+The _QS_ permuted sequence is written at ``FILENAME.1.qs``:
 
 ```sh
 tail dataset/reads.fastq.1.qs 
 ACCHHD@ICGIIHCDJJBIHBI@DGGFGEC?JFAGHE>CIGCIJ?GFEH@BICDIDEJDEEI<EGDI?JII<FG@IH@EEJHCGJHID=GJ<IIIICAHGH
 ```
 
-We have each _QS_ value ordered according to its BWT symbol:
+We have each _QS_ value ordered according to the BWT symbols:
 
 ```sh
 tail dataset/reads.fastq.1.bwt
@@ -227,9 +217,9 @@ CGCCCAGGAATAGCACCAATAAGGAATGTTGTGCCTAAAAATTTAAGATCAAAATTCCCAGGTTAATTTTTCCAATATCT
 
 ## remarks
 
-* The linear time algorithm [gsaca-k](https://github.com/felipelouza/gsa-is) is at the core of _gsufsort_. In particular, it is used to compute SA, LCP and DA.
+* The linear time algorithm [gsaca-k](https://github.com/felipelouza/gsa-is) is at the core of **_gsufsort_**. In particular, it is used to compute SA, LCP and DA.
 
-* For inputs **larger than 2GB**, _gsufsort-64_ uses **21N bytes** to compute SA, LCP and DA (GESA).
+* For inputs **larger than 2GB**, **_gsufsort-64_** uses **21N bytes** to compute SA, LCP and DA (GESA).
 
 #### working memory (in bytes)
 
@@ -244,7 +234,7 @@ CGCCCAGGAATAGCACCAATAAGGAATGTTGTGCCTAAAAATTTAAGATCAAAATTCCCAGGTTAATTTTTCCAATATCT
 
 #### _lightweight_ version
 
-* There is a _lightweight_ version of _gsufsort_ (option ``--light``) to compute DA using a bitvector during the output to disk, which saves **4N bytes**. 
+* There is a _lightweight_ version of **_gsufsort_** (option ``--light``) to compute DA using a bitvector during the output to disk, which saves **4N bytes**. 
 
 * For inputs **larger than 2GB**, the _lightweight_ version uses **17N bytes** to compute SA, LCP and DA (GESA).
 
