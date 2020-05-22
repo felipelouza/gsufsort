@@ -26,6 +26,7 @@ size_t file_size(FILE* f_in);
 
 char* file_load(FILE* f_in) ;
 char** file_load_multiple(char* c_file, int *k, size_t *n) ;
+char** file_load_multiple_qs(char* c_file, int *k, size_t *n);
 
 int file_text_write(unsigned char *str, size_t n, char* c_file, const char* ext);
 int file_text_int_write(int_t *str_int, size_t n, char* c_file, const char* ext);

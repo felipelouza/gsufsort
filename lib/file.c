@@ -147,6 +147,8 @@ char** load_multiple_txt(char *c_file, int *k, size_t *n) {
 return c_buffer;
 }
 
+/*******************************************************************/
+
 // read sequences separeted by '@' line
 char** load_multiple_fastq(char *c_file, int *k, size_t *n){
 
@@ -184,6 +186,54 @@ char** load_multiple_fastq(char *c_file, int *k, size_t *n){
 		len = 0; buf = NULL;
 		getline(&buf, &len, f_in); // @'s line
 		free(buf);
+
+		if(i==n_alloc-1){
+			n_alloc+=N_ALLOC;
+      c_buffer = (char**) realloc(c_buffer, n_alloc*sizeof(char*));
+		}
+	}
+	fclose(f_in);
+
+return c_buffer;
+}
+
+/*******************************************************************/
+char** load_multiple_qs(char *c_file, int *k, size_t *n){
+
+	FILE* f_in = file_open(c_file, "rb");
+	if(!f_in){
+    fprintf (stderr, "file_open of '%s' failed: %s.\n", c_file, strerror (errno));
+    exit (EXIT_FAILURE);
+  }
+
+  int n_alloc = N_ALLOC;
+	char **c_buffer = (char**) malloc(n_alloc*sizeof(char*));
+
+  size_t len = 0;
+	char *buf = NULL;
+	int i;
+ 	for(i=0; i<*k; i++){
+
+		len = 0; buf = NULL;
+		ssize_t size = getline(&buf, &len, f_in); // @'s line
+		free(buf);
+    if (size <= 1){
+			*k = i;
+			break;		
+		}
+
+		len = 0; buf = NULL;
+		getline(&buf, &len, f_in); // read line
+		free(buf);
+		len = 0; buf = NULL;
+		getline(&buf, &len, f_in); // +'s line
+		free(buf);
+
+		len = 0; c_buffer[i] = NULL;
+		size = getline(&c_buffer[i], &len, f_in); // @'s line
+    c_buffer[i][size-1] = 0;
+
+    (*n) += size;
 
 		if(i==n_alloc-1){
 			n_alloc+=N_ALLOC;
@@ -370,7 +420,41 @@ char** file_load_multiple(char* c_file, int *k, size_t *n) {
   #endif
 
 	else{
-		printf("Error: file not recognized (.txt, .fasta, .fastq)\n");
+		printf("Error: file not recognized (.txt, .fasta, .fa, .fastq, .fq)\n");
+    exit (EXIT_FAILURE);
+	}
+
+
+return c_buffer;
+}
+
+/*******************************************************************/
+
+char** file_load_multiple_qs(char* c_file, int *k, size_t *n) {
+
+/* .ext
+ * .fastq - strings separated by four lines
+ * .gz    - use kseq parser to extract sequences
+ */
+
+	const char *type = get_filename_ext(c_file);
+
+	char **c_buffer = NULL; // = (char**) malloc(k*sizeof(char*));
+
+	if(*k==0) *k=INT_MAX;
+
+	if(strcmp(type,"fastq") == 0 || strcmp(type,"fq") == 0)
+		c_buffer = load_multiple_qs(c_file, k, n);
+
+/* TODO
+  #if GZ
+	else if(strcmp(type,"gz") == 0)
+		c_buffer = load_multiple_gz(c_file, k, n);
+  #endif
+*/
+
+	else{
+		printf("Error: file not recognized (.fastq or .fq)\n");
     exit (EXIT_FAILURE);
 	}
 

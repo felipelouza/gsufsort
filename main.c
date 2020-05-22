@@ -51,6 +51,7 @@ void usage(char *name){
   puts("\t--light               runs lightweight algorithm to compute DA (also GSA)");
   puts("\t--gesa  [w1][w2][w3]  computes GESA=(GSA.text, GSA.suff, LCP, BWT) (FILE.w1.w2.w3.1.gesa)");
   puts("\t--bwt                 computes BWT using 1 byte (FILE.1.bwt)");
+  puts("\t--qs                  outputs (only for fastq) QS permuted according to the BWT using 1 byte (FILENAME.1.qs)");
   puts("\t--bin                 computes T^{cat} (FILE.1.bin)");
   puts("\t--docs    d           number of strings (def all FILE)");
   puts("\t--print   p           print arrays (stdout) A[1,p]");
@@ -77,7 +78,7 @@ int main(int argc, char** argv){
   time_t t_start=0;clock_t c_start=0;
   int_t i;
 
-  int sa=0, lcp=0, da=0, bwt=0, bin=0, gsa=0, gesa=0, lcp_max=0, lcp_max_text=0, lcp_avg=0, trlcp=0, time=0; //txt
+  int sa=0, lcp=0, da=0, bwt=0, q=0, bin=0, gsa=0, gesa=0, lcp_max=0, lcp_max_text=0, lcp_avg=0, trlcp=0, time=0; //txt
   int sa_bytes=sizeof(int_t);
   int lcp_bytes=sizeof(int_t);
   int da_bytes=sizeof(int_t);
@@ -107,6 +108,7 @@ int main(int argc, char** argv){
       {"da",      optional_argument, 0, 'D'},
       {"gsa",     optional_argument, 0, 'g'},
       {"bwt",     no_argument,       0, 'B'},
+      {"qs",      no_argument,       0, 'Q'},
       {"bin",     no_argument,       0, 'T'},
       {"docs",    required_argument, 0, 'd'},
       {"verbose", no_argument,       0, 'v'},
@@ -124,7 +126,7 @@ int main(int argc, char** argv){
       {0,         0,                 0,  0 }
     };
 
-    c = getopt_long(argc, argv, "S:vtP:d:L:D:g:lG:B:Tho:ic:", long_options, &option_index);
+    c = getopt_long(argc, argv, "S:vtP:d:L:D:g:lG:B:Tho:ic:Q", long_options, &option_index);
 
      if (c == -1) break;
 
@@ -162,6 +164,8 @@ int main(int argc, char** argv){
         gsa=1; break;
       case 'B':
         bwt=1; break;
+      case 'Q':
+        q=1; break;
       case 'T':
         bin=1; break;
       case 'G':
@@ -238,6 +242,31 @@ int main(int argc, char** argv){
       for(i=0; i<n; i++) printf("[%d]", str[i]);
       printf("\n");
     #endif
+
+    //quality score sequence
+    unsigned char **QS; 
+    unsigned char *qs = NULL;
+    if(q){
+
+      size_t n=0;
+      QS = (unsigned char**) file_load_multiple_qs(c_input, &d, &n);
+      //concatenate all string
+      qs = cat_all(QS, d, &n, 0);
+
+      #if DEBUG
+        printf("QS:\n");
+        for(i=0; i<d && i<10; i++)
+          printf("%" PRIdN ") %s (%zu)\n", i, QS[i], strlen((char*)QS[i]));
+        printf("####\n");
+        for(i=0; i<n; i++) printf("[%d]", qs[i]);
+        printf("\n");
+      #endif
+
+      //free memory
+      for(i=0; i<d; i++)
+        free(QS[i]);
+      free(QS);
+    }
   
     //free memory
     for(i=0; i<d; i++)
@@ -279,6 +308,7 @@ int main(int argc, char** argv){
       if(gsa)  printf("[.gsa]");
       if(gesa)  printf("[.gesa]");
       if(bwt)  printf("[.bwt]");
+      if(q)  printf("[.qs]");
       printf("\n");
       printf("N = %zu\n", n);
       printf("d = %d\n", d);
@@ -364,6 +394,7 @@ int main(int argc, char** argv){
       if(gsa) store_to_disk(NULL, DA,   rbv,  SA,   NULL, n, c_output,  "gsa",  t_bytes, s_bytes, 0);
       if(gesa) store_to_disk(str, DA,   rbv,  SA,   LCP,  n, c_output,  "gesa", t_bytes, s_bytes, lcp_bytes);
       if(bwt) store_to_disk(str,  NULL, NULL, SA,   NULL, n, c_output,  "bwt",  sizeof(char), 0, 0);
+      if(q) store_to_disk(qs,  NULL, NULL, SA,   NULL, n, c_output,  "qs",  sizeof(char), 0, 0);
     #else
       //store to disk (+1 ignores last terminator)
       if(bin) store_to_disk(str,  NULL,  NULL, NULL,  NULL,  n-1, c_output, "bin",  sizeof(char), 0, 0);
@@ -374,6 +405,7 @@ int main(int argc, char** argv){
       if(gsa) store_to_disk(NULL, DA+1,  rbv,  SA+1,  NULL,  n-1, c_output, "gsa",  t_bytes, s_bytes, 0);
       if(gesa) store_to_disk(str, DA+1,  rbv,  SA+1,  LCP+1, n-1, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
       if(bwt) store_to_disk(str,  NULL,  NULL, SA+1,  NULL,  n-1, c_output, "bwt", sizeof(char), 0, 0); 
+      if(q) store_to_disk(qs,  NULL,  NULL, SA+1,  NULL,  n-1, c_output, "qs", sizeof(char), 0, 0); 
     #endif
   
     if(time){
@@ -415,6 +447,9 @@ int main(int argc, char** argv){
 
     //free memory
     free(str);
+    if(q)
+      free(qs);
+
     free(SA);
     if(light){
       if(gesa || lcp_max || lcp_avg || lcp_max_text) free(LCP);
@@ -601,6 +636,17 @@ int store_to_disk(unsigned char *str, int_da *DA, rankbv_t* rbv, int_t *SA,  int
     }
   }
   else if(strcmp(ext, "bwt")==0){
+    for(i=0; i<n; i++){ //SA==B
+      #if LAST_END
+        char c = (SA[i])? str[SA[i]-1]:0; 
+        c = (c==1)?c:c-1; //separators = 1, and terminator = 0
+      #else
+        char c = (SA[i])? str[SA[i]-1]-1:0; //separators = 0, no terminator
+      #endif
+      fwrite(&c, wsize1, 1, f_out); 
+    }
+  }
+  else if(strcmp(ext, "qs")==0){
     for(i=0; i<n; i++){ //SA==B
       #if LAST_END
         char c = (SA[i])? str[SA[i]-1]:0; 

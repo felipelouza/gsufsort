@@ -42,6 +42,7 @@ Given a string collection in a single file FILENAME.
 --light               runs lightweight algorithm to compute DA (also GSA)
 --gesa  [w1][w2][w3]  computes GESA=(GSA, LCP, BWT) (FILENAME.w1.w2.w3.1.gesa)
 --bwt                 computes BWT using 1 byte (FILENAME.1.bwt)
+--qs                  outputs (only for fastq) QS permuted according to the BWT using 1 byte (FILENAME.1.qs)
 --bin                 computes T^{cat} (FILENAME.1.bin)
 --docs    d           number of strings (def all FILENAME)
 --print   [p]         print arrays (stdout) A[1,min(p,N)]
@@ -76,7 +77,7 @@ Given a string collection in a single file FILENAME.
 
 ## quick test
 
-To run a test with _docs=3_ strings from _dataset/input.txt_, type:
+To run a test with ``docs=3`` strings from ``dataset/input.txt``, type:
 
 ```sh
 ./gsufsort dataset/input.txt --docs 3 --sa --bwt
@@ -146,6 +147,7 @@ ls -la dataset/input.txt.4.sa
 ```
 
 ### gzipped input files
+
 _gsufsort_ also supports gzipped input files uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries:
 
 ```sh
@@ -165,6 +167,61 @@ Then, run:
 gz/input.txt.gz.4.sa	72 bytes (n = 18)
 gz/input.txt.gz.1.bwt	18 bytes (n = 18)
 malloc_count ### exiting, total: 10,578,270, peak: 10,566,937, current: 1,024
+```
+
+### additional features 
+
+_gsufsort_ can output (command ``--qs``, only for ``.fastq`` and ``.fq``) _Quality Scores_ (QS) permuted according to the BWT symbols:
+
+For example, given the first DNA read in ``dataset/reads.fastq``:
+
+```sh
+head -4 dataset/reads.fastq 
+@HWI-ST928:79:C0GNWACXX:6:1101:1184:2104 1:N:0:TAAGGCGATATCCTCT
+AGTTAGGACTATTCGAACATTATGTCACAAACGTGATGTCACAAAGCCGAATTGTCTGGAGTTAAGACTATACGAACATTATGAAACAAACGTGATGTCAC
++
+@C@FDEDDHHGHHJIIGGHJJIJGIJIHGIIFGEFIIJJJGHIGGF@DHEHIIIIJIIGGIIIGE@CEEHHEE@B?AAECDDCDDCCCBB<=<?<?CCC>A
+```
+
+Then, run:
+
+```sh
+./gsufsort dataset/reads.fastq -d 1 --bwt --qs --print 10
+```
+
+```sh
+## gsufsort ##
+## store_to_disk ##
+dataset/reads.fastq.1.bwt	102 bytes (n = 102)
+dataset/reads.fastq.1.qs	102 bytes (n = 102)
+## print ##
+i	BWT	suffixes
+0	$	#
+1	C	$
+2	G	AAACAAACGTGATGTCAC$
+3	C	AAACGTGATGTCAC$
+4	C	AAACGTGATGTCACAAAGCCGAATTGTCTGGAGTTAAGACTATACGAACATTATGAAACAAACGTGATGTCAC$
+5	C	AAAGCCGAATTGTCTGGAGTTAAGACTATACGAACATTATGAAACAAACGTGATGTCAC$
+6	A	AACAAACGTGATGTCAC$
+7	G	AACATTATGAAACAAACGTGATGTCAC$
+8	G	AACATTATGTCACAAACGTGATGTCACAAAGCCGAATTGTCTGGAGTTAAGACTATACGAACATTATGAAACAAACGTGATGTCAC$
+9	A	AACGTGATGTCAC$
+malloc_count ### exiting, total: 54,754, peak: 37,719, current: 1,024
+
+```
+
+The QS permuted sequence is written at ``FILENAME.1.qs``:
+
+```sh
+tail dataset/reads.fastq.1.qs 
+ACCHHD@ICGIIHCDJJBIHBI@DGGFGEC?JFAGHE>CIGCIJ?GFEH@BICDIDEJDEEI<EGDI?JII<FG@IH@EEJHCGJHID=GJ<IIIICAHGH
+```
+
+We have each _QS_ value ordered according to its BWT symbol:
+
+```sh
+tail dataset/reads.fastq.1.bwt
+CGCCCAGGAATAGCACCAATAAGGAATGTTGTGCCTAAAAATTTAAGATCAAAATTCCCAGGTTAATTTTTCCAATATCTTCGGGTGAGGCAAATGGAAAA
 ```
 
 
