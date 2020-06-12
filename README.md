@@ -35,6 +35,7 @@ Given a string collection in a single file FILENAME.
 ```sh
 --build	              (default)
 --load                load from disk FILENAME[.sa][.da][.lcp][.gsa][.bin]
+--ibwt                invert the BWT, given FILE[.bwt]
 --sa    [w]           computes SA  (default) using w (def 4) bytes (FILENAME.w.sa)
 --lcp   [w]           computes LCP (FILENAME.w.lcp)
 --da    [w]           computes DA  (FILENAME.w.da)
@@ -59,7 +60,7 @@ Given a string collection in a single file FILENAME.
 #### Command
 
 ```sh
-./gsufsort FILENAME [--sa [w]] [--lcp [w]] [--da [w]] [--ligth] [--gsa [w1] [w2]] [--gesa [w1] [w2] [w3]] [--bwt] [--bin] [--docs d] [--print [p]] [--lcp_max] [--lcp_max_text] [--lcp_avg] [--trlcp [k]] [--output out] [--qs]
+./gsufsort FILENAME [options]
 ```
 
 #### Input files 
@@ -77,30 +78,30 @@ Given a string collection in a single file FILENAME.
 
 ## quick test
 
-To run a test with ``docs=3`` strings from ``dataset/input.txt``, type:
+To run a test with ``docs=3`` strings from ``dataset/example.txt``, type:
 
 ```sh
-./gsufsort dataset/input.txt --docs 3 --sa --bwt
+./gsufsort dataset/example.txt --docs 3 --sa --bwt
 ```
 
 ```sh
 ## gsufsort ##
 ## store_to_disk ##
-dataset/input.txt.4.sa	72 bytes (n = 18)
-dataset/input.txt.1.bwt	18 bytes (n = 18)
+dataset/example.txt.4.sa	72 bytes (n = 18)
+dataset/example.txt.1.bwt	18 bytes (n = 18)
 malloc_count ### exiting, total: 32,859, peak: 21,420, current: 1,024
 ```
 
 To see the result (option ``--print``) stored in disk ``FILENAME.4.sa`` and ``FILENAME.1.bwt``, use **--load** option:
 
 ```sh
-./gsufsort dataset/input.txt --sa --bwt --load --print
+./gsufsort dataset/example.txt --sa --bwt --load --print
 ```
 
 ```sh
 ## load_from_disk ##
-dataset/input.txt.4.sa	72 bytes (n = 18)
-dataset/input.txt.1.bwt	18 bytes (n = 18)
+dataset/example.txt.4.sa	72 bytes (n = 18)
+dataset/example.txt.1.bwt	18 bytes (n = 18)
 i	SA	BWT	suffixes
 0	18	$	#
 1	6	a	$
@@ -129,22 +130,46 @@ malloc_count ### exiting, total: 10,438, peak: 5,790, current: 1,024
 In particular, the BWT output (``FILENAME.1.bwt``) is written in ASCII format, which can be opened in terminal:
 
 ```sh
-vim dataset/input.txt.1.bwt
-```
-
-```sh
-aannbnnn��ba\0aaaaa
+less +1 dataset/example.txt.1.bwt
+^Aaannbnnn^A^Aba^@aaaaa
 ```
 
 Suffix array output (``FILENAME.4.sa``) is written in binary format, each integer takes ``w`` bytes (default ``w`` is 4).
 
 ```sh
-ls -la dataset/input.txt.4.sa
+ls -la dataset/example.txt.4.sa
 ```
 
 ```sh
--rw-rw-r--. 1 louza louza 72 Apr 23 08:25 dataset/input.txt.4.sa
+-rw-rw-r--. 1 louza louza 72 Apr 23 08:25 dataset/example.txt.4.sa
 ```
+
+## remarks
+
+* The linear time algorithm [gsaca-k](https://github.com/felipelouza/gsa-is) is at the core of **_gsufsort_**. In particular, it is used to compute SA, LCP and DA.
+
+* For inputs **larger than 2GB**, **_gsufsort-64_** uses **21N bytes** to compute SA, LCP and DA (GESA).
+
+#### working memory (in bytes)
+
+| version   | 32 bits | 64 bits |
+|-----------|:-------:|:-------:|
+| SA        |    5N   |    9N   |
+| SA+LCP    |    9N   |   17N   |
+| SA+LCP+DA |   13N   |   21N   |
+| SA+DA     |    9N   |   13N   |
+| GSA       |    9N   |   13N   |
+| GESA      |   13N   |   21N   |
+
+#### _lightweight_ version
+
+* There is a _lightweight_ version of **_gsufsort_** (option ``--light``) to compute DA using a bitvector during the output to disk, which saves **4N bytes**. 
+
+* For inputs **larger than 2GB**, the _lightweight_ version uses **17N bytes** to compute SA, LCP and DA (GESA).
+
+
+## additional features 
+
 
 ### gzipped input files
 
@@ -158,18 +183,65 @@ make GZ=1
 Then, run:
 
 ```sh
-./gsufsort gz/input.txt.gz --docs 3 --sa --bwt
+./gsufsort gz/example.txt.gz --docs 3 --sa --bwt
 ```
 
 ```sh
 ## gsufsort ##
 ## store_to_disk ##
-gz/input.txt.gz.4.sa	72 bytes (n = 18)
-gz/input.txt.gz.1.bwt	18 bytes (n = 18)
+gz/example.txt.gz.4.sa	72 bytes (n = 18)
+gz/example.txt.gz.1.bwt	18 bytes (n = 18)
 malloc_count ### exiting, total: 10,578,270, peak: 10,566,937, current: 1,024
 ```
 
-### additional features 
+### BWT Invert
+
+**_gsufsort_** can also be used to invert the BWT (option ``--ibwt``).
+
+Given the BWT file as input ``FILENAME``, type:
+
+```sh
+./gsufsort FILENAME --ibwt
+```
+
+The result is stored in disk as ``FILENAME.ibwt``.
+
+For example, given the file ``dataset/example.txt``:
+
+```sh
+./gsufsort dataset/example.txt --bwt
+```
+
+See the resulting file:
+
+```sh
+less +1 dataset/example.txt.1.bwt
+aannbnnn^@^@ba^@aaaaa
+```
+
+Then, invert the BWT:
+
+```sh
+./gsufsort dataset/example.txt.1.bwt --ibwt
+```
+
+```sh
+## invert_bwt ##
+dataset/example.txt.1.bwt	18 bytes (n = 18)
+## store_to_disk ##
+dataset/example.txt.1.bwt.ibwt	18 bytes (n = 18)
+malloc_count ### exiting, total: 10,298, peak: 5,730, current: 1,024
+```
+
+Compare the output with the original file:
+
+```sh
+diff -s dataset/example.txt.1.bwt.ibwt dataset/example.txt
+Files dataset/example.txt.1.bwt.ibwt and dataset/example.txt are identical
+```
+
+
+### _Quality Score (QS) sequences_
 
 **_gsufsort_** can also output (command ``--qs``) the _Quality Scores_ (QS) permuted according to the BWT symbols:
 
@@ -213,31 +285,6 @@ We have each _QS_ value ordered according to the BWT symbols:
 tail dataset/reads.fastq.1.bwt
 CGCCCAGGAATAGCACCAATAAGGAATGTTGTGCCTAAAAATTTAAGATCAAAATTCCCAGGTTAATTTTTCCAATATCTTCGGGTGAGGCAAATGGAAAA
 ```
-
-
-## remarks
-
-* The linear time algorithm [gsaca-k](https://github.com/felipelouza/gsa-is) is at the core of **_gsufsort_**. In particular, it is used to compute SA, LCP and DA.
-
-* For inputs **larger than 2GB**, **_gsufsort-64_** uses **21N bytes** to compute SA, LCP and DA (GESA).
-
-#### working memory (in bytes)
-
-| version   | 32 bits | 64 bits |
-|-----------|:-------:|:-------:|
-| SA        |    5N   |    9N   |
-| SA+LCP    |    9N   |   17N   |
-| SA+LCP+DA |   13N   |   21N   |
-| SA+DA     |    9N   |   13N   |
-| GSA       |    9N   |   13N   |
-| GESA      |   13N   |   21N   |
-
-#### _lightweight_ version
-
-* There is a _lightweight_ version of **_gsufsort_** (option ``--light``) to compute DA using a bitvector during the output to disk, which saves **4N bytes**. 
-
-* For inputs **larger than 2GB**, the _lightweight_ version uses **17N bytes** to compute SA, LCP and DA (GESA).
-
 
 ## authors
 
