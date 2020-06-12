@@ -28,7 +28,7 @@
 #endif
 
 #ifndef LAST_END
-  #define LAST_END 0
+  #define LAST_END 1
 #endif
 
 #define WORD (size_t)(pow(256,sizeof(int_t))/2.0)
