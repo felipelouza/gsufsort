@@ -128,7 +128,7 @@ The suffix array output (``FILENAME.4.sa``) is written in binary format, each in
 
 ```sh
 ls -la dataset/example.txt.4.sa
--rw-rw-r--. 1 louza louza 72 Apr 23 08:25 dataset/example.txt.4.sa
+-rw-rw-r--. 1 louza louza 76 Apr 23 08:25 dataset/example.txt.4.sa
 ```
 
 The BWT output (``FILENAME.1.bwt``) is written in ASCII format:
@@ -138,11 +138,13 @@ less +1 dataset/example.txt.1.bwt
 ^Aaannbnnn^A^Aba^@aaaaa
 ```
 
-We can **invert the BWT** with **_gsufsort_** (option ``--ibwt``):
+We can **invert the BWT** with option ``--ibwt``:
 
 ```sh
 ./gsufsort dataset/example.txt.1.bwt --ibwt
 ```
+
+The result is stored in ``FILENAME.1.bwt.ibwt``.
 
 ```sh
 ## inverse_bwt ##
@@ -160,13 +162,13 @@ Files dataset/example.txt.1.bwt.ibwt and dataset/example.txt are identical
 
 #### Notes:
 
-For **fasta** files, compare ``FILENAME.1.ibwt`` with the original, using the command:
+For **fasta** files, compare ``FILENAME.1.ibwt`` with the original's, using the commands:
 
 ```sh
 awk '!/^>/ { printf "%s", $0; n = "\n" } /^>/ { print n $0; n = "" } END { printf "%s", n }' FILENAME | sed '/^>/d' - | diff FILENAME.1.ibwt -
 ```
 
-For **fastq** files, one can use the command:
+While for **fastq** files, one can use the commands:
 
 ```sh
 sed -n 2~4p FILENAME | diff FILENAME.1.ibwt -
@@ -199,7 +201,7 @@ sed -n 2~4p FILENAME | diff FILENAME.1.ibwt -
 
 ## additional features 
 
-### _Quality Score (QS) sequences_
+### _quality score (QS) sequences_
 
 **_gsufsort_** can also output (command ``--qs``) the _Quality Scores_ (QS) permuted according to the BWT symbols:
 
@@ -236,8 +238,6 @@ ACCHHD@ICGIIHCDJJBIHBI@DGGFGEC?JFAGHE>CIGCIJ?GFEH@BICDIDEJDEEI<EGDI?JII<FG@IH@EE
 ```
 
 **_gsufsort_** can also invert the __QS permuted sequence__ together with the BWT (options ``--ibwt --qs``).
-
-For example, given the files ``dataset/reads.fastq.1.bwt`` and ``dataset/reads.fastq.1.qs``:
 
 ```sh
 ./gsufsort --ibwt --qs dataset/reads.fastq.1.bwt
