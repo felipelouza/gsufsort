@@ -57,12 +57,6 @@ Given a string collection in a single file FILENAME.
 --help                this help message
 ```
 
-### Command
-
-```sh
-./gsufsort FILENAME [options]
-```
-
 ### Input files 
 
 - **Supported extensions**: _.txt_, _.fasta_ (or _.fa_) and _.fastq_ (or _.fq_).
@@ -71,7 +65,7 @@ Given a string collection in a single file FILENAME.
 
 - **_gsufsort_** supports **ASCII alphabet**, so that values _0_ and _1_ reserved.
 
-- **gzipped input data** (extension _.gz_) are also supported uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries. Please, use the option ``make GZ=1``.
+- **gzipped input data** (extension _.gz_) are supported uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries. Please, build with the option ``make GZ=1``.
 
 - For inputs **larger than 2GB**, use **_gsufsort-64_**
 
@@ -124,14 +118,14 @@ i	SA	BWT	suffixes
 
 ### output files
 
-The suffix array output (``FILENAME.4.sa``) is written in binary format, each integer takes ``w`` bytes (default ``w`` is 4).
+The **suffix array** output (``FILENAME.4.sa``) is written in binary format, each integer takes ``w`` bytes (default ``w`` is 4).
 
 ```sh
 ls -la dataset/example.txt.4.sa
 -rw-rw-r--. 1 louza louza 76 Apr 23 08:25 dataset/example.txt.4.sa
 ```
 
-The BWT output (``FILENAME.1.bwt``) is written in ASCII format:
+The **BWT** output (``FILENAME.1.bwt``) is written in ASCII format:
 
 ```sh
 less +1 dataset/example.txt.1.bwt
@@ -144,16 +138,7 @@ We can **invert the BWT** with option ``--ibwt``:
 ./gsufsort dataset/example.txt.1.bwt --ibwt
 ```
 
-The result is stored in ``FILENAME.1.bwt.ibwt``.
-
-```sh
-## inverse_bwt ##
-dataset/example.txt.1.bwt	19 bytes (n = 19)
-## store_to_disk ##
-dataset/example.txt.1.bwt.ibwt	18 bytes (n = 18)
-```
-
-Comparing the inverted BWT with the original file:
+The result is stored in ``FILENAME.1.bwt.ibwt``, which can be compared with the orignal file:
 
 ```sh
 diff -s dataset/example.txt.1.bwt.ibwt dataset/example.txt
@@ -162,7 +147,7 @@ Files dataset/example.txt.1.bwt.ibwt and dataset/example.txt are identical
 
 #### Notes:
 
-For **fasta** files, compare ``FILENAME.1.ibwt`` with the original's, using the commands:
+For **fasta** files, one can compare ``FILENAME.1.ibwt`` using the commands:
 
 ```sh
 awk '!/^>/ { printf "%s", $0; n = "\n" } /^>/ { print n $0; n = "" } END { printf "%s", n }' FILENAME | sed '/^>/d' - | diff FILENAME.1.ibwt -
@@ -203,9 +188,9 @@ sed -n 2~4p FILENAME | diff FILENAME.1.ibwt -
 
 ### _quality score (QS) sequences_
 
-**_gsufsort_** can also output (command ``--qs``) the _Quality Scores_ (QS) permuted according to the BWT symbols:
+* **_gsufsort_** can also output (command ``--qs``) the _Quality Scores_ (QS) permuted according to the BWT symbols:
 
-This option is valid only for ``.fastq`` or ``.fq`` files.
+* This option is valid only for ``.fastq`` or ``.fq`` files.
 
 For example, given the first DNA read in ``dataset/reads.fastq``:
 
