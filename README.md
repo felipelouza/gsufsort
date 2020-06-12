@@ -1,8 +1,8 @@
 # gsufsort: 
 
-This software is an implementation of **_gsufsort_**, a fast, portable, and lightweight tool for constructing the **suffix array** and related data structures for **string collections**. 
+This software is a fast, portable, and lightweight tool for constructing the **suffix array** and related data structures for **string collections**. 
 
-The software runs in internal memory (the computed data structures are written to disk). 
+The software runs in internal memory (data structures are written to disk). 
 
 Given an string collection, **_gsufsort_** can compute the:
 
@@ -30,22 +30,22 @@ Given a string collection in a single file FILENAME.
 ./gsufsort FILENAME [options]
 ```
 
-#### Available options
+### Available options
 
 ```sh
 --build	              (default)
 --load                load from disk FILENAME[.sa][.da][.lcp][.gsa][.bin]
---ibwt                invert the BWT, given FILE[.bwt]
 --sa    [w]           computes SA  (default) using w (def 4) bytes (FILENAME.w.sa)
 --lcp   [w]           computes LCP (FILENAME.w.lcp)
 --da    [w]           computes DA  (FILENAME.w.da)
 --gsa   [w1][w2]      computes GSA=(text, suff) using pairs of (w1, w2) bytes (FILENAME.w1.w2.gsa)
---light               runs lightweight algorithm to compute DA (also GSA)
 --gesa  [w1][w2][w3]  computes GESA=(GSA, LCP, BWT) (FILENAME.w1.w2.w3.1.gesa)
+--light               runs lightweight algorithm to compute DA (also GSA and GESA)
 --bwt                 computes BWT using 1 byte (FILENAME.1.bwt)
---qs                  outputs (only for fastq) QS permuted according to the BWT using 1 byte (FILENAME.1.qs)
---bin                 computes T^{cat} (FILENAME.1.bin)
---docs    d           number of strings (def all FILENAME)
+--ibwt                invert the BWT, given FILENAME[.bwt]
+--qs                  outputs QS sequences (only for fastq) permuted according to the BWT (FILENAME.1.qs)
+--bin                 outputs T^{cat} in binary format (FILENAME.1.bin)
+--docs    d           number of strings to be handled (def all)
 --print   [p]         print arrays (stdout) A[1,min(p,N)]
 --lcp_max             outputs maximum LCP-value
 --lcp_max_text        outputs maximum LCP-value (text)
@@ -57,24 +57,23 @@ Given a string collection in a single file FILENAME.
 --help                this help message
 ```
 
-#### Command
+### Command
 
 ```sh
 ./gsufsort FILENAME [options]
 ```
 
-#### Input files 
+### Input files 
 
 - **Supported extensions**: _.txt_, _.fasta_ (or _.fa_) and _.fastq_ (or _.fq_).
-
-- **gzipped input data** (extension _.gz_) are also supported.
 
 - Strings are separated per '\0' (new line) in _.txt_ files.
 
 - **_gsufsort_** supports **ASCII alphabet**, so that values _0_ and _1_ reserved.
 
-- For inputs **larger than 2GB**, use **_gsufsort-64_**
+- **gzipped input data** (extension _.gz_) are also supported uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries. Please, use the option ``make GZ=1``.
 
+- For inputs **larger than 2GB**, use **_gsufsort-64_**
 
 ## quick test
 
@@ -87,12 +86,11 @@ To run a test with ``docs=3`` strings from ``dataset/example.txt``, type:
 ```sh
 ## gsufsort ##
 ## store_to_disk ##
-dataset/example.txt.4.sa	72 bytes (n = 18)
-dataset/example.txt.1.bwt	18 bytes (n = 18)
-malloc_count ### exiting, total: 32,859, peak: 21,420, current: 1,024
+dataset/example.txt.4.sa	76 bytes (n = 19)
+dataset/example.txt.1.bwt	19 bytes (n = 19)
 ```
 
-To see the result (option ``--print``) stored in disk ``FILENAME.4.sa`` and ``FILENAME.1.bwt``, use **--load** option:
+To see the result (option ``--print``) stored in disk ``FILENAME.4.sa`` and ``FILENAME.1.bwt``, use ``--load`` option:
 
 ```sh
 ./gsufsort dataset/example.txt --sa --bwt --load --print
@@ -100,8 +98,8 @@ To see the result (option ``--print``) stored in disk ``FILENAME.4.sa`` and ``FI
 
 ```sh
 ## load_from_disk ##
-dataset/example.txt.4.sa	72 bytes (n = 18)
-dataset/example.txt.1.bwt	18 bytes (n = 18)
+dataset/example.txt.4.sa	76 bytes (n = 19)
+dataset/example.txt.1.bwt	19 bytes (n = 19)
 i	SA	BWT	suffixes
 0	18	$	#
 1	6	a	$
@@ -122,27 +120,58 @@ i	SA	BWT	suffixes
 16	8	a	naba$
 17	14	a	nan$
 18	2	a	nana$
-malloc_count ### exiting, total: 10,438, peak: 5,790, current: 1,024
 ```
 
 ### output files
 
-In particular, the BWT output (``FILENAME.1.bwt``) is written in ASCII format, which can be opened in terminal:
+The suffix array output (``FILENAME.4.sa``) is written in binary format, each integer takes ``w`` bytes (default ``w`` is 4).
+
+```sh
+ls -la dataset/example.txt.4.sa
+-rw-rw-r--. 1 louza louza 72 Apr 23 08:25 dataset/example.txt.4.sa
+```
+
+The BWT output (``FILENAME.1.bwt``) is written in ASCII format:
 
 ```sh
 less +1 dataset/example.txt.1.bwt
 ^Aaannbnnn^A^Aba^@aaaaa
 ```
 
-Suffix array output (``FILENAME.4.sa``) is written in binary format, each integer takes ``w`` bytes (default ``w`` is 4).
+We can **invert the BWT** with **_gsufsort_** (option ``--ibwt``):
 
 ```sh
-ls -la dataset/example.txt.4.sa
+./gsufsort dataset/example.txt.1.bwt --ibwt
 ```
 
 ```sh
--rw-rw-r--. 1 louza louza 72 Apr 23 08:25 dataset/example.txt.4.sa
+## inverse_bwt ##
+dataset/example.txt.1.bwt	19 bytes (n = 19)
+## store_to_disk ##
+dataset/example.txt.1.bwt.ibwt	18 bytes (n = 18)
 ```
+
+Comparing the inverted BWT with the original file:
+
+```sh
+diff -s dataset/example.txt.1.bwt.ibwt dataset/example.txt
+Files dataset/example.txt.1.bwt.ibwt and dataset/example.txt are identical
+```
+
+#### Notes:
+
+For **fasta** files, compare ``FILENAME.1.ibwt`` with the original, using the command:
+
+```sh
+awk '!/^>/ { printf "%s", $0; n = "\n" } /^>/ { print n $0; n = "" } END { printf "%s", n }' FILENAME | sed '/^>/d' - | diff FILENAME.1.ibwt -
+```
+
+For **fastq** files, one can use the command:
+
+```sh
+sed -n 2~4p FILENAME | diff FILENAME.1.ibwt -
+```
+
 
 ## remarks
 
@@ -170,77 +199,6 @@ ls -la dataset/example.txt.4.sa
 
 ## additional features 
 
-
-### gzipped input files
-
-**_gsufsort_** also supports gzipped input files uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries:
-
-```sh
-make clean
-make GZ=1
-```
-
-Then, run:
-
-```sh
-./gsufsort gz/example.txt.gz --docs 3 --sa --bwt
-```
-
-```sh
-## gsufsort ##
-## store_to_disk ##
-gz/example.txt.gz.4.sa	72 bytes (n = 18)
-gz/example.txt.gz.1.bwt	18 bytes (n = 18)
-malloc_count ### exiting, total: 10,578,270, peak: 10,566,937, current: 1,024
-```
-
-### BWT Invert
-
-**_gsufsort_** can also be used to invert the BWT (option ``--ibwt``).
-
-Given the BWT file as input ``FILENAME``, type:
-
-```sh
-./gsufsort FILENAME --ibwt
-```
-
-The result is stored in disk as ``FILENAME.ibwt``.
-
-For example, given the file ``dataset/example.txt``:
-
-```sh
-./gsufsort dataset/example.txt --bwt
-```
-
-See the resulting file:
-
-```sh
-less +1 dataset/example.txt.1.bwt
-aannbnnn^@^@ba^@aaaaa
-```
-
-Then, invert the BWT:
-
-```sh
-./gsufsort dataset/example.txt.1.bwt --ibwt
-```
-
-```sh
-## invert_bwt ##
-dataset/example.txt.1.bwt	18 bytes (n = 18)
-## store_to_disk ##
-dataset/example.txt.1.bwt.ibwt	18 bytes (n = 18)
-malloc_count ### exiting, total: 10,298, peak: 5,730, current: 1,024
-```
-
-Compare the output with the original file:
-
-```sh
-diff -s dataset/example.txt.1.bwt.ibwt dataset/example.txt
-Files dataset/example.txt.1.bwt.ibwt and dataset/example.txt are identical
-```
-
-
 ### _Quality Score (QS) sequences_
 
 **_gsufsort_** can also output (command ``--qs``) the _Quality Scores_ (QS) permuted according to the BWT symbols:
@@ -266,25 +224,39 @@ Then, run:
 ```sh
 ## gsufsort ##
 ## store_to_disk ##
-dataset/reads.fastq.1.bwt	102 bytes (n = 102)
-dataset/reads.fastq.1.qs	102 bytes (n = 102)
-malloc_count ### exiting, total: 54,754, peak: 37,719, current: 1,024
-
+dataset/reads.fastq.1.bwt	103 bytes (n = 103)
+dataset/reads.fastq.1.bwt.qs	103 bytes (n = 103)
 ```
 
-The _QS_ permuted sequence is written at ``FILENAME.1.qs``:
+The _QS_ permuted sequence is written at ``dataset/reads.fastq.1.bwt.qs``:
 
 ```sh
 tail dataset/reads.fastq.1.qs 
 ACCHHD@ICGIIHCDJJBIHBI@DGGFGEC?JFAGHE>CIGCIJ?GFEH@BICDIDEJDEEI<EGDI?JII<FG@IH@EEJHCGJHID=GJ<IIIICAHGH
 ```
 
-We have each _QS_ value ordered according to the BWT symbols:
+**_gsufsort_** can also invert the __QS permuted sequence__ together with the BWT (options ``--ibwt --qs``).
+
+For example, given the files ``dataset/reads.fastq.1.bwt`` and ``dataset/reads.fastq.1.qs``:
 
 ```sh
-tail dataset/reads.fastq.1.bwt
-CGCCCAGGAATAGCACCAATAAGGAATGTTGTGCCTAAAAATTTAAGATCAAAATTCCCAGGTTAATTTTTCCAATATCTTCGGGTGAGGCAAATGGAAAA
+./gsufsort --ibwt --qs dataset/reads.fastq.1.bwt
 ```
+
+See the resulting file:
+
+```sh
+less +1 dataset/reads.fastq.1.bwt.iqs
+@C@FDEDDHHGHHJIIGGHJJIJGIJIHGIIFGEFIIJJJGHIGGF@DHEHIIIIJIIGGIIIGE@CEEHHEE@B?AAECDDCDDCCCBB<=<?<?CCC>A
+```
+
+Compare the output with the original file:
+
+```sh
+head -4 dataset/reads.fastq | sed -n 4~4p - | diff -s dataset/reads.fastq.1.bwt.iqs -
+Files dataset/reads.fastq.1.bwt.iqs and - are identical
+```
+
 
 ## authors
 
