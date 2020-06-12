@@ -237,7 +237,7 @@ tail dataset/reads.fastq.1.qs
 ACCHHD@ICGIIHCDJJBIHBI@DGGFGEC?JFAGHE>CIGCIJ?GFEH@BICDIDEJDEEI<EGDI?JII<FG@IH@EEJHCGJHID=GJ<IIIICAHGH
 ```
 
-**_gsufsort_** can also invert the __QS permuted sequence__ together with the BWT (options ``--ibwt --qs``).
+**_gsufsort_** can invert the __QS permuted sequence__ together with the BWT (options ``--ibwt --qs``).
 
 ```sh
 ./gsufsort --ibwt --qs dataset/reads.fastq.1.bwt
