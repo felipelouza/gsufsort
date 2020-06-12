@@ -128,7 +128,7 @@ return str;
 
 /**********************************************************************/
 
-int print_array(unsigned char *str, int_da *DA, rankbv_t* rbv, int light, int_t *SA, int_t *LCP, int bin, int da, int sa, int bwt, int gsa, size_t n, size_t m){
+int print_array(unsigned char *str, int_da *DA, rankbv_t* rbv, int light, int_t *SA, int_t *LCP, int bin, int da, int sa, int lcp, int bwt, int gsa, int gesa, size_t n, size_t m, int last_end){
 
 	size_t i,j;
 
@@ -136,13 +136,19 @@ int print_array(unsigned char *str, int_da *DA, rankbv_t* rbv, int light, int_t 
   printf("i\t");
   if(sa)	printf("SA\t");
   if(da)	printf("DA\t");
-  if(LCP) printf("LCP\t");
+  if(gesa || lcp) printf("LCP\t");
   if(gsa)	printf("GSA\t\t");
   if(bwt) printf("BWT\t");
 	if(bin)	printf("suffixes");
 	printf("\n");
 
-	for(i = 0; i < m; ++i) {
+  char terminal='$';
+
+  if(last_end){
+    terminal='#';
+  }
+
+	for(i=0; i < m; ++i) {
 
 		printf("%zu\t",i);
 		if(sa) 	printf("%" PRIdN "\t",SA[i]);
@@ -151,15 +157,20 @@ int print_array(unsigned char *str, int_da *DA, rankbv_t* rbv, int light, int_t 
       da_value = (light)?rankbv_rank1(rbv,SA[i]):DA[i];
       printf("%" PRIdA "\t",da_value);
     }
-		if(LCP)	printf("%" PRIdN "\t",LCP[i]);
+		if(gesa || lcp)	printf("%" PRIdN "\t",LCP[i]);
 		if(gsa){
       da_value = (light)?rankbv_rank1(rbv,SA[i]):DA[i];
 			printf("(%" PRIdA ", ", da_value);
-			int_t value = (da_value==0)?SA[i]:SA[i]-SA[da_value]-1;
+
+      int_t pos;
+      if(last_end) pos=SA[da_value];
+      else pos=SA[da_value-1];
+
+			int_t value = (da_value==0)?SA[i]:SA[i]-pos-1;
 			printf("%" PRIdN ")   \t", value);
 		}
 		if(bwt){
-			char c = (SA[i])? str[SA[i]-1]-1:'#';
+			char c = (SA[i])? str[SA[i]-1]-1:terminal;
 			if(c==0) c = '$';
 			printf("%c\t",c);
 		}

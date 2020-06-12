@@ -35,6 +35,7 @@ Given a string collection in a single file FILENAME.
 ```sh
 --build	              (default)
 --load                load from disk FILENAME[.sa][.da][.lcp][.gsa][.bin]
+--ibwt                invert the BWT, given FILE[.bwt]
 --sa    [w]           computes SA  (default) using w (def 4) bytes (FILENAME.w.sa)
 --lcp   [w]           computes LCP (FILENAME.w.lcp)
 --da    [w]           computes DA  (FILENAME.w.da)
@@ -42,7 +43,7 @@ Given a string collection in a single file FILENAME.
 --light               runs lightweight algorithm to compute DA (also GSA)
 --gesa  [w1][w2][w3]  computes GESA=(GSA, LCP, BWT) (FILENAME.w1.w2.w3.1.gesa)
 --bwt                 computes BWT using 1 byte (FILENAME.1.bwt)
---qs                  outputs (only for fastq) QS permuted according to the BWT using 1 byte (FILENAME.1.qs)
+--qs                  outputs (only for fastq) QS permuted according to the BWT using 1 byte (FILENAME.1.bwt.qs)
 --bin                 computes T^{cat} (FILENAME.1.bin)
 --docs    d           number of strings (def all FILENAME)
 --print   [p]         print arrays (stdout) A[1,min(p,N)]
@@ -193,7 +194,7 @@ Then, run:
 ## gsufsort ##
 ## store_to_disk ##
 dataset/reads.fastq.1.bwt	102 bytes (n = 102)
-dataset/reads.fastq.1.qs	102 bytes (n = 102)
+dataset/reads.fastq.1.bwt.qs	102 bytes (n = 102)
 ## print ##
 i	BWT	suffixes
 0	$	#
@@ -210,10 +211,10 @@ malloc_count ### exiting, total: 54,754, peak: 37,719, current: 1,024
 
 ```
 
-The QS permuted sequence is written at ``FILENAME.1.qs``:
+The QS permuted sequence is written at ``FILENAME.1.bwt.qs``:
 
 ```sh
-tail dataset/reads.fastq.1.qs 
+tail dataset/reads.fastq.1.bwt.qs 
 ACCHHD@ICGIIHCDJJBIHBI@DGGFGEC?JFAGHE>CIGCIJ?GFEH@BICDIDEJDEEI<EGDI?JII<FG@IH@EEJHCGJHID=GJ<IIIICAHGH
 ```
 
@@ -260,3 +261,42 @@ CGCCCAGGAATAGCACCAATAAGGAATGTTGTGCCTAAAAATTTAAGATCAAAATTCCCAGGTTAATTTTTCCAATATCT
 ## thanks
 
 Thanks to [Antonis Maronikolakis](https://github.com/antmarakis) by helpful suggestions.
+
+
+
+
+
+
+################################################################################
+
+
+##tmp
+
+### txt
+
+./gsufsort --bwt dataset/input.txt
+./gsufsort --ibwt dataset/input.txt.1.bwt
+
+diff dataset/input.txt dataset/input.txt.1.bwt
+
+
+### fasta
+./gsufsort --bwt dataset/proteins.fasta
+./gsufsort --ibwt dataset/proteins.fasta.1.bwt
+
+awk '!/^>/ { printf "%s", $0; n = "\n" } /^>/ { print n $0; n = "" } END { printf "%s", n }' dataset/proteins.fasta | sed '/^>/d' - | diff dataset/proteins.fasta.1.bwt.1.ibwt -
+
+### fastq
+
+./gsufsort --bwt dataset/reads.fastq
+./gsufsort --ibwt dataset/reads.fastq.1.bwt
+
+sed -n 2~4p dataset/reads.fastq | diff dataset/reads.fastq.1.bwt.1.ibwt -
+
+--qs
+
+./gsufsort --bwt --qs dataset/reads.fastq
+./gsufsort --ibwt --qs dataset/reads.fastq.1.bwt
+
+sed -n 2~4p dataset/reads.fastq | diff dataset/reads.fastq.1.bwt.ibwt -
+sed -n 4~4p dataset/reads.fastq | diff dataset/reads.fastq.1.bwt.iqs -

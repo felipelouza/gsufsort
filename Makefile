@@ -10,7 +10,11 @@ OPT_FLAGS= -O3 -ffast-math -funroll-loops -m64 -fomit-frame-pointer -D_FILE_OFFS
 LFLAGS = -lm -ldl -mpopcnt
 
 CFLAGS = $(WFLAGS) $(OPT_FLAGS) 
+#valgrind
+#CFLAGS += -g -O0 
+
 CFLAGS += $(LFLAGS)
+
 
 CXX_FLAGS = -std=c++11 $(WFLAGS) $(OPT_FLAGS)
 CXX_FLAGS += -I$(INC_DIR) -L$(LIB_DIR) $(LFLAGS)
@@ -82,4 +86,4 @@ run:
 	./gsufsort $(DIR)$(INPUT) -v --sa
 
 valgrind:
-	valgrind -q --tool=memcheck --leak-check=full --track-origins=yes --show-leak-kinds=all ./gsufsort $(DIR)$(INPUT) --sa -d 100
+	valgrind -q --tool=memcheck --leak-check=full --track-origins=yes --show-leak-kinds=all ./gsufsort --ibwt --qs $(DIR)$(INPUT) 
