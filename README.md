@@ -7,10 +7,12 @@ The software runs in internal memory (data structures are written to disk).
 Given an string collection, **_gsufsort_** can compute the:
 
 - [x] Suffix array (SA)
+- [x] Inverse suffix array (ISA)
 - [x] LCP-array (LCP)
 - [x] k-truncated LCP-array (k-LCP)
 - [x] Document array (DA)
 - [x] Burrows-Wheeler transform (BWT)
+- [x] Inverse BWT
 - [x] Generalized suffix array (GSA)
 - [x] Generalized enhanced suffix array (GESA)
 
@@ -35,24 +37,25 @@ Given a string collection in a single file FILENAME.
 ```sh
 --build	              (default)
 --load                load from disk FILENAME[.sa][.da][.lcp][.gsa][.bin]
---sa    [w]           computes SA  (default) using w (def 4) bytes (FILENAME.w.sa)
---lcp   [w]           computes LCP (FILENAME.w.lcp)
---da    [w]           computes DA  (FILENAME.w.da)
---gsa   [w1][w2]      computes GSA=(text, suff) using pairs of (w1, w2) bytes (FILENAME.w1.w2.gsa)
---gesa  [w1][w2][w3]  computes GESA=(GSA, LCP, BWT) (FILENAME.w1.w2.w3.1.gesa)
---light               runs lightweight algorithm to compute DA (also GSA and GESA)
---bwt                 computes BWT using 1 byte (FILENAME.1.bwt)
+--sa    [w]           compute SA  (default) using w (def 4) bytes (FILENAME.w.sa)
+--isa   [w]           compute ISA (FILENAME.w.isa)
+--lcp   [w]           compute LCP (FILENAME.w.lcp)
+--da    [w]           compute DA  (FILENAME.w.da)
+--gsa   [w1][w2]      compute GSA=(text, suff) using pairs of (w1, w2) bytes (FILENAME.w1.w2.gsa)
+--gesa  [w1][w2][w3]  compute GESA=(GSA, LCP, BWT) (FILENAME.w1.w2.w3.1.gesa)
+--light               run lightweight algorithm to compute DA (also GSA and GESA)
+--bwt                 compute BWT using 1 byte (FILENAME.1.bwt)
 --ibwt                invert the BWT, given FILENAME[.bwt]
---qs                  outputs QS sequences (only for fastq) permuted according to the BWT (FILENAME.1.qs)
---bin                 outputs T^{cat} in binary format (FILENAME.1.bin)
+--qs                  output QS sequences (only for fastq) permuted according to the BWT (FILENAME.1.qs)
+--bin                 output T^{cat} in binary format (FILENAME.1.bin)
 --docs    d           number of strings to be handled (def all)
 --print   [p]         print arrays (stdout) A[1,min(p,N)]
---lcp_max             outputs maximum LCP-value
---lcp_max_text        outputs maximum LCP-value (text)
---lcp_avg             outputs average LCP-value
---trlcp   k           outputs k-truncated LCP array (FILENAME.w.lcp)
---time                outputs time (in seconds)
---output  outfile     renames output file
+--lcp_max             output maximum LCP-value
+--lcp_max_text        output maximum LCP-value (text)
+--lcp_avg             output average LCP-value
+--trlcp   k           output k-truncated LCP array (FILENAME.w.lcp)
+--time                output time (in seconds)
+--output  outfile     rename output file
 --verbose             verbose output
 --help                this help message
 ```
