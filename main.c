@@ -53,7 +53,7 @@ void usage(char *name){
   puts("\t--gsa   [w1][w2]      compute GSA=(text, suff) using pairs of (w1, w2) bytes (FILE.w1.w2.gsa)");
   puts("\t--light               run lightweight algorithm to compute DA (also GSA)");
   puts("\t--gesa  [w1][w2][w3]  compute GESA=(GSA.text, GSA.suff, LCP, BWT) (FILE.w1.w2.w3.1.gesa)");
-  puts("\t--bwt                 compute BWT using 1 byte (FILE.1.bwt)");
+  puts("\t--bwt                 compute BWT using 1 byte (FILE.bwt)");
   puts("\t--qs                  output (only for fastq) QS permuted according to the BWT using 1 byte (FILENAME.bwt.qs)");
   puts("\t--bin                 output concatenated input T^{cat} (FILE.1.bin)");
   puts("\t--docs    d           number of strings (def all FILE)");
@@ -729,7 +729,7 @@ int store_to_disk(unsigned char *str, int_da *DA, rankbv_t* rbv, int_t *SA, int_
     sprintf(c_out, "%s.%d.%s", c_file, wsize2, ext);
   else if(strcmp(ext, "lcp")==0)
     sprintf(c_out, "%s.%d.%s", c_file, wsize3, ext);
-  else if(strcmp(ext, "ibwt")==0 || strcmp(ext, "iqs")==0)
+  else if(strcmp(ext, "bwt")==0 || strcmp(ext, "ibwt")==0 || strcmp(ext, "bwt.qs")==0|| strcmp(ext, "iqs")==0)
     sprintf(c_out, "%s.%s", c_file, ext);
   else
     sprintf(c_out, "%s.%d.%s", c_file, wsize1, ext);
@@ -855,7 +855,7 @@ size_t load_from_disk(unsigned char **str, int_da **DA, int_t **SA, int_t **LCP,
     sprintf(c_in, "%s.%d.%s", c_file, wsize3, ext);
   else if(strcmp(ext, "ibwt")==0)
     sprintf(c_in, "%s", c_file);
-  else if(strcmp(ext, "qs")==0)
+  else if(strcmp(ext, "bwt")==0 || strcmp(ext, "qs")==0)
     sprintf(c_in, "%s.%s", c_file, ext);
   else
     sprintf(c_in, "%s.%d.%s", c_file, wsize1, ext);

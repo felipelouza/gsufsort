@@ -44,7 +44,7 @@ Given a string collection in a single file FILENAME.
 --gsa   [w1][w2]      compute GSA=(text, suff) using pairs of (w1, w2) bytes (FILENAME.w1.w2.gsa)
 --gesa  [w1][w2][w3]  compute GESA=(GSA, LCP, BWT) (FILENAME.w1.w2.w3.1.gesa)
 --light               run lightweight algorithm to compute DA (also GSA and GESA)
---bwt                 compute BWT using 1 byte (FILENAME.1.bwt)
+--bwt                 compute BWT using 1 byte (FILENAME.bwt)
 --ibwt                invert the BWT, given FILENAME[.bwt]
 --qs                  output QS sequences (only for fastq) permuted according to the BWT (FILENAME.1.qs)
 --bin                 output T^{cat} in binary format (FILENAME.1.bin)
@@ -84,10 +84,10 @@ To run a test with ``docs=3`` strings from ``dataset/example.txt``, type:
 ## gsufsort ##
 ## store_to_disk ##
 dataset/example.txt.4.sa	76 bytes (n = 19)
-dataset/example.txt.1.bwt	19 bytes (n = 19)
+dataset/example.txt.bwt	19 bytes (n = 19)
 ```
 
-To see the result (option ``--print``) stored in disk ``FILENAME.4.sa`` and ``FILENAME.1.bwt``, use ``--load`` option:
+To see the result (option ``--print``) stored in disk ``FILENAME.4.sa`` and ``FILENAME.bwt``, use ``--load`` option:
 
 ```sh
 ./gsufsort dataset/example.txt --sa --bwt --load --print
@@ -96,7 +96,7 @@ To see the result (option ``--print``) stored in disk ``FILENAME.4.sa`` and ``FI
 ```sh
 ## load_from_disk ##
 dataset/example.txt.4.sa	76 bytes (n = 19)
-dataset/example.txt.1.bwt	19 bytes (n = 19)
+dataset/example.txt.bwt	19 bytes (n = 19)
 i	SA	BWT	suffixes
 0	18	$	#
 1	6	a	$
@@ -128,38 +128,38 @@ ls -la dataset/example.txt.4.sa
 -rw-rw-r--. 1 louza louza 76 Apr 23 08:25 dataset/example.txt.4.sa
 ```
 
-The **BWT** output (``FILENAME.1.bwt``) is written in ASCII format:
+The **BWT** output (``FILENAME.bwt``) is written in ASCII format:
 
 ```sh
-less +1 dataset/example.txt.1.bwt
+less +1 dataset/example.txt.bwt
 ^Aaannbnnn^A^Aba^@aaaaa
 ```
 
 We can **invert the BWT** with option ``--ibwt``:
 
 ```sh
-./gsufsort dataset/example.txt.1.bwt --ibwt
+./gsufsort dataset/example.txt.bwt --ibwt
 ```
 
-The result is stored in ``FILENAME.1.bwt.ibwt``, which can be compared with the orignal file:
+The result is stored in ``FILENAME.bwt.ibwt``, which can be compared with the orignal file:
 
 ```sh
-diff -s dataset/example.txt.1.bwt.ibwt dataset/example.txt
-Files dataset/example.txt.1.bwt.ibwt and dataset/example.txt are identical
+diff -s dataset/example.txt.bwt.ibwt dataset/example.txt
+Files dataset/example.txt.bwt.ibwt and dataset/example.txt are identical
 ```
 
 #### Notes:
 
-For **fasta** files, one can compare ``FILENAME.1.ibwt`` using the commands:
+For **fasta** files, one can compare ``FILENAME.ibwt`` using the commands:
 
 ```sh
-awk '!/^>/ { printf "%s", $0; n = "\n" } /^>/ { print n $0; n = "" } END { printf "%s", n }' FILENAME | sed '/^>/d' - | diff FILENAME.1.ibwt -
+awk '!/^>/ { printf "%s", $0; n = "\n" } /^>/ { print n $0; n = "" } END { printf "%s", n }' FILENAME | sed '/^>/d' - | diff FILENAME.ibwt -
 ```
 
 While for **fastq** files, one can use the commands:
 
 ```sh
-sed -n 2~4p FILENAME | diff FILENAME.1.ibwt -
+sed -n 2~4p FILENAME | diff FILENAME.ibwt -
 ```
 
 
@@ -214,11 +214,11 @@ Then, run:
 ```sh
 ## gsufsort ##
 ## store_to_disk ##
-dataset/reads.fastq.1.bwt	103 bytes (n = 103)
-dataset/reads.fastq.1.bwt.qs	103 bytes (n = 103)
+dataset/reads.fastq.bwt	103 bytes (n = 103)
+dataset/reads.fastq.bwt.qs	103 bytes (n = 103)
 ```
 
-The _QS_ permuted sequence is written at ``dataset/reads.fastq.1.bwt.qs``:
+The _QS_ permuted sequence is written at ``dataset/reads.fastq.bwt.qs``:
 
 ```sh
 tail dataset/reads.fastq.1.qs 
@@ -228,21 +228,21 @@ ACCHHD@ICGIIHCDJJBIHBI@DGGFGEC?JFAGHE>CIGCIJ?GFEH@BICDIDEJDEEI<EGDI?JII<FG@IH@EE
 **_gsufsort_** can invert the __QS permuted sequence__ together with the BWT (options ``--ibwt --qs``).
 
 ```sh
-./gsufsort --ibwt --qs dataset/reads.fastq.1.bwt
+./gsufsort --ibwt --qs dataset/reads.fastq.bwt
 ```
 
 See the resulting file:
 
 ```sh
-less +1 dataset/reads.fastq.1.bwt.iqs
+less +1 dataset/reads.fastq.bwt.iqs
 @C@FDEDDHHGHHJIIGGHJJIJGIJIHGIIFGEFIIJJJGHIGGF@DHEHIIIIJIIGGIIIGE@CEEHHEE@B?AAECDDCDDCCCBB<=<?<?CCC>A
 ```
 
 Compare the output with the original file:
 
 ```sh
-head -4 dataset/reads.fastq | sed -n 4~4p - | diff -s dataset/reads.fastq.1.bwt.iqs -
-Files dataset/reads.fastq.1.bwt.iqs and - are identical
+head -4 dataset/reads.fastq | sed -n 4~4p - | diff -s dataset/reads.fastq.bwt.iqs -
+Files dataset/reads.fastq.bwt.iqs and - are identical
 ```
 
 
