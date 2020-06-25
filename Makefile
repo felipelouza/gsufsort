@@ -64,7 +64,7 @@ clean:
 	\rm -f *.o  external/*.o lib/*o external/malloc_count/*.o gsufsort gsufsort-64 
 
 remove:
-	\rm -f $(DIR)*.bin  $(DIR)*.sa $(DIR)*.da $(DIR)*.lcp $(DIR)*.bwt $(DIR)*.gsa $(DIR)*.gesa
+	\rm -f $(DIR)*.str $(DIR)*.sa $(DIR)*.da $(DIR)*.lcp $(DIR)*.bwt $(DIR)*.gsa $(DIR)*.gesa $(DIR)*.bwt $(DIR)*.qs
 
 ###
 

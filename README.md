@@ -36,7 +36,7 @@ Given a string collection in a single file FILENAME.
 
 ```sh
 --build	              (default)
---load                load from disk FILENAME[.sa][.da][.lcp][.gsa][.bin]
+--load                load from disk FILENAME[.sa][.da][.lcp][.gsa][.str]
 --sa    [w]           compute SA  (default) using w (def 4) bytes (FILENAME.w.sa)
 --isa   [w]           compute ISA (FILENAME.w.isa)
 --lcp   [w]           compute LCP (FILENAME.w.lcp)
@@ -47,7 +47,7 @@ Given a string collection in a single file FILENAME.
 --bwt                 compute BWT using 1 byte per symbol (FILENAME.bwt)
 --ibwt                invert the BWT, given FILENAME[.bwt]
 --qs                  output QS sequences (only for fastq) permuted according to the BWT (FILENAME.1.qs)
---bin                 output T^{cat} in binary format (FILENAME.1.bin)
+--str                 output T^{cat} in ASCII format (FILENAME.1.str)
 --docs    d           number of strings to be handled (def all)
 --print   [p]         print arrays (stdout) A[1,min(p,N)]
 --lcp_max             output maximum LCP-value
