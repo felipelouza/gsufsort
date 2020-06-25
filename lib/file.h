@@ -6,6 +6,7 @@
 #include <string.h>
 #include <math.h>
 #include <unistd.h>
+#include <dirent.h>
 
 #include "utils.h"
 
@@ -25,7 +26,8 @@ int file_close(FILE* f_in);
 size_t file_size(FILE* f_in);
 
 char* file_load(FILE* f_in) ;
-char** file_load_multiple(char* c_file, int *k, size_t *n, int in_type) ;
+char** file_load_multiple(char* c_file, int *k, size_t *n, int in_type, int ignore);
+char** file_load_multiple_dir(char* c_file, int *k, size_t *n, int in_type, int verbose);
 char** file_load_multiple_qs(char* c_file, int *k, size_t *n, int in_type);
 
 int file_text_write(unsigned char *str, size_t n, char* c_file, const char* ext);

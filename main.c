@@ -58,18 +58,19 @@ void usage(char *name){
   puts("\t--str                 output concatenated input T^{cat} (FILENAME.1.str)");
   puts("\t--docs    d           number of strings (def all FILENAME)");
   puts("\t--print   p           print arrays (stdout) A[1,p]");
-  puts("\t--output  outfile     rename output file");
-  puts("\t--txt                 handle input (FILENAME) as raw file (one string per line)");
-  puts("\t--fasta               handle input (FILENAME) as FASTA");
-  puts("\t--fastq               handle input (FILENAME) as FASTQ");
-  puts("\t--verbose             verbose output");
   puts("\t--lcp_max             output maximum LCP");
   puts("\t--lcp_max_text        output maximum LCP (text)");
   puts("\t--lcp_avg             output average LCP");
   puts("\t--trlcp   k           output k-truncated LCP array (FILENAME.w.lcp)");
-  puts("\t--lower               converts input symbols to lowercase");
-  puts("\t--upper               converts input symbols to uppercase");
+  puts("\t--lower               convert input symbols to lowercase");
+  puts("\t--upper               convert input symbols to uppercase");
   puts("\t--time                output time (seconds)");
+  puts("\t--txt                 handle input (FILENAME) as raw file (one string per line)");
+  puts("\t--fasta               handle input (FILENAME) as FASTA");
+  puts("\t--fastq               handle input (FILENAME) as FASTQ");
+  puts("\t--dir                 handle multiple files in directory (DIR) as input");
+  puts("\t--output  outfile     rename output file");
+  puts("\t--verbose             verbose output");
   puts("\t--help                this help message");
   exit(EXIT_FAILURE);
 }
@@ -88,6 +89,7 @@ int main(int argc, char** argv){
   int_t i;
 
   int sa=0, isa=0, lcp=0, da=0, bwt=0, q=0, str=0, gsa=0, gesa=0, lcp_max=0, lcp_max_text=0, lcp_avg=0, trlcp=0, time=0, upper=0; 
+  int dir=0;
   int in_type=0;// (txt, 1), (fasta, 2) and (fastq, 3)
   int sa_bytes=sizeof(int_t);
   int isa_bytes=sizeof(int_t);
@@ -122,6 +124,7 @@ int main(int argc, char** argv){
       {"bwt",     no_argument,       0, 'B'},
       {"qs",      no_argument,       0, 'Q'},
       {"str",     no_argument,       0, 'b'},
+      {"dir",     no_argument,       0, 'm'},
       {"docs",    required_argument, 0, 'd'},
       {"verbose", no_argument,       0, 'v'},
       {"time",    no_argument,       0, 'T'},
@@ -144,7 +147,7 @@ int main(int argc, char** argv){
       {0,         0,                 0,  0 }
     };
 
-    c = getopt_long(argc, argv, "S:vtP:d:L:D:g:lG:B:bhtfqo:ic:Qu", long_options, &option_index);
+    c = getopt_long(argc, argv, "S:vtP:d:L:D:g:lG:B:bhtfqo:ic:Qum", long_options, &option_index);
 
      if (c == -1) break;
 
@@ -217,6 +220,8 @@ int main(int argc, char** argv){
         in_type=2; break; //fasta
       case 'q':
         in_type=3; break; //fastq
+      case 'm':
+        dir=1; break; //multiple files in directory FILENAME 
       case 'h':
         usage(argv[0]); break;      
       case 'o':
@@ -247,7 +252,10 @@ int main(int argc, char** argv){
 
   if(!output){
     c_output = (char*) malloc(strlen(c_input)+5);
-    sprintf(c_output, "%s", c_input);
+    if(dir)
+      sprintf(c_output, "cat");
+    else
+      sprintf(c_output, "%s", c_input);
   }
 
   if(build){
@@ -256,7 +264,12 @@ int main(int argc, char** argv){
     size_t n=0;
   
     //disk access
-    R = (unsigned char**) file_load_multiple(c_input, &d, &n, in_type);
+    if(dir){
+      R = (unsigned char**) file_load_multiple_dir(c_input, &d, &n, in_type, verbose);
+    }
+    else{
+      R = (unsigned char**) file_load_multiple(c_input, &d, &n, in_type, 0);
+    }
 
     if(n>pow(2,30) && (sizeof(int_t)<8)){
       fprintf(stderr, "####\n");
@@ -612,7 +625,7 @@ int main(int argc, char** argv){
         if(str && sa){
           int_t j=SA[i];
           while(j<n){
-             if(T[j]=='$'){ printf("$"); break;}
+             if(T[j]=='\n'){ printf("$"); break;}
              else printf("%c", T[j]);
              j++;
            }
@@ -824,10 +837,11 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
       fwrite(&c, wsize1, 1, f_out); 
     }
   }
+//TODO
   else if(strcmp(ext, "str")==0){
     for(i=0; i<n; i++){
-      char c = (T[i]>0)?T[i]-1:'#';
-      if(c==0) c = '$';
+      char c = (T[i]>0)?T[i]-1:'\n';
+      if(c==0) c = '\n';
       fwrite(&c, wsize1, 1, f_out);
     }
   }

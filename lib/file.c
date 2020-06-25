@@ -387,6 +387,7 @@ char** load_multiple_gz(char *c_file, int *k, size_t *n, int in_type){
 return c_buffer;
 }
 
+/*******************************************************************/
 
 char** load_multiple_gz_qs(char *c_file, int *k, size_t *n){
 
@@ -431,7 +432,74 @@ return c_buffer;
 
 /*******************************************************************/
 
-char** file_load_multiple(char* c_file, int *k, size_t *n, int in_type) {
+char** file_load_multiple_dir(char* c_file, int *k, size_t *n, int in_type, int verbose) {
+
+	char **c_buffer = NULL; // = (char**) malloc(k*sizeof(char*));
+	if(*k==0) *k=INT_MAX;
+  int tmp=*k;
+
+  struct dirent *de;  // Pointer for directory entry 
+  
+  // opendir() returns a pointer of DIR type.  
+  DIR *dr = opendir(c_file); 
+  
+  if (dr == NULL) { // opendir returns NULL if couldn't open directory 
+    printf("Could not open current directory" ); 
+    exit (EXIT_FAILURE);
+  } 
+  
+  unsigned char isFile =0x8;
+  int total=0;
+  size_t sum=0;
+
+  while((de = readdir(dr)) != NULL){
+    if(de->d_type == isFile){
+      char c_in[256];
+      sprintf(c_in, "%s%s", c_file, de->d_name);
+      char **c_tmp = file_load_multiple(c_in, k, n, in_type, 1);//ignores non allowed extensions
+
+      total+=(*k);
+      sum+=(*n);
+
+      c_buffer = (char**) realloc(c_buffer, (total+1)*sizeof(char*));
+      memcpy(c_buffer+((total)-(*k)), c_tmp, (*k)*sizeof(char*));
+
+      free(c_tmp);
+
+      if(verbose){
+        printf("%s\n", c_in); 
+        if(*k==0) printf("## ignored ##\n");
+        else{
+          printf("N = %zu\n", *n);
+          printf("d = %d\n", *k);
+        }
+      }
+  
+      #if DEBUG
+        printf("%d\t%d\t%d\n", total, (total)-(*k), *k);
+      #endif
+
+      /**/
+      if(tmp==INT_MAX) *k=tmp;
+      else{
+        *k = tmp-total;
+        if(*k<=0) break;
+      }
+      *n=0;
+      /**/
+    }
+  }
+  *k = total;
+  *n = sum;
+  
+  closedir(dr);    
+
+return c_buffer;
+}
+
+/*******************************************************************/
+
+char** file_load_multiple(char* c_file, int *k, size_t *n, int in_type, int ignore) {
 
 /* .ext
  * .txt   - strings per line
@@ -440,11 +508,10 @@ char** file_load_multiple(char* c_file, int *k, size_t *n, int in_type) {
  * .gz    - use kseq parser to extract sequences
  */
 
-	const char *type = get_filename_ext(c_file);
-
 	char **c_buffer = NULL; // = (char**) malloc(k*sizeof(char*));
-
 	if(*k==0) *k=INT_MAX;
+
+  const char *type = get_filename_ext(c_file);
 
   if(in_type){
 
@@ -464,6 +531,7 @@ char** file_load_multiple(char* c_file, int *k, size_t *n, int in_type) {
 
   }
   else{
+	
 	  if(strcmp(type,"txt") == 0)
 	  	c_buffer = load_multiple_txt(c_file, k, n);
 
@@ -479,7 +547,13 @@ char** file_load_multiple(char* c_file, int *k, size_t *n, int in_type) {
     #endif
 
 	  else{
-	  	printf("Error: file not recognized (.txt, .fasta, .fa, .fna, .fastq, .fq)\n");
+      if(ignore){
+        *k=0;
+        *n=0;
+        return c_buffer;
+      }
+      printf("%s\n", c_file);
+	  	printf("ERROR: file not recognized (.txt, .fasta, .fa, .fna, .fastq, .fq)\n");
       exit (EXIT_FAILURE);
 	  }
   }

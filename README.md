@@ -60,6 +60,7 @@ Given a string collection in a single file FILENAME.
 --txt                 handle input (FILENAME) as raw file (one string per line)
 --fasta               handle input (FILENAME) as FASTA 
 --fastq               handle input (FILENAME) as FASTQ
+--dir                 handle multiple files in directory (FILENAME) as input
 --output  outfile     rename output file
 --verbose             verbose output
 --help                this help message
