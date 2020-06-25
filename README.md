@@ -57,6 +57,9 @@ Given a string collection in a single file FILENAME.
 --lower               converts input symbols to lowercase
 --upper               converts input symbols to uppercase 
 --time                output time (in seconds)
+-txt                  handle input (FILENAME) as a raw file (one string per line)
+-fasta                handle input (FILENAME) as a FASTA file
+-fastq                handle input (FILENAME) as a FASTQ file
 --output  outfile     rename output file
 --verbose             verbose output
 --help                this help message
@@ -64,7 +67,7 @@ Given a string collection in a single file FILENAME.
 
 ### Input files 
 
-- **Supported extensions**: _.txt_, _.fasta_ (or _.fa_) and _.fastq_ (or _.fq_).
+- **Supported extensions**: _.txt_, _.fasta_ (or _.fa_, _.fna._) and _.fastq_ (or _.fq_).
 
 - Strings are separated per '\0' (new line) in _.txt_ files.
 
