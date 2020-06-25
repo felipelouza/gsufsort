@@ -40,12 +40,11 @@ size_t load_from_disk(unsigned char **str, int_da **DA, int_t **SA, int_t **LCP,
 
 void usage(char *name){
   printf("\n\tUsage: %s FILE [options]\n\n",name);
-  puts("Extensions supported: .txt .fasta .fastq");
+  puts("Extensions supported: txt (raw files) fasta and fastq");
   puts("Available options:");
 
   puts("\t--build               (default)");
   puts("\t--load                load from disk FILE[.sa][.da][.lcp][.gsa][.bin]");
-  puts("\t--ibwt                invert the BWT, given FILE[.bwt]");
   puts("\t--sa    [w]           compute SA (default) using w (def 4) bytes (FILE.w.sa)");
   puts("\t--isa   [w]           compute ISA (FILE.w.isa)");
   puts("\t--lcp   [w]           compute LCP (FILE.w.lcp)");
@@ -54,11 +53,15 @@ void usage(char *name){
   puts("\t--light               run lightweight algorithm to compute DA (also GSA)");
   puts("\t--gesa  [w1][w2][w3]  compute GESA=(GSA.text, GSA.suff, LCP, BWT) (FILE.w1.w2.w3.1.gesa)");
   puts("\t--bwt                 compute BWT using 1 byte per symbol (FILE.bwt)");
+  puts("\t--ibwt                invert the BWT, given FILE[.bwt]");
   puts("\t--qs                  output (only for fastq) QS permuted according to the BWT (FILENAME.bwt.qs)");
   puts("\t--bin                 output concatenated input T^{cat} (FILE.1.bin)");
   puts("\t--docs    d           number of strings (def all FILE)");
   puts("\t--print   p           print arrays (stdout) A[1,p]");
   puts("\t--output  outfile     rename output file");
+  puts("\t--txt                 handle input (FILENAME) as a raw file one string per line");
+  puts("\t--fasta               handle input (FILENAME) as a FASTA file");
+  puts("\t--fastq               handle input (FILENAME) as a FASTQ file");
   puts("\t--verbose             verbose output");
   puts("\t--lcp_max             output maximum LCP");
   puts("\t--lcp_max_text        output maximum LCP (text)");
@@ -85,6 +88,7 @@ int main(int argc, char** argv){
   int_t i;
 
   int sa=0, isa=0, lcp=0, da=0, bwt=0, q=0, bin=0, gsa=0, gesa=0, lcp_max=0, lcp_max_text=0, lcp_avg=0, trlcp=0, time=0, upper=0; 
+  int in_type=0;// (txt, 1), (fasta, 2) and (fastq, 3)
   int sa_bytes=sizeof(int_t);
   int isa_bytes=sizeof(int_t);
   int lcp_bytes=sizeof(int_t);
@@ -117,14 +121,17 @@ int main(int argc, char** argv){
       {"gsa",     optional_argument, 0, 'g'},
       {"bwt",     no_argument,       0, 'B'},
       {"qs",      no_argument,       0, 'Q'},
-      {"bin",     no_argument,       0, 'T'},
+      {"bin",     no_argument,       0, 'b'},
       {"docs",    required_argument, 0, 'd'},
       {"verbose", no_argument,       0, 'v'},
-      {"time",    no_argument,       0, 't'},
+      {"time",    no_argument,       0, 'T'},
       {"lower",   no_argument,       0, 'u'},
       {"upper",   no_argument,       0, 'U'},
       {"help",    no_argument,       0, 'h'},
       {"output",  required_argument, 0, 'o'},
+      {"txt",     no_argument,       0, 't'},
+      {"fasta",   no_argument,       0, 'f'},
+      {"fastq",   no_argument,       0, 'q'},
       {"build",   no_argument,       0, '1'},
       {"load",    no_argument,       0, '2'},
       {"ibwt",    no_argument,       0, '3'},
@@ -137,7 +144,7 @@ int main(int argc, char** argv){
       {0,         0,                 0,  0 }
     };
 
-    c = getopt_long(argc, argv, "S:vtP:d:L:D:g:lG:B:Tho:ic:Qu", long_options, &option_index);
+    c = getopt_long(argc, argv, "S:vtP:d:L:D:g:lG:B:bhtfqo:ic:Qu", long_options, &option_index);
 
      if (c == -1) break;
 
@@ -157,7 +164,7 @@ int main(int argc, char** argv){
         verbose++; break;
       case 'l':
         light++; break;
-      case 't':
+      case 'T':
         time++; break;
       case 'P':
         if (!optarg && argv[optind] != NULL && argv[optind][0] != '-') p = (int) atoi(argv[optind++]);
@@ -182,7 +189,7 @@ int main(int argc, char** argv){
         bwt=1; break;
       case 'Q':
         q=1; break;
-      case 'T':
+      case 'b':
         bin=1; break;
       case 'G':
         if (!optarg && argv[optind] != NULL && argv[optind][0] != '-') t_bytes  = (int) atoi(argv[optind++]);
@@ -204,6 +211,12 @@ int main(int argc, char** argv){
         upper=1; break; //lowercase
       case 'U':
         upper=2; break; //uppercase
+      case 't':
+        in_type=1; break; //txt
+      case 'f':
+        in_type=2; break; //fasta
+      case 'q':
+        in_type=3; break; //fastq
       case 'h':
         usage(argv[0]); break;      
       case 'o':
@@ -241,7 +254,7 @@ int main(int argc, char** argv){
     size_t n=0;
   
     //disk access
-    R = (unsigned char**) file_load_multiple(c_input, &d, &n);
+    R = (unsigned char**) file_load_multiple(c_input, &d, &n, in_type);
 
     if(n>pow(2,30) && (sizeof(int_t)<8)){
       fprintf(stderr, "####\n");
@@ -269,7 +282,7 @@ int main(int argc, char** argv){
     if(q){
 
       size_t n=0;
-      QS = (unsigned char**) file_load_multiple_qs(c_input, &d, &n);
+      QS = (unsigned char**) file_load_multiple_qs(c_input, &d, &n, in_type);
       //concatenate all string
       qs = cat_all(QS, d, &n, 0, 0);
 
@@ -344,7 +357,7 @@ int main(int argc, char** argv){
         else printf("sizeof(int_da) = %zu bytes\n", sizeof(int_da));
       }
       #if LAST_END
-        printf("LAST_END\n");
+        printf("LAST_END\n");//T=T1$T2..Td$#
       #endif
       printf("########\n");
     }
