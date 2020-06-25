@@ -96,7 +96,7 @@ return str;
 
 /******************************************************************************/
 
-unsigned char* cat_all(unsigned char** R, int k, size_t *n, int verbose){
+unsigned char* cat_all(unsigned char** R, int k, size_t *n, int verbose, int upper){
 
 	(*n)++; //add 0 at the end
 	int_t i, j;
@@ -105,14 +105,41 @@ unsigned char* cat_all(unsigned char** R, int k, size_t *n, int verbose){
 
 	int_t max=0;
 
-	for(i=0; i<k; i++){
-		int_t m = strlen((char*)R[i]);
-		if(m>max) max=m;
-		for(j=0; j<m; j++){
-			if(R[i][j]<255) str[l++] = R[i][j]+1;
-		}
-    if(m) str[l++] = 1; //add 1 as separator (ignores empty entries)
-	}
+  if(upper){
+    
+    int diff=0;
+    char lb, rb;
+    if(upper==1){//lowercase
+      diff = 32;
+      lb='A'; rb='Z';
+    }
+    if(upper==2){//uppercase
+      diff = -32;
+      lb='a'; rb='z';
+    }
+
+	  for(i=0; i<k; i++){
+		  int_t m = strlen((char*)R[i]);
+  		if(m>max) max=m;
+  		for(j=0; j<m; j++){
+  			if(R[i][j]<255){
+          str[l++] = R[i][j]+1;
+          if(R[i][j]>=lb && R[i][j]<=rb) str[l-1]+=diff;
+        }
+  		}
+      if(m) str[l++] = 1; //add 1 as separator (ignores empty entries)
+  	}
+  }
+  else{
+	  for(i=0; i<k; i++){
+	  	int_t m = strlen((char*)R[i]);
+	  	if(m>max) max=m;
+	  	for(j=0; j<m; j++){
+	  		if(R[i][j]<255) str[l++] = R[i][j]+1;
+	  	}
+      if(m) str[l++] = 1; //add 1 as separator (ignores empty entries)
+	  }
+  }
 
 	str[l++]=0;
 	if(*n>l){

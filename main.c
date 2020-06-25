@@ -53,8 +53,8 @@ void usage(char *name){
   puts("\t--gsa   [w1][w2]      compute GSA=(text, suff) using pairs of (w1, w2) bytes (FILE.w1.w2.gsa)");
   puts("\t--light               run lightweight algorithm to compute DA (also GSA)");
   puts("\t--gesa  [w1][w2][w3]  compute GESA=(GSA.text, GSA.suff, LCP, BWT) (FILE.w1.w2.w3.1.gesa)");
-  puts("\t--bwt                 compute BWT using 1 byte (FILE.bwt)");
-  puts("\t--qs                  output (only for fastq) QS permuted according to the BWT using 1 byte (FILENAME.bwt.qs)");
+  puts("\t--bwt                 compute BWT using 1 byte per symbol (FILE.bwt)");
+  puts("\t--qs                  output (only for fastq) QS permuted according to the BWT (FILENAME.bwt.qs)");
   puts("\t--bin                 output concatenated input T^{cat} (FILE.1.bin)");
   puts("\t--docs    d           number of strings (def all FILE)");
   puts("\t--print   p           print arrays (stdout) A[1,p]");
@@ -64,6 +64,8 @@ void usage(char *name){
   puts("\t--lcp_max_text        output maximum LCP (text)");
   puts("\t--lcp_avg             output average LCP");
   puts("\t--trlcp   k           output k-truncated LCP array (FILE.w.lcp)");
+  puts("\t--lower               converts input symbols to lowercase");
+  puts("\t--upper               converts input symbols to uppercase");
   puts("\t--time                output time (seconds)");
   puts("\t--help                this help message");
   exit(EXIT_FAILURE);
@@ -82,7 +84,7 @@ int main(int argc, char** argv){
   time_t t_start=0;clock_t c_start=0;
   int_t i;
 
-  int sa=0, isa=0, lcp=0, da=0, bwt=0, q=0, bin=0, gsa=0, gesa=0, lcp_max=0, lcp_max_text=0, lcp_avg=0, trlcp=0, time=0; //txt
+  int sa=0, isa=0, lcp=0, da=0, bwt=0, q=0, bin=0, gsa=0, gesa=0, lcp_max=0, lcp_max_text=0, lcp_avg=0, trlcp=0, time=0, upper=0; 
   int sa_bytes=sizeof(int_t);
   int isa_bytes=sizeof(int_t);
   int lcp_bytes=sizeof(int_t);
@@ -119,6 +121,8 @@ int main(int argc, char** argv){
       {"docs",    required_argument, 0, 'd'},
       {"verbose", no_argument,       0, 'v'},
       {"time",    no_argument,       0, 't'},
+      {"lower",   no_argument,       0, 'u'},
+      {"upper",   no_argument,       0, 'U'},
       {"help",    no_argument,       0, 'h'},
       {"output",  required_argument, 0, 'o'},
       {"build",   no_argument,       0, '1'},
@@ -133,7 +137,7 @@ int main(int argc, char** argv){
       {0,         0,                 0,  0 }
     };
 
-    c = getopt_long(argc, argv, "S:vtP:d:L:D:g:lG:B:Tho:ic:Q", long_options, &option_index);
+    c = getopt_long(argc, argv, "S:vtP:d:L:D:g:lG:B:Tho:ic:Qu", long_options, &option_index);
 
      if (c == -1) break;
 
@@ -196,6 +200,10 @@ int main(int argc, char** argv){
       case 'c':
         trlcp = (int) atoi(optarg);
         lcp=1; break;
+      case 'u':
+        upper=1; break; //lowercase
+      case 'U':
+        upper=2; break; //uppercase
       case 'h':
         usage(argv[0]); break;      
       case 'o':
@@ -244,7 +252,7 @@ int main(int argc, char** argv){
     }
   
     //concatenate all string
-    unsigned char *str = cat_all(R, d, &n, verbose);
+    unsigned char *str = cat_all(R, d, &n, verbose, upper);
   
     #if DEBUG
       printf("R:\n");
@@ -263,7 +271,7 @@ int main(int argc, char** argv){
       size_t n=0;
       QS = (unsigned char**) file_load_multiple_qs(c_input, &d, &n);
       //concatenate all string
-      qs = cat_all(QS, d, &n, 0);
+      qs = cat_all(QS, d, &n, 0, 0);
 
       #if DEBUG
         printf("QS:\n");

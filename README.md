@@ -44,7 +44,7 @@ Given a string collection in a single file FILENAME.
 --gsa   [w1][w2]      compute GSA=(text, suff) using pairs of (w1, w2) bytes (FILENAME.w1.w2.gsa)
 --gesa  [w1][w2][w3]  compute GESA=(GSA, LCP, BWT) (FILENAME.w1.w2.w3.1.gesa)
 --light               run lightweight algorithm to compute DA (also GSA and GESA)
---bwt                 compute BWT using 1 byte (FILENAME.bwt)
+--bwt                 compute BWT using 1 byte per symbol (FILENAME.bwt)
 --ibwt                invert the BWT, given FILENAME[.bwt]
 --qs                  output QS sequences (only for fastq) permuted according to the BWT (FILENAME.1.qs)
 --bin                 output T^{cat} in binary format (FILENAME.1.bin)
@@ -54,6 +54,8 @@ Given a string collection in a single file FILENAME.
 --lcp_max_text        output maximum LCP-value (text)
 --lcp_avg             output average LCP-value
 --trlcp   k           output k-truncated LCP array (FILENAME.w.lcp)
+--lower               converts input symbols to lowercase
+--upper               converts input symbols to uppercase 
 --time                output time (in seconds)
 --output  outfile     rename output file
 --verbose             verbose output
