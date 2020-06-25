@@ -57,9 +57,9 @@ Given a string collection in a single file FILENAME.
 --lower               converts input symbols to lowercase
 --upper               converts input symbols to uppercase 
 --time                output time (in seconds)
--txt                  handle input (FILENAME) as a raw file (one string per line)
--fasta                handle input (FILENAME) as a FASTA file
--fastq                handle input (FILENAME) as a FASTQ file
+--txt                 handle input (FILENAME) as raw file (one string per line)
+--fasta               handle input (FILENAME) as FASTA 
+--fastq               handle input (FILENAME) as FASTQ
 --output  outfile     rename output file
 --verbose             verbose output
 --help                this help message

@@ -59,9 +59,9 @@ void usage(char *name){
   puts("\t--docs    d           number of strings (def all FILE)");
   puts("\t--print   p           print arrays (stdout) A[1,p]");
   puts("\t--output  outfile     rename output file");
-  puts("\t--txt                 handle input (FILENAME) as a raw file one string per line");
-  puts("\t--fasta               handle input (FILENAME) as a FASTA file");
-  puts("\t--fastq               handle input (FILENAME) as a FASTQ file");
+  puts("\t--txt                 handle input (FILENAME) as raw file (one string per line)");
+  puts("\t--fasta               handle input (FILENAME) as FASTA");
+  puts("\t--fastq               handle input (FILENAME) as FASTQ");
   puts("\t--verbose             verbose output");
   puts("\t--lcp_max             output maximum LCP");
   puts("\t--lcp_max_text        output maximum LCP (text)");
