@@ -383,7 +383,7 @@ int main(int argc, char** argv){
         else printf("sizeof(int_da) = %zu bytes\n", sizeof(int_da));
       }
       #if LAST_END
-        printf("LAST_END\n");//T=T1$T2..Td$#
+        printf("LAST_END\n");
       #endif
       printf("########\n");
     }
@@ -747,7 +747,6 @@ int main(int argc, char** argv){
       free(qs);
     }
   }
-
 
   if(time){
     printf("## total ##\n");

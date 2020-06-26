@@ -38,7 +38,7 @@
 #define max(a,b) ((a) > (b) ? (a) : (b))
 
 #ifndef DEBUG
-	#define DEBUG 0
+  #define DEBUG 0
 #endif
 
 #ifndef M64

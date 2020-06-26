@@ -74,7 +74,7 @@ Given a string collection in a single file INPUT.
 
 - **_gsufsort_** supports **ASCII alphabet**, so that values _0_ and _1_ are reserved.
 
-- **gzipped input data** (extension _.gz_) are supported uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries. Please, build with the option ``make GZ=1``.
+- **gzipped input data** (extension _.gz_) are supported uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries. In the case you do not have _zlib_, build with the option ``make GZ=0``.
 
 - **Multiple files** in a given directory (_INPUT_) are supported with option ``--dir``, see [Wiki](https://github.com/felipelouza/gsufsort/wiki/Multiple-Files).
 

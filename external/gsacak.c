@@ -2067,7 +2067,7 @@ int_t gSACA_K_DA(uint_t *s, uint_t *SA, int_da *DA,
   printf("\n");
   printf("DA\n");
   for(i=0; i<n; i++)
-        printf("%" PRIdN "\t", DA[i]);
+        printf("%" PRIdA "\t", DA[i]);
   printf("\n\n");
   #endif
 
@@ -2085,7 +2085,7 @@ int_t gSACA_K_DA(uint_t *s, uint_t *SA, int_da *DA,
   printf("\n");
   printf("DA\n");
   for(i=0; i<n; i++)
-        printf("%" PRIdN "\t", DA[i]);
+        printf("%" PRIdA "\t", DA[i]);
   printf("\n\n");
   #endif
 
@@ -2116,7 +2116,7 @@ int_t gSACA_K_DA(uint_t *s, uint_t *SA, int_da *DA,
   printf("\n");
   printf("DA\n");
   for(i=0; i<n; i++)
-        printf("%" PRIdN "\t", DA[i]);
+        printf("%" PRIdA "\t", DA[i]);
   printf("\n\n");
   #endif
 
@@ -2131,7 +2131,7 @@ int_t gSACA_K_DA(uint_t *s, uint_t *SA, int_da *DA,
   printf("\n");
   printf("DA\n");
   for(i=0; i<n; i++)
-        printf("%" PRIdN "\t", DA[i]);
+        printf("%" PRIdA "\t", DA[i]);
   printf("\n\n");
   #endif
 
@@ -2160,7 +2160,7 @@ int_t gSACA_K_DA(uint_t *s, uint_t *SA, int_da *DA,
   printf("\n");
   printf("DA\n");
   for(i=0; i<n; i++)
-        printf("%" PRIdN "\t", DA[i]);
+        printf("%" PRIdA "\t", DA[i]);
   printf("\n\n");
   #endif
   free(bkt);
@@ -2339,7 +2339,7 @@ int_t gSACA_K_LCP_DA(uint_t *s, uint_t *SA, int_t *LCP, int_da *DA,
   printf("\n");
   printf("DA\n");
   for(i=0; i<n; i++)
-        printf("%" PRIdN "\t", DA[i]); 
+        printf("%" PRIdA "\t", DA[i]); 
   printf("\n\n");
   #endif
 
@@ -2386,7 +2386,7 @@ int_t gSACA_K_LCP_DA(uint_t *s, uint_t *SA, int_t *LCP, int_da *DA,
   printf("\n");
   printf("DA\n");
   for(i=0; i<n; i++)
-        printf("%" PRIdN "\t", DA[i]);
+        printf("%" PRIdA "\t", DA[i]);
   printf("\n\n");
   #endif
 
@@ -2436,7 +2436,7 @@ int_t gSACA_K_LCP_DA(uint_t *s, uint_t *SA, int_t *LCP, int_da *DA,
   printf("\n");
   printf("DA\n");
   for(i=0; i<n; i++)
-        printf("%" PRIdN "\t", DA[i]);
+        printf("%" PRIdA "\t", DA[i]);
   printf("\n\n");
   #endif
 
@@ -2467,7 +2467,7 @@ int_t gSACA_K_LCP_DA(uint_t *s, uint_t *SA, int_t *LCP, int_da *DA,
   printf("\n");
   printf("DA\n");
   for(i=0; i<n; i++)
-        printf("%" PRIdN "\t", DA[i]);
+        printf("%" PRIdA "\t", DA[i]);
   printf("\n\n");
   #endif
   free(bkt);

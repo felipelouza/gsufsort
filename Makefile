@@ -1,89 +1,97 @@
-CC = gcc
-CXX = /usr/bin/c++ 
-LIB_DIR = ${HOME}/lib
-INC_DIR = ${HOME}/include
+CC?=gcc
 
 #WFLAGS= -Wall -Wextra  -DNDEBUG -Wno-ignored-qualifiers
-WFLAGS= -Wall -Wno-unused-function 
+WFLAGS= -Wall -Werror -Wno-unused-function
 OPT_FLAGS= -O3 -ffast-math -funroll-loops -m64 -fomit-frame-pointer -D_FILE_OFFSET_BITS=64
-#CCLIB= -lstdc++ -lsdsl  -I$(INC_DIR) -L$(LIB_DIR)
-LFLAGS = -lm -ldl -mpopcnt
+CFLAGS = $(WFLAGS) $(OPT_FLAGS)
+SYSTEM?=$(shell uname -s)
 
-CFLAGS = $(WFLAGS) $(OPT_FLAGS) 
 #valgrind
 #CFLAGS += -g -O0 
 
-CFLAGS += $(LFLAGS)
-
-
-CXX_FLAGS = -std=c++11 $(WFLAGS) $(OPT_FLAGS)
-CXX_FLAGS += -I$(INC_DIR) -L$(LIB_DIR) $(LFLAGS)
-
 ##
+
+MALLOC_COUNT=
+MALLOC_COUNT64=
+ 
+ifeq ($(SYSTEM),Darwin)
+  LDFLAGS=-lz -mpopcnt
+else
+	MALLOC_COUNT=external/malloc_count/malloc_count.o
+	MALLOC_COUNT64=external/malloc_count/malloc_count.64.o
+  LDFLAGS=-lz -lm -ldl -mpopcnt
+endif
 
 LIBOBJ = \
 	lib/file.o\
 	lib/utils.o\
 	lib/rankbv.o\
-	external/gsacak.o\
-	external/malloc_count/malloc_count.o
+	external/gsacak.o ${MALLOC_COUNT}
 	
 LIBOBJ_64 = \
 	lib/file.64.o\
 	lib/utils.64.o\
 	lib/rankbv.64.o\
-	external/gsacak.64.o\
-	external/malloc_count/malloc_count.64.o
+	external/gsacak.64.o ${MALLOC_COUNT}
+
+TARGETS=gsufsort gsufsort-64
 
 ##
 
 DEBUG = 0
 M64 = 0
-
-##
-
-DEFINES = -DDEBUG=$(DEBUG) 
-GZ = 0
-
+DEFINES = -DDEBUG=$(DEBUG)
+GZ = 1
 CFLAGS += $(DEFINES) -DGZ=$(GZ)
-
-ifeq ($(GZ),1)
-	CFLAGS += -lz
-endif
 ##
 
 DIR = dataset/
-INPUT = input-10000.txt
+INPUT = input.txt
 DOCS	= 3
 
 ##
 
-all: compile compile-64
+all:${TARGETS}
 
 clean:
-	\rm -f *.o  external/*.o lib/*o external/malloc_count/*.o gsufsort gsufsort-64 
+	@${RM} *.o external/*.o lib/*o external/malloc_count/*.o ${TARGETS}
 
 remove:
-	\rm -f $(DIR)*.str $(DIR)*.sa $(DIR)*.da $(DIR)*.lcp $(DIR)*.bwt $(DIR)*.gsa $(DIR)*.gesa $(DIR)*.bwt $(DIR)*.qs $(DIR)*.ibwt  $(DIR)*.iqs
+	@for directory in . dataset; do\
+	  echo $$directory; \
+	    for suffix in lcp str bwt gsa sa da gesa str qs ibwt iqs; do \
+      	${RM} $$directory/*.$$suffix;\
+	  done \
+	done
 
 ###
 
-%.o: %.c
+%.o:%.c
 	 $(CC) $(CFLAGS) -c -o $@ $< -DM64=0
 
-%.64.o: %.c
+%.64.o:%.c
 	 $(CC) $(CFLAGS) -c -o $@ $< -DM64=1	
 
 ##
 
-compile: main.c ${LIBOBJ} 
-	$(CC) -o gsufsort main.c ${LIBOBJ} $(CFLAGS) $(CCLIB) -DM64=0
+gsufsort:main.c ${LIBOBJ}
+	$(CC) -o $@ main.c ${LIBOBJ} $(LDFLAGS) $(CCLIB) -DM64=0
 
-compile-64: main.c ${LIBOBJ_64} 
-	$(CC) -o gsufsort-64 main.c ${LIBOBJ_64} $(CFLAGS) $(CCLIB) -DM64=1 
+gsufsort-64:main.c ${LIBOBJ_64}
+	$(CC) -o $@ main.c ${LIBOBJ_64} $(LDFLAGS) $(CCLIB) -DM64=1
 
-run:
+run:${TARGETS}
 	./gsufsort $(DIR)$(INPUT) -v --sa
+	./gsufsort-64 $(DIR)$(INPUT) -v --sa
+
+run_all:${TARGETS}
+	@for directory in dataset; do\
+	  for filename in `ls $$directory/*.txt $$directory/*.fasta $$directory/*.fastq`; do\
+	    for prog in ${TARGETS}; do\
+                ./$$prog $$filename --sa --lcp --da --gsa --gesa --bwt --str;\
+	    done \
+	  done \
+        done
 
 valgrind:
-	valgrind -q --tool=memcheck --leak-check=full --track-origins=yes --show-leak-kinds=all ./gsufsort --ibwt --qs $(DIR)$(INPUT) 
+	valgrind -q --tool=memcheck --leak-check=full --track-origins=yes --show-leak-kinds=all ./gsufsort $(DIR)$(INPUT) --sa -d 100
