@@ -177,9 +177,9 @@ While for **fastq** files, one can use the commands:
 ```sh
 sed -n 2~4p INPUT | diff INPUT.ibwt -
 ```
-## Wiki
+## wiki
 
-See more details in [Wiki](https://github.com/felipelouza/gsufsort/wiki).
+See more details and additional features in [Wiki](https://github.com/felipelouza/gsufsort/wiki).
 
 ## authors
 
