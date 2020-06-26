@@ -76,9 +76,17 @@ Given a string collection in a single file INPUT.
 
 - **gzipped input data** (extension _.gz_) are supported uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries. Please, build with the option ``make GZ=1``.
 
-- **Multiple files** in a given directory (_INPUT_) are supported with option ``--dir``, see [link](https://github.com/felipelouza/gsufsort#multiple-files).
+- **Multiple files** in a given directory (_INPUT_) are supported with option ``--dir``, see [below](https://github.com/felipelouza/gsufsort#multiple-files).
 
 - For inputs **larger than 2GB**, use **_gsufsort-64_**
+
+### Output files 
+
+- Output data structures (for example ``INPUT.4.sa``) are written in binary format, in which each integer takes ``w`` bytes (def. ``w`` is 4).
+
+- Output files are written (**by default**) in the current directory, in which **gsufsort** is executed, see [below](https://github.com/felipelouza/gsufsort#output).
+
+- Option ``--output DIR/`` renames the target directory to ``DIR/``, while ``--output DIR/FILENAME`` renames output file names to ``DIR/FILENAME``.
 
 ## quick test
 
@@ -127,11 +135,7 @@ i	SA	BWT	suffixes
 18	2	a	nana$
 ```
 
-The output files are written (by default) in the current directory, in which **gsufsort** is executed.
-
-* Option ``--output DIR/`` renames the target directory to ``DIR/``, while ``--output DIR/FILENAME`` renames output file names to ``DIR/FILENAME``.
-
-### output files
+### output
 
 The **suffix array** output (``INPUT.4.sa``) is written in binary format, each integer takes ``w`` bytes (default ``w`` is 4).
 
