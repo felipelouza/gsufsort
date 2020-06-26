@@ -12,7 +12,7 @@ const char *get_filename_ext(const char *filename) {
     char *dot = strrchr(filename, '.');
 
     if(!dot || dot == filename) return "";                                                            
-    return dot + 1;                                                                                   
+return dot + 1; 
 }   
 
 /*******************************************************************/
@@ -29,7 +29,19 @@ const char *get_gz_ext(const char *filename) {
     *tmp = '.';
     
     if(!dot || dot == filename) return "";                                                            
-    return dot + 1;                                                                                   
+return dot + 1; 
+}   
+
+/*******************************************************************/
+
+char *filename_without_ext(char *filename) {
+ 
+    char *dot = strrchr(filename, '.');
+
+    if(!dot || dot == filename) return "";                                                            
+    *dot = '\0';
+
+return filename; 
 }   
 
 /*******************************************************************/
@@ -438,61 +450,66 @@ char** file_load_multiple_dir(char* c_file, int *k, size_t *n, int in_type, int 
 	if(*k==0) *k=INT_MAX;
   int tmp=*k;
 
-  struct dirent *de;  // Pointer for directory entry 
-  
-  // opendir() returns a pointer of DIR type.  
-  DIR *dr = opendir(c_file); 
-  
-  if (dr == NULL) { // opendir returns NULL if couldn't open directory 
-    printf("Could not open current directory" ); 
-    exit (EXIT_FAILURE);
-  } 
-  
-  unsigned char isFile =0x8;
   int total=0;
   size_t sum=0;
 
-  while((de = readdir(dr)) != NULL){
-    if(de->d_type == isFile){
-      char c_in[256];
-      sprintf(c_in, "%s%s", c_file, de->d_name);
-      char **c_tmp = file_load_multiple(c_in, k, n, in_type, 1);//ignores non allowed extensions
+  /**/
+  struct dirent **namelist;
+  int num_files = scandir(c_file, &namelist, NULL, alphasort);
 
-      total+=(*k);
-      sum+=(*n);
-
-      c_buffer = (char**) realloc(c_buffer, (total+1)*sizeof(char*));
-      memcpy(c_buffer+((total)-(*k)), c_tmp, (*k)*sizeof(char*));
-
-      free(c_tmp);
-
-      if(verbose){
-        printf("%s\n", c_in); 
-        if(*k==0) printf("## ignored ##\n");
-        else{
-          printf("N = %zu\n", *n);
-          printf("d = %d\n", *k);
-        }
-      }
-  
-      #if DEBUG
-        printf("%d\t%d\t%d\n", total, (total)-(*k), *k);
-      #endif
-
-      /**/
-      if(tmp==INT_MAX) *k=tmp;
-      else{
-        *k = tmp-total;
-        if(*k<=0) break;
-      }
-      *n=0;
-      /**/
-    }
+  if(num_files<0){
+    printf("ERROR: Could not open directory: %s\n", c_file); 
+    exit (EXIT_FAILURE);
   }
-  *k = total;
-  *n = sum;
+  else {
+    int i=0;
+    for (i=0; i<num_files; i++) {
+      if(namelist[i]->d_type==DT_REG){
+
+        char c_in[256];
+        sprintf(c_in, "%s%s", c_file, namelist[i]->d_name);
+        char **c_tmp = file_load_multiple(c_in, k, n, in_type, 1);//ignores non allowed extensions
+
+        total+=(*k);
+        sum+=(*n);
+
+        c_buffer = (char**) realloc(c_buffer, (total+1)*sizeof(char*));
+        memcpy(c_buffer+((total)-(*k)), c_tmp, (*k)*sizeof(char*));
+
+        free(c_tmp);
+
+        if(verbose){
+          printf("%s\n", c_in); 
+          if(*k==0) printf("## ignored ##\n");
+          else{
+            printf("N = %zu\n", *n);
+            printf("d = %d\n", *k);
+          }
+        }
   
-  closedir(dr);    
+        #if DEBUG
+          printf("%d\t%d\t%d\n", total, (total)-(*k), *k);
+        #endif
+
+        /**/
+        if(tmp==INT_MAX) *k=tmp;
+        else{
+          *k = tmp-total;
+          if(*k<=0) break;
+        }
+        *n=0;
+        /**/
+      }
+      free(namelist[i]);
+    }
+    free(namelist);
+
+    /**/
+
+    *k = total;
+    *n = sum;
+  }
+  
 
 return c_buffer;
 }

@@ -26,41 +26,41 @@ make
 
 ## run
 
-Given a string collection in a single file FILENAME.
+Given a string collection in a single file INPUT.
 
 ```sh
-./gsufsort FILENAME [options]
+./gsufsort INPUT [options]
 ```
 
 ### Available options
 
 ```sh
 --build	              (default)
---load                load from disk FILENAME[.sa][.da][.lcp][.gsa][.str]
---sa    [w]           compute SA  (default) using w (def 4) bytes (FILENAME.w.sa)
---isa   [w]           compute ISA (FILENAME.w.isa)
---lcp   [w]           compute LCP (FILENAME.w.lcp)
---da    [w]           compute DA  (FILENAME.w.da)
---gsa   [w1][w2]      compute GSA=(text, suff) using pairs of (w1, w2) bytes (FILENAME.w1.w2.gsa)
---gesa  [w1][w2][w3]  compute GESA=(GSA, LCP, BWT) (FILENAME.w1.w2.w3.1.gesa)
+--load                load from disk INPUT[.sa][.da][.lcp][.gsa][.str]
+--sa    [w]           compute SA  (default) using w (def 4) bytes (INPUT.w.sa)
+--isa   [w]           compute ISA (INPUT.w.isa)
+--lcp   [w]           compute LCP (INPUT.w.lcp)
+--da    [w]           compute DA  (INPUT.w.da)
+--gsa   [w1][w2]      compute GSA=(text, suff) using pairs of (w1, w2) bytes (INPUT.w1.w2.gsa)
+--gesa  [w1][w2][w3]  compute GESA=(GSA, LCP, BWT) (INPUT.w1.w2.w3.1.gesa)
 --light               run lightweight algorithm to compute DA (also GSA and GESA)
---bwt                 compute BWT using 1 byte per symbol (FILENAME.bwt)
---ibwt                invert the BWT, given FILENAME[.bwt]
---qs                  output QS sequences (only for fastq) permuted according to the BWT (FILENAME.1.qs)
---str                 output T^{cat} in ASCII format (FILENAME.1.str)
+--bwt                 compute BWT using 1 byte per symbol (INPUT.bwt)
+--ibwt                invert the BWT, given INPUT[.bwt]
+--qs                  output QS sequences (only for fastq) permuted according to the BWT (INPUT.qs)
+--str                 output T^{cat} in ASCII format (INPUT.1.str)
 --docs    d           number of strings to be handled (def all)
 --print   [p]         print arrays (stdout) A[1,min(p,N)]
 --lcp_max             output maximum LCP-value
 --lcp_max_text        output maximum LCP-value (text)
 --lcp_avg             output average LCP-value
---trlcp   k           output k-truncated LCP array (FILENAME.w.lcp)
+--trlcp   k           output k-truncated LCP array (INPUT.w.lcp)
 --lower               converts input symbols to lowercase
 --upper               converts input symbols to uppercase 
 --time                output time (in seconds)
---txt                 handle input (FILENAME) as raw file (one string per line)
---fasta               handle input (FILENAME) as FASTA 
---fastq               handle input (FILENAME) as FASTQ
---dir                 handle multiple files in directory (FILENAME) as input
+--txt                 handle input (INPUT) as raw file (one string per line)
+--fasta               handle input (INPUT) as FASTA 
+--fastq               handle input (INPUT) as FASTQ
+--dir                 handle multiple files in directory (INPUT) as input
 --output  outfile     rename output file
 --verbose             verbose output
 --help                this help message
@@ -72,9 +72,11 @@ Given a string collection in a single file FILENAME.
 
 - Strings are separated per '\0' (new line) in _.txt_ files.
 
-- **_gsufsort_** supports **ASCII alphabet**, so that values _0_ and _1_ reserved.
+- **_gsufsort_** supports **ASCII alphabet**, so that values _0_ and _1_ are reserved.
 
 - **gzipped input data** (extension _.gz_) are supported uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries. Please, build with the option ``make GZ=1``.
+
+- **Multiple files** in a given directory (_INPUT_) are supported with option ``--dir``, see [link](https://github.com/felipelouza/gsufsort#multiple-files).
 
 - For inputs **larger than 2GB**, use **_gsufsort-64_**
 
@@ -93,7 +95,7 @@ dataset/example.txt.4.sa	76 bytes (n = 19)
 dataset/example.txt.bwt	19 bytes (n = 19)
 ```
 
-To see the result (option ``--print``) stored in disk ``FILENAME.4.sa`` and ``FILENAME.bwt``, use ``--load`` option:
+To see the result (option ``--print``) stored in disk ``INPUT.4.sa`` and ``INPUT.bwt``, use ``--load`` option:
 
 ```sh
 ./gsufsort dataset/example.txt --sa --bwt --load --print
@@ -127,14 +129,14 @@ i	SA	BWT	suffixes
 
 ### output files
 
-The **suffix array** output (``FILENAME.4.sa``) is written in binary format, each integer takes ``w`` bytes (default ``w`` is 4).
+The **suffix array** output (``INPUT.4.sa``) is written in binary format, each integer takes ``w`` bytes (default ``w`` is 4).
 
 ```sh
 ls -la dataset/example.txt.4.sa
 -rw-rw-r--. 1 louza louza 76 Apr 23 08:25 dataset/example.txt.4.sa
 ```
 
-The **BWT** output (``FILENAME.bwt``) is written in ASCII format:
+The **BWT** output (``INPUT.bwt``) is written in ASCII format:
 
 ```sh
 less +1 dataset/example.txt.bwt
@@ -147,25 +149,25 @@ We can **invert the BWT** with option ``--ibwt``:
 ./gsufsort dataset/example.txt.bwt --ibwt
 ```
 
-The result is stored in ``FILENAME.bwt.ibwt``, which can be compared with the orignal file:
+The result is stored in ``INPUT.ibwt``, which can be compared with the orignal file:
 
 ```sh
-diff -s dataset/example.txt.bwt.ibwt dataset/example.txt
-Files dataset/example.txt.bwt.ibwt and dataset/example.txt are identical
+diff -s dataset/example.txt.ibwt dataset/example.txt
+Files dataset/example.txt.ibwt and dataset/example.txt are identical
 ```
 
 #### Notes:
 
-For **fasta** files, one can compare ``FILENAME.ibwt`` using the commands:
+For **fasta** files, one can compare ``INPUT.ibwt`` using the commands:
 
 ```sh
-awk '!/^>/ { printf "%s", $0; n = "\n" } /^>/ { print n $0; n = "" } END { printf "%s", n }' FILENAME | sed '/^>/d' - | diff FILENAME.ibwt -
+awk '!/^>/ { printf "%s", $0; n = "\n" } /^>/ { print n $0; n = "" } END { printf "%s", n }' INPUT | sed '/^>/d' - | diff INPUT.ibwt -
 ```
 
 While for **fastq** files, one can use the commands:
 
 ```sh
-sed -n 2~4p FILENAME | diff FILENAME.ibwt -
+sed -n 2~4p INPUT | diff INPUT.ibwt -
 ```
 
 
@@ -194,6 +196,64 @@ sed -n 2~4p FILENAME | diff FILENAME.ibwt -
 
 
 ## additional features 
+
+### _Multiple files_
+
+* **_gsufsort_** supports multiple files in directory INPUT (command ``--dir``):
+
+For example, ``dataset/input.txt`` were splitted into 5 files in ``dataset/input/``:
+
+```sh
+ls dataset/input/
+input-1.txt  input-2.txt  input-3.txt  input-4.txt  input-5.txt
+```
+
+One can index all files in ``dataset/input/`` with options ``--dir`` and ``--sa``:
+
+```sh
+./gsufsort dataset/input/ --dir --sa
+```
+
+In the case no argument is given for ``--output``, the default output filename is ``./all``.
+
+```sh
+## gsufsort ##
+## store_to_disk ##
+all.4.sa 	20198960 bytes (n = 5049740)
+```
+
+Compare the output ``all.4.sa`` with ``dataset/input.txt.4.sa``:
+
+```sh
+diff all.4.sa dataset/input.txt.4.sa -s
+Files all.4.sa and dataset/input.txt.4.sa are identical
+```
+
+We can also output the concatenations of all files in ``all.str`` (option ``--str``):
+
+```sh
+./gsufsort dataset/input/ --dir --sa
+```
+
+```sh
+## gsufsort ##
+## store_to_disk ##
+all.1.str 5049740  bytes (n = 5049740)
+```
+
+When we compare ``all.str`` with ``dataset/input.txt``, there is an extra byte in ``all.str`` corresponding to the terminator \# added to the concatenated string:
+
+```sh
+ls all.1.str dataset/input.txt -la
+-rw-rw-r--. 1 louza louza 5049740 Jun 26 09:54 all.1.str
+-rw-rw-r--. 1 louza louza 5049739 Jun 25 10:19 dataset/input.txt
+```
+
+```sh
+diff all.1.str dataset/input.txt -s
+10001d10000
+<
+```
 
 ### _quality score (QS) sequences_
 
@@ -227,7 +287,7 @@ dataset/reads.fastq.bwt.qs	103 bytes (n = 103)
 The _QS_ permuted sequence is written at ``dataset/reads.fastq.bwt.qs``:
 
 ```sh
-tail dataset/reads.fastq.1.qs 
+tail dataset/reads.fastq.bwt.qs 
 ACCHHD@ICGIIHCDJJBIHBI@DGGFGEC?JFAGHE>CIGCIJ?GFEH@BICDIDEJDEEI<EGDI?JII<FG@IH@EEJHCGJHID=GJ<IIIICAHGH
 ```
 
@@ -240,15 +300,15 @@ ACCHHD@ICGIIHCDJJBIHBI@DGGFGEC?JFAGHE>CIGCIJ?GFEH@BICDIDEJDEEI<EGDI?JII<FG@IH@EE
 See the resulting file:
 
 ```sh
-less +1 dataset/reads.fastq.bwt.iqs
+less +1 dataset/reads.fastq.iqs
 @C@FDEDDHHGHHJIIGGHJJIJGIJIHGIIFGEFIIJJJGHIGGF@DHEHIIIIJIIGGIIIGE@CEEHHEE@B?AAECDDCDDCCCBB<=<?<?CCC>A
 ```
 
 Compare the output with the original file:
 
 ```sh
-head -4 dataset/reads.fastq | sed -n 4~4p - | diff -s dataset/reads.fastq.bwt.iqs -
-Files dataset/reads.fastq.bwt.iqs and - are identical
+head -4 dataset/reads.fastq | sed -n 4~4p - | diff -s dataset/reads.fastq.iqs -
+Files dataset/reads.fastq.iqs and - are identical
 ```
 
 

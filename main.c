@@ -253,7 +253,7 @@ int main(int argc, char** argv){
   if(!output){
     c_output = (char*) malloc(strlen(c_input)+5);
     if(dir)
-      sprintf(c_output, "cat");
+      sprintf(c_output, "all");
     else
       sprintf(c_output, "%s", c_input);
   }
@@ -719,13 +719,13 @@ int main(int argc, char** argv){
     printf("## store_to_disk ##\n");
   
     #if LAST_END
-      store_to_disk(T,  NULL, NULL, NULL,  NULL, n-1, c_output, "ibwt",  sizeof(char), 0, 0);
+      store_to_disk(T,  NULL, NULL, NULL,  NULL, n-1, filename_without_ext(c_output), "ibwt",  sizeof(char), 0, 0);
       if(q)
-        store_to_disk(qs,  NULL, NULL, NULL,  NULL, n-1, c_output, "iqs",  sizeof(char), 0, 0);
+        store_to_disk(qs,  NULL, NULL, NULL,  NULL, n-1, filename_without_ext(c_output), "iqs",  sizeof(char), 0, 0);
     #else
-      store_to_disk(T,  NULL, NULL, NULL,  NULL, n, c_output, "ibwt",  sizeof(char), 0, 0);
+      store_to_disk(T,  NULL, NULL, NULL,  NULL, n, filename_without_ext(c_output), "ibwt",  sizeof(char), 0, 0);
       if(q)
-        store_to_disk(qs,  NULL, NULL, NULL,  NULL, n, c_output, "iqs",  sizeof(char), 0, 0);
+        store_to_disk(qs,  NULL, NULL, NULL,  NULL, n, filename_without_ex(tc_output), "iqs",  sizeof(char), 0, 0);
     #endif
 
     free(BWT);     
@@ -775,7 +775,7 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
   size_t wsize = wsize1+wsize2+wsize3;
   if(strcmp(ext, "gesa")==0) wsize++;
 
-  printf("%s\t%zu bytes (n = %zu)\n", c_out, n*wsize, n);
+  printf("%s \t%zu bytes (n = %zu)\n", c_out, n*wsize, n);
 
   size_t i;
   if(strcmp(ext, "gsa")==0){
