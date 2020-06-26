@@ -38,6 +38,7 @@ int_t file_text_int_read(int_t** str, char* c_file, const char* ext);
 
 void mkdir(const char* c_file);
 char *filename_without_ext(char *filename);
+char *filename_without_path(char *filename);
 
 /*******************************************************************/
 

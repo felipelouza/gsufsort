@@ -91,8 +91,8 @@ To run a test with ``docs=3`` strings from ``dataset/example.txt``, type:
 ```sh
 ## gsufsort ##
 ## store_to_disk ##
-dataset/example.txt.4.sa	76 bytes (n = 19)
-dataset/example.txt.bwt	19 bytes (n = 19)
+example.txt.4.sa	76 bytes (n = 19)
+example.txt.bwt	19 bytes (n = 19)
 ```
 
 To see the result (option ``--print``) stored in disk ``INPUT.4.sa`` and ``INPUT.bwt``, use ``--load`` option:
@@ -103,8 +103,8 @@ To see the result (option ``--print``) stored in disk ``INPUT.4.sa`` and ``INPUT
 
 ```sh
 ## load_from_disk ##
-dataset/example.txt.4.sa	76 bytes (n = 19)
-dataset/example.txt.bwt	19 bytes (n = 19)
+example.txt.4.sa	76 bytes (n = 19)
+example.txt.bwt	19 bytes (n = 19)
 i	SA	BWT	suffixes
 0	18	$	#
 1	6	a	$
@@ -127,13 +127,17 @@ i	SA	BWT	suffixes
 18	2	a	nana$
 ```
 
+The output files are written (by default) in the current directory, in which **gsufsort** is executed.
+
+* Option ``--output DIR/`` renames the target directory to ``DIR/``, while ``--output DIR/FILENAME`` renames output file names to ``DIR/FILENAME``.
+
 ### output files
 
 The **suffix array** output (``INPUT.4.sa``) is written in binary format, each integer takes ``w`` bytes (default ``w`` is 4).
 
 ```sh
-ls -la dataset/example.txt.4.sa
--rw-rw-r--. 1 louza louza 76 Apr 23 08:25 dataset/example.txt.4.sa
+ls -la example.txt.4.sa
+-rw-rw-r--. 1 louza louza 76 Apr 23 08:25 example.txt.4.sa
 ```
 
 The **BWT** output (``INPUT.bwt``) is written in ASCII format:
@@ -254,6 +258,8 @@ diff all.1.str dataset/input.txt -s
 10001d10000
 <
 ```
+
+* **Awarning**: in the case one use options ``--txt``, ``--fasta`` or ``-fastq`` together with ``--dir``, be carefull that INPUT contains only valid files, otherwise the program may crash.
 
 ### _quality score (QS) sequences_
 

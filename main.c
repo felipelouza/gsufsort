@@ -255,7 +255,18 @@ int main(int argc, char** argv){
     if(dir)
       sprintf(c_output, "all");
     else
-      sprintf(c_output, "%s", c_input);
+      sprintf(c_output, "%s", filename_without_path(c_input));
+  }
+  else{
+    if(c_output[strlen(c_output)-1]=='/'){
+      char* c_tmp = (char*) malloc(strlen(c_output)+strlen(c_input)+1);
+      if(dir)
+        sprintf(c_tmp, "%s%s", c_output, "all");
+      else
+        sprintf(c_tmp, "%s%s", c_output, filename_without_path(c_input));
+      c_output = c_tmp;
+      output=0;
+    }
   }
 
   if(build){

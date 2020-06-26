@@ -155,7 +155,7 @@ return str;
 
 /**********************************************************************/
 
-int print_array(unsigned char *str, int_da *DA, rankbv_t* rbv, int light, int_t *SA, int_t *ISA, int_t *LCP, int bin, int da, int sa, int isa, int lcp, int bwt, int gsa, int gesa, size_t n, size_t m, int last_end){
+int print_array(unsigned char *T, int_da *DA, rankbv_t* rbv, int light, int_t *SA, int_t *ISA, int_t *LCP, int str, int da, int sa, int isa, int lcp, int bwt, int gsa, int gesa, size_t n, size_t m, int last_end){
 
 	size_t i,j;
 
@@ -167,7 +167,7 @@ int print_array(unsigned char *str, int_da *DA, rankbv_t* rbv, int light, int_t 
   if(gesa || lcp) printf("LCP\t");
   if(gsa)	printf("GSA\t\t");
   if(bwt) printf("BWT\t");
-	if(bin)	printf("suffixes");
+	if(str)	printf("suffixes");
 	printf("\n");
 
   char terminal='$';
@@ -199,23 +199,17 @@ int print_array(unsigned char *str, int_da *DA, rankbv_t* rbv, int light, int_t 
 			printf("%" PRIdN ")   \t", value);
 		}
 		if(bwt){
-			char c = (SA[i])? str[SA[i]-1]-1:terminal;
+			char c = (SA[i])? T[SA[i]-1]-1:terminal;
 			if(c==0) c = '$';
 			printf("%c\t",c);
 		}
-		if(bin){
+		if(str){
 			j=SA[i];
 			while(j<n){
-				if(str[j]==1){ printf("$"); break;}
-				else if(str[j]==0) printf("#"); 
-				else printf("%c", str[j]-1);
+				if(T[j]==1){ printf("$"); break;}
+				else if(T[j]==0) printf("#"); 
+				else printf("%c", T[j]-1);
 				j++;
-				/*
-				if(j-SA[i]>10){
-					printf("...");
-					break;
-				}
-				*/
 			}
 		}
 		printf("\n");

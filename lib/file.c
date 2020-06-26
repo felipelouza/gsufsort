@@ -11,7 +11,8 @@ const char *get_filename_ext(const char *filename) {
  
     char *dot = strrchr(filename, '.');
 
-    if(!dot || dot == filename) return "";                                                            
+    if(!dot || dot == filename) return "";
+
 return dot + 1; 
 }   
 
@@ -28,8 +29,19 @@ const char *get_gz_ext(const char *filename) {
     dot = strrchr(filename, '.');
     *tmp = '.';
     
-    if(!dot || dot == filename) return "";                                                            
+    if(!dot || dot == filename) return "";
+
 return dot + 1; 
+}   
+
+/*******************************************************************/
+
+char *filename_without_path(char *filename) {
+ 
+    char *dot = strrchr(filename, '/');
+
+    if(!dot || dot == filename) return "";                                                            
+return dot+1; 
 }   
 
 /*******************************************************************/
