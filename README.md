@@ -90,10 +90,10 @@ Given a string collection in a single file INPUT.
 
 ## quick test
 
-To run a test with ``docs=3`` strings from ``dataset/example.txt``, type:
+To run a test with all strings from ``dataset/example.txt``, type:
 
 ```sh
-./gsufsort dataset/example.txt --docs 3 --sa --bwt
+./gsufsort dataset/example.txt --sa --bwt
 ```
 
 ```sh
@@ -106,7 +106,7 @@ example.txt.bwt	19 bytes (n = 19)
 To see the result (option ``--print``) stored in disk ``INPUT.4.sa`` and ``INPUT.bwt``, use ``--load`` option:
 
 ```sh
-./gsufsort dataset/example.txt --sa --bwt --load --print
+./gsufsort example.txt --sa --bwt --load --print
 ```
 
 ```sh
@@ -147,36 +147,23 @@ ls -la example.txt.4.sa
 The **BWT** output (``INPUT.bwt``) is written in ASCII format:
 
 ```sh
-less +1 dataset/example.txt.bwt
+less +1 example.txt.bwt
 ^Aaannbnnn^A^Aba^@aaaaa
 ```
 
 We can **invert the BWT** with option ``--ibwt``:
 
 ```sh
-./gsufsort dataset/example.txt.bwt --ibwt
+./gsufsort example.txt.bwt --ibwt
 ```
 
 The result is stored in ``INPUT.ibwt``, which can be compared with the orignal file:
 
 ```sh
-diff -s dataset/example.txt.ibwt dataset/example.txt
-Files dataset/example.txt.ibwt and dataset/example.txt are identical
+diff -s example.txt.ibwt dataset/example.txt
+Files example.txt.ibwt and dataset/example.txt are identical
 ```
 
-#### Notes:
-
-For **fasta** files, one can compare ``INPUT.ibwt`` using the commands:
-
-```sh
-awk '!/^>/ { printf "%s", $0; n = "\n" } /^>/ { print n $0; n = "" } END { printf "%s", n }' INPUT | sed '/^>/d' - | diff INPUT.ibwt -
-```
-
-While for **fastq** files, one can use the commands:
-
-```sh
-sed -n 2~4p INPUT | diff INPUT.ibwt -
-```
 ## wiki
 
 See more details and additional features in [Wiki](https://github.com/felipelouza/gsufsort/wiki).
