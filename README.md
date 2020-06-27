@@ -33,7 +33,7 @@ Issuing these commands will build executables gsufsort and gsufsort-64.
 For inputs larger than **2GB**, **_gsufsort-64_** must be used.
 
 To enable support to compressed files, zlib is required.  If zlib is
-not installed in you system, build with the option ``make GZ=0``.
+not installed in you system, build with option ``make GZ=0``.
 
 
 
@@ -49,7 +49,6 @@ where INPUT is a single file with a string collection.
 
 ```sh
 --build	              (default)
-<<<<<<< HEAD
 --sa    [w]           compute the SA using w bytes (defaut 4), write to INPUT.w.sa
 --isa   [w]           compute the ISA, write to INPUT.w.isa
 --lcp   [w]           compute the LCP, write to INPUT.w.lcp
