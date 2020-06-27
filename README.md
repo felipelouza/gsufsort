@@ -1,10 +1,12 @@
 # gsufsort: 
 
-This software is a fast, portable, and lightweight tool for constructing the **suffix array** and related data structures for **string collections**. 
+This software is a fast, portable, and lightweight tool for
+constructing the **suffix array** and related data structures for
+**string collections**.
 
-The software runs in internal memory (data structures are written to disk). 
+gsufsort runs in internal memory and data structures are written to disk. 
 
-Given an string collection, **_gsufsort_** can compute the:
+For a string collection **_gsufsort_** can compute the following data structures:
 
 - [x] Suffix array (SA)
 - [x] Inverse suffix array (ISA)
@@ -16,7 +18,9 @@ Given an string collection, **_gsufsort_** can compute the:
 - [x] Generalized suffix array (GSA)
 - [x] Generalized enhanced suffix array (GESA)
 
-## install
+## Compilation and instalation
+
+gsufsort will compile in systems with a standard C compiler, as gcc. 
 
 ```sh
 git clone https://github.com/felipelouza/gsufsort.git
@@ -24,47 +28,64 @@ cd gsufsort
 make 
 ```
 
-## run
+Issuing these commands will build executables gsufsort and gsufsort-64.
 
-Given a string collection in a single file INPUT.
+For inputs larger than **2GB**, **_gsufsort-64_** must be used.
+
+To enable support to compressed files, zlib is required.  If zlib is
+not installed in you system, build with the option ``make GZ=0``.
+
+
+
+## Execution
 
 ```sh
 ./gsufsort INPUT [options]
 ```
 
-### Available options
+where INPUT is a single file with a string collection.
+
+### Construction options:
 
 ```sh
 --build	              (default)
---load                load from disk INPUT[.sa][.da][.lcp][.gsa][.str]
---sa    [w]           compute SA  (default) using w (def 4) bytes (INPUT.w.sa)
---isa   [w]           compute ISA (INPUT.w.isa)
---lcp   [w]           compute LCP (INPUT.w.lcp)
---da    [w]           compute DA  (INPUT.w.da)
---gsa   [w1][w2]      compute GSA=(text, suff) using pairs of (w1, w2) bytes (INPUT.w1.w2.gsa)
---gesa  [w1][w2][w3]  compute GESA=(GSA, LCP, BWT) (INPUT.w1.w2.w3.1.gesa)
---light               run lightweight algorithm to compute DA (also GSA and GESA)
---bwt                 compute BWT using 1 byte per symbol (INPUT.bwt)
+<<<<<<< HEAD
+--sa    [w]           compute the SA using w bytes (defaut 4), write to INPUT.w.sa
+--isa   [w]           compute the ISA, write to INPUT.w.isa
+--lcp   [w]           compute the LCP, write to INPUT.w.lcp
+--trlcp k             compute the k-truncated LCP array, write to INPUT.w.lcp
+--da    [w]           compute the DA, write to INPUT.w.da
+--gsa   [w1][w2]      compute the GSA=(text,suff) as pairs of (w1, w2) bytes, write to INPUT.w1.w2.gsa
+--gesa  [w1][w2][w3]  compute the GESA=(GSA,LCP,BWT), write to INPUT.w1.w2.w3.1.gesa
+--bwt                 compute the BWT using 1 byte per symbol, write to INPUT.bwt
+--docs  d             process only the first d strings in the collection
+--light               run the lightweight algorithm to compute DA, GSA and GESA
+--output  OUTFILE     name files OUTFILE.* instead of INPUT.*
+```
+
+### Loading options:
+
+```sh
+--load                load data-structures from disk INPUT[.sa][.da][.lcp][.gsa][.bin]
 --ibwt                invert the BWT, given INPUT[.bwt]
---qs                  output QS sequences (only for fastq) permuted according to the BWT (INPUT.qs)
---str                 output T^{cat} in ASCII format (INPUT.1.str)
---docs    d           number of strings to be handled (def all)
---print   [p]         print arrays (stdout) A[1,min(p,N)]
---lcp_max             output maximum LCP-value
---lcp_max_text        output maximum LCP-value (text)
---lcp_avg             output average LCP-value
---trlcp   k           output k-truncated LCP array (INPUT.w.lcp)
---lower               converts input symbols to lowercase
---upper               converts input symbols to uppercase 
---time                output time (in seconds)
---txt                 handle input (INPUT) as raw file (one string per line)
---fasta               handle input (INPUT) as FASTA 
---fastq               handle input (INPUT) as FASTQ
---dir                 handle multiple files in directory (INPUT) as input
---output  outfile     rename output file
+```
+
+### Output options:
+
+```sh
+--qs                  write QS sequences in fastq permuted according to the BWT to INPUT.1.qs
+--str                 write the collection cancatenation (T^{cat}) to INPUT.1.str
+--print [p]           print the first p elements of arrays to stdout, defaults to the collection length
+--lcp_max             print maximum LCP value
+--lcp_max_text        print maximum LCP value (text order)
+--lcp_avg             print average LCP value
+--time                print the running time in seconds
+--lower               convert input letters to lowercase before data structures construction
+--upper               convert input letters to uppercase before data structures construction
 --verbose             verbose output
 --help                this help message
 ```
+
 
 ### Input files 
 
@@ -78,7 +99,6 @@ Given a string collection in a single file INPUT.
 
 - **Multiple files** in a given directory (_INPUT_) are supported with option ``--dir``, see [Wiki](https://github.com/felipelouza/gsufsort/wiki/Multiple-Files).
 
-- For inputs **larger than 2GB**, use **_gsufsort-64_**
 
 ### Output files 
 
@@ -86,7 +106,7 @@ Given a string collection in a single file INPUT.
 
 - Output files are written (**by default**) in the current directory, in which **gsufsort** is executed, see [below](https://github.com/felipelouza/gsufsort#output).
 
-- Option ``--output DIR/`` renames the target directory to ``DIR/``, while ``--output DIR/FILENAME`` renames output file names to ``DIR/FILENAME``.
+- Option ``--output DIR/`` renames the target directory to ``DIR/``, while ``--output DIR/INPUT`` renames output file names to ``DIR/INPUT``.
 
 ## quick test
 
