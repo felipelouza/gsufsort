@@ -42,7 +42,8 @@ char *filename_without_path(char *filename) {
  
     char *dot = strrchr(filename, '/');
 
-    if(!dot || dot == filename) return "";                                                            
+    if(!dot || dot == filename) return filename;
+
 return dot+1; 
 }   
 

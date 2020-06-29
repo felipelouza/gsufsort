@@ -732,13 +732,13 @@ int main(int argc, char** argv){
     printf("## store_to_disk ##\n");
   
     #if LAST_END
-      store_to_disk(T,  NULL, NULL, NULL,  NULL, n-1, filename_without_ext(c_output), "ibwt",  sizeof(char), 0, 0);
+      store_to_disk(T,  NULL, NULL, NULL,  NULL, n-1, (c_output), "ibwt",  sizeof(char), 0, 0);
       if(q)
-        store_to_disk(qs,  NULL, NULL, NULL,  NULL, n-1, filename_without_ext(c_output), "iqs",  sizeof(char), 0, 0);
+        store_to_disk(qs,  NULL, NULL, NULL,  NULL, n-1, (c_output), "iqs",  sizeof(char), 0, 0);
     #else
-      store_to_disk(T,  NULL, NULL, NULL,  NULL, n, filename_without_ext(c_output), "ibwt",  sizeof(char), 0, 0);
+      store_to_disk(T,  NULL, NULL, NULL,  NULL, n, (c_output), "ibwt",  sizeof(char), 0, 0);
       if(q)
-        store_to_disk(qs,  NULL, NULL, NULL,  NULL, n, filename_without_ex(tc_output), "iqs",  sizeof(char), 0, 0);
+        store_to_disk(qs,  NULL, NULL, NULL,  NULL, n, (c_output), "iqs",  sizeof(char), 0, 0);
     #endif
 
     free(BWT);     
@@ -782,7 +782,12 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
   else
     sprintf(c_out, "%s.%d.%s", c_file, wsize1, ext);
 
-  FILE *f_out = file_open(c_out, "wb");
+  FILE *f_out = NULL;
+
+  if(strcmp(ext, "str")==0 || strcmp(ext, "bwt")==0 || strcmp(ext, "ibwt")==0 || strcmp(ext, "bwt.qs")==0|| strcmp(ext, "iqs")==0) 
+    f_out = file_open(c_out, "w");
+  else 
+    f_out = file_open(c_out, "wb");
 
   size_t wsize = wsize1+wsize2+wsize3;
   if(strcmp(ext, "gesa")==0) wsize++;
@@ -849,7 +854,6 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
       fwrite(&c, wsize1, 1, f_out); 
     }
   }
-//TODO
   else if(strcmp(ext, "str")==0){
     for(i=0; i<n; i++){
       char c = (T[i]>0)?T[i]-1:'\n';
@@ -909,7 +913,13 @@ size_t load_from_disk(unsigned char **T, int_da **DA, int_t **SA, int_t **LCP, c
   else
     sprintf(c_in, "%s.%d.%s", c_file, wsize1, ext);
 
-  FILE *f_in = file_open(c_in, "rb");
+  FILE *f_in=NULL;
+
+  if(strcmp(ext, "str")==0 || strcmp(ext, "bwt")==0 || strcmp(ext, "ibwt")==0 || strcmp(ext, "bwt.qs")==0|| strcmp(ext, "iqs")==0) 
+    f_in = file_open(c_in, "r");
+  else 
+    f_in = file_open(c_in, "rb");
+
   if(f_in==NULL){
      exit(EXIT_FAILURE);
   }
