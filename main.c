@@ -260,8 +260,10 @@ int main(int argc, char** argv){
   else{
     if(c_output[strlen(c_output)-1]=='/'){
       char* c_tmp = (char*) malloc(strlen(c_output)+strlen(c_input)+1);
-      if(dir)
+      if(dir){
+        mkdir(c_output);
         sprintf(c_tmp, "%s%s", c_output, "all");
+      }
       else
         sprintf(c_tmp, "%s%s", c_output, filename_without_path(c_input));
       c_output = c_tmp;

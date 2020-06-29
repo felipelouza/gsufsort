@@ -5,6 +5,8 @@
   #define GZ_BUFF 10485760 //10MB for each string line (in txt files)
 #endif
 
+#define FILE_NAME 1024
+
 /* Returns the file extension
  */
 const char *get_filename_ext(const char *filename) {
@@ -465,12 +467,18 @@ char** file_load_multiple_dir(char* c_file, int *k, size_t *n, int in_type, int 
   int total=0;
   size_t sum=0;
 
+  char *c_dir = (char*) malloc(strlen(c_file)+2);
+  if(c_file[strlen(c_file)-1]=='/')
+    sprintf(c_dir, "%s", c_file);
+  else
+    sprintf(c_dir, "%s%s", c_file, "/");
+
   /**/
   struct dirent **namelist;
-  int num_files = scandir(c_file, &namelist, NULL, alphasort);
+  int num_files = scandir(c_dir, &namelist, NULL, alphasort);
 
   if(num_files<0){
-    printf("ERROR: Could not open directory: %s\n", c_file); 
+    printf("ERROR: Could not open directory: %s\n", c_dir); 
     exit (EXIT_FAILURE);
   }
   else {
@@ -478,8 +486,8 @@ char** file_load_multiple_dir(char* c_file, int *k, size_t *n, int in_type, int 
     for (i=0; i<num_files; i++) {
       if(namelist[i]->d_type==DT_REG){
 
-        char c_in[256];
-        sprintf(c_in, "%s%s", c_file, namelist[i]->d_name);
+        char *c_in = (char*) malloc(strlen(c_dir)+strlen(namelist[i]->d_name)+1);
+        sprintf(c_in, "%s%s", c_dir, namelist[i]->d_name);
         char **c_tmp = file_load_multiple(c_in, k, n, in_type, 1);//ignores non allowed extensions
 
         total+=(*k);
@@ -511,6 +519,8 @@ char** file_load_multiple_dir(char* c_file, int *k, size_t *n, int in_type, int 
         }
         *n=0;
         /**/
+
+        free(c_in);
       }
       free(namelist[i]);
     }
@@ -521,7 +531,8 @@ char** file_load_multiple_dir(char* c_file, int *k, size_t *n, int in_type, int 
     *k = total;
     *n = sum;
   }
-  
+
+  free(c_dir);
 
 return c_buffer;
 }
@@ -642,7 +653,7 @@ return c_buffer;
 
 void mkdir(const char* c_file){
 	
-	char c_aux[500];
+	char c_aux[FILE_NAME];
 	
 	strcpy (c_aux,"mkdir -p ");
 	strcat (c_aux, c_file);
