@@ -48,6 +48,28 @@
 
 typedef uint32_t int_text;
 
+#ifndef LAST_END
+  #define LAST_END 1
+#endif
+
+#define DNA 0
+#define PROTEIN 0
+
+#if DNA || PROTEIN
+  #define terminator '#'
+  #if LAST_END
+    #define separator '$'
+  #else
+    #define separator '#'
+  #endif
+#else
+  #define terminator 0
+  #if LAST_END
+    #define separator 1
+  #else
+    #define separator 0
+  #endif
+#endif
 
 /**********************************************************************/
 

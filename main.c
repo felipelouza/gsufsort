@@ -27,10 +27,6 @@
   #define DEBUG 0 
 #endif
 
-#ifndef LAST_END
-  #define LAST_END 1
-#endif
-
 #define WORD (size_t)(pow(256,sizeof(int_t))/2.0)
 
 int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA,  int_t *LCP, size_t n, char* c_file, char *ext, int wsize1, int wsize2, int wsize3); 
@@ -634,7 +630,14 @@ int main(int argc, char** argv){
         if(da)  printf("%" PRIdA "\t",DA[i]);
         if(gsa || gesa) printf("(%" PRIdA ", %" PRIdN ")   \t", GSA_text[i], GSA_suff[i]);
         if(LCP) printf("%" PRIdN "\t",LCP[i]);
-        if(bwt || gesa) printf("%c\t",BWT[i]);
+        if(bwt || gesa){
+          if(BWT[i]==terminator)
+            printf("#\t");
+          else if (BWT[i]==separator)
+            printf("$\t");
+          else
+            printf("%c\t",BWT[i]);
+        }
         if(str && sa){
           int_t j=SA[i];
           while(j<n){
@@ -679,11 +682,6 @@ int main(int argc, char** argv){
       C[i]=sum-C[i];
     }      
 
-    char separator = 0, terminator = '\n';
-    #if LAST_END
-      separator = 1; 
-    #endif
-
     size_t docs=0;
     int_t  *LF = (int_t*) malloc(n*sizeof(int_t));
     for(i=0; i<n; i++){
@@ -723,8 +721,8 @@ int main(int argc, char** argv){
       else j=LF[j];
     }
 
-    T[n-1]=terminator;
-    if(q) qs[n-1]=terminator;
+    T[n-1]='\n';
+    if(q) qs[n-1]='\n';
 
     if(print)
       printf("%s\n", T);
@@ -824,10 +822,9 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
       fwrite(&LCP[i], wsize3, 1, f_out); //LCP==C
       //BWT
       #if LAST_END
-        char c = (SA[i])? T[SA[i]-1]:0; 
-        c = (c==1)?c:c-1; //separators = 1, and terminator = 0
+        char c = (!SA[i])?terminator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 1, and terminator = 0
       #else
-        char c = (SA[i])? T[SA[i]-1]-1:0; //separators = 0, no terminator
+        char c = (!SA[i])?separator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 0, no terminator
       #endif
       fwrite(&c, sizeof(char), 1, f_out);
     }
@@ -835,10 +832,9 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
   else if(strcmp(ext, "bwt")==0){
     for(i=0; i<n; i++){ //SA==B
       #if LAST_END
-        char c = (SA[i])? T[SA[i]-1]:0; 
-        c = (c>1)?c-1:c; //separators = 1, and terminator = 0
+        char c = (!SA[i])?terminator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 1, and terminator = 0
       #else
-        char c = (SA[i])? T[SA[i]-1]-1:0; //separators = 0, no terminator
+        char c = (!SA[i])?separator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 0, no terminator
       #endif
       fwrite(&c, wsize1, 1, f_out); 
     }
@@ -846,10 +842,9 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
   else if(strcmp(ext, "bwt.qs")==0){
     for(i=0; i<n; i++){ //SA==B
       #if LAST_END
-        char c = (SA[i])? T[SA[i]-1]:0; 
-        c = (c>1)?c-1:c; //separators = 1, and terminator = 0
+        char c = (!SA[i])?terminator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 1, and terminator = 0
       #else
-        char c = (SA[i])? T[SA[i]-1]-1:0; //separators = 0, no terminator
+        char c = (!SA[i])?separator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 0, no terminator
       #endif
       fwrite(&c, wsize1, 1, f_out); 
     }
