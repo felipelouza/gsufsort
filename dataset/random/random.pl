@@ -8,16 +8,14 @@ else {
   die "usage: $0 d length\n";
 }
 
+#@S = split('','ABCDEFGHIKLMNPQRSTVWXYZ');
 @S = split('','ACGT');
-$l = $#S+1;
+$l = @S;
 
-for($j=0; $j<$d;$j++){
+for($j=0; $j<$d; $j++){
   print ">$j\n";
-  $s = "";
   for ($i=0; $i<$len; $i++) {
-    $aux = int(rand()*$l);
-    $s .= $S[$aux];
+    print $S[int(rand($l))];
   }
-  print "$s\n";
+  print "\n";
 }
-
