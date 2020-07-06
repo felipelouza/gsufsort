@@ -65,14 +65,23 @@ where INPUT is a single file with a string collection.
 ### Loading options:
 
 ```sh
---load                load data-structures from disk INPUT[.sa][.da][.lcp][.gsa][.bin]
---ibwt                invert the BWT, given INPUT[.bwt]
+--load                load data-structures from disk INPUT[.sa][.da][.lcp][.gsa][.str]
+--ibwt                invert the BWT, given INPUT.bwt, write output in INPUT.bwt.ibwt
+```
+
+### Input options:
+
+```sh
+--txt                 handle input (INPUT) as raw files (one string per line)
+--fasta               handle input (INPUT) as FASTA 
+--fastq               handle input (INPUT) as FASTQ
+--dir                 handle multiple files in directory (INPUT) as input
 ```
 
 ### Output options:
 
 ```sh
---qs                  write QS sequences in fastq permuted according to the BWT to INPUT.1.qs
+--qs                  write QS sequences in fastq permuted according to the BWT to INPUT.bwt.qs
 --str                 write the collection cancatenation (T^{cat}) to INPUT.1.str
 --print [p]           print the first p elements of arrays to stdout, defaults to the collection length
 --lcp_max             print maximum LCP value
@@ -93,6 +102,8 @@ where INPUT is a single file with a string collection.
 - Strings are separated per '\0' (new line) in _.txt_ files.
 
 - **_gsufsort_** supports **ASCII alphabet**, so that values _0_ and _1_ are reserved.
+
+- _IUPAC symbols_ and _'N'_ are **not** handled as special symbols in _fasta_ or _fastq_ files. 
 
 - **gzipped input data** (extension _.gz_) are supported uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries. In the case you do not have _zlib_, build with the option ``make GZ=0``.
 
