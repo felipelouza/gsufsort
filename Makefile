@@ -40,7 +40,15 @@ TARGETS=gsufsort gsufsort-64
 
 DEBUG = 0
 M64 = 0
+DNA = 0
+TERMINATOR = 1
 DEFINES = -DDEBUG=$(DEBUG)
+ifeq ($(DNA),1)
+	DEFINES += -DDNA=$(DNA)
+endif
+ifeq ($(TERMINATOR),0)
+	DEFINES += -DTERMINATOR=0
+endif
 GZ = 1
 CFLAGS += $(DEFINES) -DGZ=$(GZ)
 ##
@@ -75,10 +83,10 @@ remove:
 ##
 
 gsufsort:main.c ${LIBOBJ}
-	$(CC) -o $@ main.c ${LIBOBJ} $(LDFLAGS) $(CCLIB) -DM64=0
+	$(CC) -o $@ main.c ${LIBOBJ} $(CFLAGS) $(LDFLAGS) $(CCLIB) -DM64=0
 
 gsufsort-64:main.c ${LIBOBJ_64}
-	$(CC) -o $@ main.c ${LIBOBJ_64} $(LDFLAGS) $(CCLIB) -DM64=1
+	$(CC) -o $@ main.c ${LIBOBJ_64} $(CFLAGS) $(LDFLAGS) $(CCLIB) -DM64=1
 
 run:${TARGETS}
 	./gsufsort $(DIR)$(INPUT) -v --sa

@@ -17,10 +17,8 @@
 #include "rankbv.h"
 
 #ifndef UCHAR_SIZE
-#define UCHAR_SIZE 256
+  #define UCHAR_SIZE 256
 #endif
-
-#define END_MARKER '$'
 
 #ifndef M64
 	#define M64 0
@@ -48,23 +46,24 @@
 
 typedef uint32_t int_text;
 
-#ifndef LAST_END
-  #define LAST_END 1
+#ifndef TERMINATOR
+  #define TERMINATOR 1
 #endif
 
-#define DNA 0
-#define PROTEIN 0
+#ifndef DNA
+  #define DNA 0
+#endif
 
-#if DNA || PROTEIN
+#if DNA
   #define terminator '#'
-  #if LAST_END
+  #if TERMINATOR
     #define separator '$'
   #else
     #define separator '#'
   #endif
 #else
   #define terminator 0
-  #if LAST_END
+  #if TERMINATOR
     #define separator 1
   #else
     #define separator 0

@@ -380,8 +380,8 @@ int main(int argc, char** argv){
         if(light) printf("DA = lightweight\n");
         else printf("sizeof(int_da) = %zu bytes\n", sizeof(int_da));
       }
-      #if LAST_END
-        printf("LAST_END\n");
+      #if TERMINATOR
+        printf("TERMINATOR\n");
       #endif
       printf("########\n");
     }
@@ -403,7 +403,7 @@ int main(int argc, char** argv){
           for(i=0; i<n; i++) if(LCP[i]>trlcp) LCP[i]=trlcp;
         }
         printf("## store_to_disk ##\n");
-        #if LAST_END  
+        #if TERMINATOR  
           store_to_disk(NULL, NULL, NULL, NULL, LCP,  n, c_output,  "lcp",  0, 0, lcp_bytes);
         #else
           store_to_disk(NULL, NULL,  NULL, NULL,  LCP+1, n-1, c_output, "lcp",  0, 0, lcp_bytes);
@@ -456,7 +456,7 @@ int main(int argc, char** argv){
     else
       printf("## store_to_disk ##\n");
   
-    #if LAST_END  
+    #if TERMINATOR  
       //store to disk
       if(str) store_to_disk(T,  NULL, NULL, NULL,  NULL, n, c_output, "str",  sizeof(char), 0, 0);
       if(sa)  store_to_disk(NULL, NULL, NULL, SA,   NULL, n, c_output,  "sa",   0, sa_bytes, 0);
@@ -492,7 +492,7 @@ int main(int argc, char** argv){
     if(print){
       printf("## print ##\n");
       if(!p)p=n;
-      #if LAST_END
+      #if TERMINATOR
         print_array(T, DA, rbv, light, SA, ISA, LCP, str=1, da, sa, isa, lcp, bwt || gesa, gsa || gesa, gesa, n, min(n,p), 1);
       #else
         print_array(T, DA+1, rbv, light, SA+1, ISA+1, LCP+1, str=1, da, sa, isa, lcp, bwt || gesa, gsa || gesa, gesa, n-1, min(n-1,p), 0);
@@ -502,7 +502,7 @@ int main(int argc, char** argv){
     if(lcp_max || lcp_avg || lcp_max_text){
       int_t max=0,total=n, j=0;
       double avg=0.0;
-      #if LAST_END == 0
+      #if TERMINATOR == 0
         total=n-1;
       #endif
       for(i=0; i<n; i++){
@@ -704,7 +704,7 @@ int main(int argc, char** argv){
     }
 
     size_t j;
-    #if LAST_END
+    #if TERMINATOR
       j=0;
       docs++;
     #else
@@ -729,7 +729,7 @@ int main(int argc, char** argv){
 
     printf("## store_to_disk ##\n");
   
-    #if LAST_END
+    #if TERMINATOR
       store_to_disk(T,  NULL, NULL, NULL,  NULL, n-1, (c_output), "ibwt",  sizeof(char), 0, 0);
       if(q)
         store_to_disk(qs,  NULL, NULL, NULL,  NULL, n-1, (c_output), "iqs",  sizeof(char), 0, 0);
@@ -798,7 +798,7 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
       int_t da_value = (light)?rankbv_rank1(rbv,SA[i]):DA[i];
       fwrite(&da_value, wsize1, 1, f_out);
 
-      #if LAST_END
+      #if TERMINATOR
         int_t value = (da_value==0)?SA[i]:SA[i]-SA[da_value]-1;
       #else
         int_t value = (da_value==0)?SA[i]:SA[i]-SA[da_value-1]-1;
@@ -811,7 +811,7 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
       //GSA
       int_t da_value = (light)?rankbv_rank1(rbv,SA[i]):DA[i];
       fwrite(&da_value, wsize1, 1, f_out);
-      #if LAST_END
+      #if TERMINATOR
         int_t value = (da_value==0)?SA[i]:SA[i]-SA[da_value]-1;
       #else
         int_t value = (da_value==0)?SA[i]:SA[i]-SA[da_value-1]-1;
@@ -821,7 +821,7 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
       //LCP
       fwrite(&LCP[i], wsize3, 1, f_out); //LCP==C
       //BWT
-      #if LAST_END
+      #if TERMINATOR
         char c = (!SA[i])?terminator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 1, and terminator = 0
       #else
         char c = (!SA[i])?separator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 0, no terminator
@@ -831,7 +831,7 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
   }
   else if(strcmp(ext, "bwt")==0){
     for(i=0; i<n; i++){ //SA==B
-      #if LAST_END
+      #if TERMINATOR
         char c = (!SA[i])?terminator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 1, and terminator = 0
       #else
         char c = (!SA[i])?separator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 0, no terminator
@@ -841,7 +841,7 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
   }
   else if(strcmp(ext, "bwt.qs")==0){
     for(i=0; i<n; i++){ //SA==B
-      #if LAST_END
+      #if TERMINATOR
         char c = (!SA[i])?terminator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 1, and terminator = 0
       #else
         char c = (!SA[i])?separator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 0, no terminator
