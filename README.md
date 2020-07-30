@@ -58,7 +58,7 @@ where INPUT is a single file or directory with a string collection.
 --bwt                 compute the BWT using 1 byte per symbol, write to INPUT.bwt
 --docs  d             process only the first d strings in the collection
 --light               run the lightweight algorithm to compute DA, GSA and GESA
---output NAME         use NAME as a prefix for file names, instead od input name
+--output DIR/NAME     write output files to DIR and use NAME as a prefix for file names
 ```
 
 ### Loading options:
@@ -133,7 +133,7 @@ where INPUT is a single file or directory with a string collection.
 
 - If option ``--output DIR/`` is set, files are written to directory
   ``DIR``.  Setting ``--output DIR/NAME`` will make files be written
-  to directory ``DIR`` with suffix ``INPUT``.
+  to directory ``DIR`` with suffix ``NAME``.
 
 - Output files format is discussed [below](https://github.com/felipelouza/gsufsort#output).
 
