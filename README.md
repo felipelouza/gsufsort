@@ -105,7 +105,7 @@ where INPUT is a single file or directory with a string collection.
   In _fasta_ and _fastq_ files, each sequence is taken as a string in the
   collection.
 
-- gsufsort supports ASCII alphabet, but values _0_ and _255_ are
+- gsufsort supports the ASCII alphabet, but values _0_ and _255_ are
   reserved and must not occur in the input.
 
 - IUPAC symbols and 'N' are not handled as special symbols in _fasta_
@@ -193,11 +193,11 @@ i	SA	BWT	suffixes
 - BWT and iBWT are written in ASCII format, using 1 byte per input symbol.
 
 - The GSA is written sequentially to a binary file, with no headers.
-  The values of DA and SA are intercalated throughout the file:
+  The values of DA and SA are intercalated throughout the file with w1 and w2 bytes respectively:
   DA[0],SA[0],DA[1],SA[1],...
 
 - The GESA is written sequentially to a binary file, with no headers.
-  The values of DA and SA, LCP and BWT are intercalated throughout the file:
+  The values of DA and SA, LCP and BWT are intercalated throughout the file with w1, w2, w3 and 1 bytes respectively:
   DA[0],SA[0],LCP[0],BWT[0],DA[1],SA[1],LCP[1],BWT[1]...
 
 
