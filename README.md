@@ -99,7 +99,7 @@ where INPUT is a single file or directory with a string collection.
 - File types (text, fasta or fastq) will be selected by extensions:
   _.txt_, _.fasta_ (or _.fa_, _.fna._) and _.fastq_ (or _.fq_).
 
-- Options --txt, --fasta and --fastq enable loading file disregarding extensions.
+- Options ``--txt``, ``--fasta`` and ``--fastq`` enable loading file disregarding extensions.
 
 - In _txt_ files, each line is taken as a strings in the collection.
   In _fasta_ and _fastq_ files, each sequence is taken as a string in the
