@@ -5,7 +5,7 @@ gsufsort is a fast, portable and lightweight tool for constructing the
 
 gsufsort runs in internal memory and data structures are written to disk. 
 
-For a string collection, **_gsufsort_** can compute the following data structures:
+For a string collection, gsufsort can compute the following data structures:
 
 - [x] Suffix array (SA)
 - [x] Inverse suffix array (ISA)
@@ -17,7 +17,7 @@ For a string collection, **_gsufsort_** can compute the following data structure
 - [x] Generalized suffix array (GSA)
 - [x] Generalized enhanced suffix array (GESA)
 
-## Compilation and instalation
+## Compilation and installation
 
 gsufsort will compile in systems with a standard C compiler (like gcc) and make. 
 
@@ -48,12 +48,12 @@ where INPUT is a single file or directory with a string collection.
 
 ```sh
 --build	              (default)
---sa    [w]           compute the SA using w bytes (defaut 4), write to INPUT.w.sa
+--sa    [w]           compute the SA using w bytes (default 4), write to INPUT.w.sa
 --isa   [w]           compute the ISA, write to INPUT.w.isa
 --lcp   [w]           compute the LCP, write to INPUT.w.lcp
 --trlcp k             compute the k-truncated LCP array, write to INPUT.w.lcp
 --da    [w]           compute the DA, write to INPUT.w.da
---gsa   [w1][w2]      compute the GSA=(text,suff) as pairs of (w1, w2) bytes, write to INPUT.w1.w2.gsa
+--gsa   [w1][w2]      compute the GSA=(string,suffix) as pairs of w1+w2 bytes, write to INPUT.w1.w2.gsa
 --gesa  [w1][w2][w3]  compute the GESA=(GSA,LCP,BWT), write to INPUT.w1.w2.w3.1.gesa
 --bwt                 compute the BWT using 1 byte per symbol, write to INPUT.bwt
 --docs  d             process only the first d strings in the collection
@@ -82,7 +82,7 @@ where INPUT is a single file or directory with a string collection.
 ### Output options:
 
 ```sh
---str                 write the collection cancatenation (T^{cat}) to INPUT.1.str
+--str                 write the collection concatenation (T^{cat}) to INPUT.1.str
 --print [p]           print the first p elements of arrays to stdout, defaults to the collection length
 --qs                  write QS sequences in fastq permuted according to the BWT to INPUT.bwt.qs
 --lcp_max             print maximum LCP value
@@ -105,13 +105,13 @@ where INPUT is a single file or directory with a string collection.
   In _fasta_ and _fastq_ files, each sequence is taken as a string in the
   collection.
 
-- gsufsort supports ASCII alphabet, but values _0_ and _1_ are
+- gsufsort supports ASCII alphabet, but values _0_ and _255_ are
   reserved and must not occur in the input.
 
 - IUPAC symbols and 'N' are not handled as special symbols in _fasta_
   or _fastq_ files.
 
-- gzipped input files (with _.gz_ extension) are supported uzing
+- gzipped input files (with _.gz_ extension) are supported using
   [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib)
   and
   [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq)
@@ -123,7 +123,7 @@ where INPUT is a single file or directory with a string collection.
   Every file with expected extensions in the directory will be
   processed to compose the collection, and the default output file
   prefix will be **all**.
-  See
+  See also
     [Wiki](https://github.com/felipelouza/gsufsort/wiki/Multiple-Files).
 
 
@@ -190,12 +190,15 @@ i	SA	BWT	suffixes
   file.  The file has no header and every integer takes ``w``
   bytes. The default value of ``w`` is 4.
 
-
 - BWT and iBWT are written in ASCII format, using 1 byte per input symbol.
 
-- The GSA is written 
+- The GSA is written sequentially to a binary file, with no headers.
+  The values of DA and SA are intercalated throughout the file:
+  DA[0],SA[0],DA[1],SA[1],...
 
-- The GESA is written 
+- The GESA is written sequentially to a binary file, with no headers.
+  The values of DA and SA, LCP and BWT are intercalated throughout the file:
+  DA[0],SA[0],LCP[0],BWT[0],DA[1],SA[1],LCP[1],BWT[1]...
 
 
 ## wiki
@@ -212,5 +215,5 @@ See more details and additional features in [Wiki](https://github.com/felipelouz
 
 ## thanks
 
-Thanks to [Antonis Maronikolakis](https://github.com/antmarakis) by helpful suggestions.
+We thank to [Antonis Maronikolakis](https://github.com/antmarakis) for his helpful suggestions.
 
