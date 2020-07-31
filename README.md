@@ -65,7 +65,7 @@ where INPUT is a single file or directory with a string collection.
 
 ```sh
 --load                load data-structures from disk INPUT[.sa][.da][.lcp][.gsa][.str]
---ibwt                invert the BWT, given INPUT.bwt, write output in INPUT.bwt.ibwt
+--ibwt                invert the BWT, given INPUT.bwt, write output to INPUT.bwt.ibwt
 ```
 
 ### Input options:
@@ -74,7 +74,7 @@ where INPUT is a single file or directory with a string collection.
 --txt                 handle input as raw text files (one string per line)
 --fasta               handle input as fasta files 
 --fastq               handle input as fastq files
---dir                 include all files in the input directory
+--dir                 include all files at the input directory
 --lower               convert input to lowercase before data structures construction
 --upper               convert input to uppercase before data structures construction
 ```
