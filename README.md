@@ -1,6 +1,6 @@
 # gsufsort
 
-gsufsort is a fast, portable and lightweight tool for constructing the
+gsufsort \[1\] is a fast, portable and lightweight tool for constructing the
 **suffix array** and related data structures for **string collections**.
 
 gsufsort runs in internal memory and data structures are written to disk. 
@@ -217,3 +217,6 @@ See more details and additional features in [Wiki](https://github.com/felipelouz
 
 We thank to [Antonis Maronikolakis](https://github.com/antmarakis) for his helpful suggestions.
 
+## references
+
+\[1\] Louza, F.A., Telles, G.P., Gog, S., Prezza, N., Rosone, G.. gsufsort: constructing suffix arrays, LCP arrays and BWTs for string collections. Algorithms Mol Biol 15, 18 (2020). https://doi.org/10.1186/s13015-020-00177-y
