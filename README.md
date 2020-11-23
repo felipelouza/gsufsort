@@ -221,6 +221,7 @@ We thank to [Antonis Maronikolakis](https://github.com/antmarakis) for his helpf
 
 \[1\] Louza, F.A., Telles, G.P., Gog, S., Prezza, N., Rosone, G.. gsufsort: constructing suffix arrays, LCP arrays and BWTs for string collections. Algorithms Mol Biol 15, 18 (2020). https://doi.org/10.1186/s13015-020-00177-y
 
+
 ---
 
 <small> Supported by the project Italian MIUR-SIR [CMACBioSeq][240fb5f5] ("_Combinatorial methods for analysis and compression of biological sequences_") grant n.~RBSI146R5L. P.I. Giovanna Rosone</small> [↩](#a1)
