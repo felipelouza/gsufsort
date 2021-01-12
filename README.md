@@ -1,12 +1,11 @@
-# gsufsort: 
+# gsufsort
 
-This software is a fast, portable, and lightweight tool for
-constructing the **suffix array** and related data structures for
-**string collections**.
+gsufsort \[1\] is a fast, portable and lightweight tool for constructing the
+**suffix array** and related data structures for **string collections**.
 
 gsufsort runs in internal memory and data structures are written to disk. 
 
-For a string collection **_gsufsort_** can compute the following data structures:
+For a string collection, gsufsort can compute the following data structures:
 
 - [x] Suffix array (SA)
 - [x] Inverse suffix array (ISA)
@@ -18,9 +17,9 @@ For a string collection **_gsufsort_** can compute the following data structures
 - [x] Generalized suffix array (GSA)
 - [x] Generalized enhanced suffix array (GESA)
 
-## Compilation and instalation
+## Compilation and installation
 
-gsufsort will compile in systems with a standard C compiler, as gcc. 
+gsufsort will compile in systems with a standard C compiler (like gcc) and make. 
 
 ```sh
 git clone https://github.com/felipelouza/gsufsort.git
@@ -43,80 +42,100 @@ not installed in you system, build with option ``make GZ=0``.
 ./gsufsort INPUT [options]
 ```
 
-where INPUT is a single file with a string collection.
+where INPUT is a single file or directory with a string collection.
 
 ### Construction options:
 
 ```sh
 --build	              (default)
---sa    [w]           compute the SA using w bytes (defaut 4), write to INPUT.w.sa
+--sa    [w]           compute the SA using w bytes (default 4), write to INPUT.w.sa
 --isa   [w]           compute the ISA, write to INPUT.w.isa
 --lcp   [w]           compute the LCP, write to INPUT.w.lcp
 --trlcp k             compute the k-truncated LCP array, write to INPUT.w.lcp
 --da    [w]           compute the DA, write to INPUT.w.da
---gsa   [w1][w2]      compute the GSA=(text,suff) as pairs of (w1, w2) bytes, write to INPUT.w1.w2.gsa
+--gsa   [w1][w2]      compute the GSA=(string,suffix) as pairs of w1+w2 bytes, write to INPUT.w1.w2.gsa
 --gesa  [w1][w2][w3]  compute the GESA=(GSA,LCP,BWT), write to INPUT.w1.w2.w3.1.gesa
 --bwt                 compute the BWT using 1 byte per symbol, write to INPUT.bwt
 --docs  d             process only the first d strings in the collection
 --light               run the lightweight algorithm to compute DA, GSA and GESA
---output  OUTFILE     name files OUTFILE.* instead of INPUT.*
+--output DIR/NAME     write output files to DIR and use NAME as a prefix for file names
 ```
 
 ### Loading options:
 
 ```sh
 --load                load data-structures from disk INPUT[.sa][.da][.lcp][.gsa][.str]
---ibwt                invert the BWT, given INPUT.bwt, write output in INPUT.bwt.ibwt
+--ibwt                invert the BWT, given INPUT.bwt, write output to INPUT.bwt.ibwt
 ```
 
 ### Input options:
 
 ```sh
---txt                 handle input (INPUT) as raw files (one string per line)
---fasta               handle input (INPUT) as FASTA 
---fastq               handle input (INPUT) as FASTQ
---dir                 handle multiple files in directory (INPUT) as input
+--txt                 handle input as raw text files (one string per line)
+--fasta               handle input as fasta files 
+--fastq               handle input as fastq files
+--dir                 include all files at the input directory
+--lower               convert input to lowercase before data structures construction
+--upper               convert input to uppercase before data structures construction
 ```
 
 ### Output options:
 
 ```sh
---qs                  write QS sequences in fastq permuted according to the BWT to INPUT.bwt.qs
---str                 write the collection cancatenation (T^{cat}) to INPUT.1.str
+--str                 write the collection concatenation (T^{cat}) to INPUT.1.str
 --print [p]           print the first p elements of arrays to stdout, defaults to the collection length
+--qs                  write QS sequences in fastq permuted according to the BWT to INPUT.bwt.qs
 --lcp_max             print maximum LCP value
 --lcp_max_text        print maximum LCP value (text order)
 --lcp_avg             print average LCP value
 --time                print the running time in seconds
---lower               convert input letters to lowercase before data structures construction
---upper               convert input letters to uppercase before data structures construction
 --verbose             verbose output
 --help                this help message
 ```
 
 
-### Input files 
+## Input files 
 
-- **Supported extensions**: _.txt_, _.fasta_ (or _.fa_, _.fna._) and _.fastq_ (or _.fq_).
+- File types (text, fasta or fastq) will be selected by extensions:
+  _.txt_, _.fasta_ (or _.fa_, _.fna._) and _.fastq_ (or _.fq_).
 
-- Strings are separated per '\0' (new line) in _.txt_ files.
+- Options ``--txt``, ``--fasta`` and ``--fastq`` enable loading file disregarding extensions.
 
-- **_gsufsort_** supports **ASCII alphabet**, so that values _0_ and _1_ are reserved.
+- In _txt_ files, each line is taken as a strings in the collection.
+  In _fasta_ and _fastq_ files, each sequence is taken as a string in the
+  collection.
 
-- _IUPAC symbols_ and _'N'_ are **not** handled as special symbols in _fasta_ or _fastq_ files. 
+- gsufsort supports the ASCII alphabet, but values _0_ and _255_ are
+  reserved and must not occur in the input.
 
-- **gzipped input data** (extension _.gz_) are supported uzing [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib) and [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq) libraries. In the case you do not have _zlib_, build with the option ``make GZ=0``.
+- IUPAC symbols and 'N' are not handled as special symbols in _fasta_
+  or _fastq_ files.
 
-- **Multiple files** in a given directory (_INPUT_) are supported with option ``--dir``, see [Wiki](https://github.com/felipelouza/gsufsort/wiki/Multiple-Files).
+- gzipped input files (with _.gz_ extension) are supported using
+  [zlib](https://github.com/felipelouza/gsufsort/tree/master/external/zlib)
+  and
+  [kseq](https://github.com/felipelouza/gsufsort/tree/master/external/kseq)
+  libraries.  If _zlib_ is not installed in your system, build
+  gsufsort with the option ``make GZ=0``.  If _zlib_ is not available
+  and a gzipped file is given as input, a runtime error will occur.
+
+- A directory may be given as input, selecting option ``--dir``.
+  Every file with expected extensions in the directory will be
+  processed to compose the collection, and the default output file
+  prefix will be **all**.
+  See also
+    [Wiki](https://github.com/felipelouza/gsufsort/wiki/Multiple-Files).
 
 
-### Output files 
+## Output files 
 
-- Output data structures (for example ``INPUT.4.sa``) are written in binary format, in which each integer takes ``w`` bytes (def. ``w`` is 4).
+- Output files are written by default in the current directory.
 
-- Output files are written (**by default**) in the current directory, in which **gsufsort** is executed, see [below](https://github.com/felipelouza/gsufsort#output).
+- If option ``--output DIR/`` is set, files are written to directory
+  ``DIR``.  Setting ``--output DIR/NAME`` will make files be written
+  to directory ``DIR`` with suffix ``NAME``.
 
-- Option ``--output DIR/`` renames the target directory to ``DIR/``, while ``--output DIR/INPUT`` renames output file names to ``DIR/INPUT``.
+- Output files format is discussed [below](https://github.com/felipelouza/gsufsort#output).
 
 ## quick test
 
@@ -165,34 +184,22 @@ i	SA	BWT	suffixes
 18	2	a	nana$
 ```
 
-### output
+### output format
 
-The **suffix array** output (``INPUT.4.sa``) is written in binary format, each integer takes ``w`` bytes (default ``w`` is 4).
+- SA, ISA, LCP, k-LCP and DA are each written sequentially to a binary
+  file.  The file has no header and every integer takes ``w``
+  bytes. The default value of ``w`` is 4.
 
-```sh
-ls -la example.txt.4.sa
--rw-rw-r--. 1 louza louza 76 Apr 23 08:25 example.txt.4.sa
-```
+- BWT and iBWT are written in ASCII format, using 1 byte per input symbol.
 
-The **BWT** output (``INPUT.bwt``) is written in ASCII format:
+- The GSA is written sequentially to a binary file, with no headers.
+  The values of DA and SA are intercalated throughout the file with w1 and w2 bytes respectively:
+  DA[0],SA[0],DA[1],SA[1],...
 
-```sh
-less +1 example.txt.bwt
-^Aaannbnnn^A^Aba^@aaaaa
-```
+- The GESA is written sequentially to a binary file, with no headers.
+  The values of DA and SA, LCP and BWT are intercalated throughout the file with w1, w2, w3 and 1 bytes respectively:
+  DA[0],SA[0],LCP[0],BWT[0],DA[1],SA[1],LCP[1],BWT[1]...
 
-We can **invert the BWT** with option ``--ibwt``:
-
-```sh
-./gsufsort example.txt.bwt --ibwt
-```
-
-The result is stored in ``INPUT.ibwt``, which can be compared with the orignal file:
-
-```sh
-diff -s example.txt.ibwt dataset/example.txt
-Files example.txt.ibwt and dataset/example.txt are identical
-```
 
 ## wiki
 
@@ -208,5 +215,16 @@ See more details and additional features in [Wiki](https://github.com/felipelouz
 
 ## thanks
 
-Thanks to [Antonis Maronikolakis](https://github.com/antmarakis) by helpful suggestions.
+We thank to [Antonis Maronikolakis](https://github.com/antmarakis) for his helpful suggestions.
+
+## references
+
+\[1\] Louza, F.A., Telles, G.P., Gog, S., Prezza, N., Rosone, G.. gsufsort: constructing suffix arrays, LCP arrays and BWTs for string collections. Algorithms Mol Biol 15, 18 (2020). https://doi.org/10.1186/s13015-020-00177-y
+
+
+---
+
+<small> Supported by the project Italian MIUR-SIR [CMACBioSeq][240fb5f5] ("_Combinatorial methods for analysis and compression of biological sequences_") grant n.~RBSI146R5L. P.I. Giovanna Rosone</small> [↩](#a1)
+
+[240fb5f5]: http://pages.di.unipi.it/rosone/CMACBioSeq.html
 
