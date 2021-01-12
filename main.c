@@ -431,6 +431,10 @@ int main(int argc, char** argv){
     }
     else{
       gsacak(T, (uint_t*)SA, LCP, DA, n);
+    
+      if(trlcp){
+        for(i=0; i<n; i++) if(LCP[i]>trlcp) LCP[i]=trlcp;
+      }
     }
 
     //compute ISA
