@@ -303,11 +303,13 @@ rankbv_load(FILE* f)
 {
     size_t bytes;
     /* read space */
-    fread(&bytes,sizeof(size_t),1,f);
+    if(fread(&bytes,sizeof(size_t),1,f)==EOF)
+    	perror("rankbv_load");
 
     /* read the bv */
     void* mem = rankbv_safecalloc(bytes);
-    fread(mem,bytes,1,f);
+    if(fread(mem,bytes,1,f)==EOF)
+    	perror("rankbv_load");
 
     return (rankbv_t*)mem;
 }

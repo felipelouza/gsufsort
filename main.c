@@ -933,7 +933,8 @@ size_t load_from_disk(unsigned char **T, int_da **DA, int_t **SA, int_t **LCP, c
 
   if(strcmp(ext, "str")==0 || strcmp(ext, "bwt")==0 || strcmp(ext, "ibwt")==0 || strcmp(ext, "qs")==0){
     *T= (unsigned char*) malloc(n*sizeof(unsigned char));
-    fread(*T, wsize1, n, f_in);
+    if(fread(*T, wsize1, n, f_in)==EOF)
+      perror("main_t");
   }
   else{
 
@@ -954,22 +955,26 @@ size_t load_from_disk(unsigned char **T, int_da **DA, int_t **SA, int_t **LCP, c
 
       if(DA){
         int_da da_value=0;
-        fread(&da_value, wsize1, 1, f_in);
+        if(fread(&da_value, wsize1, 1, f_in)==EOF) 
+	  perror("main_da_value");
         (*DA)[i] = (int_da) da_value;
       }
       int_t value=0;
       if(SA){
-        fread(&value, wsize2, 1, f_in);
+        if(fread(&value, wsize2, 1, f_in)==EOF)
+	  perror("main_sa_value");
         (*SA)[i] = (int_t) value;
       }
       //LCP (gesa)
       if(LCP){
-        fread(&value, wsize3, 1, f_in);
+        if(fread(&value, wsize3, 1, f_in)==EOF)
+	  perror("main_lcp_value");
         (*LCP)[i] = (int_t) value;
       }
       //BWT (gesa)
       if(strcmp(ext, "gesa")==0){
-        fread(&value, sizeof(char), 1, f_in);
+        if(fread(&value, sizeof(char), 1, f_in)==EOF)
+	  perror("main_gesa_value");
         (*T)[i] = (char) value;
       }
     }
