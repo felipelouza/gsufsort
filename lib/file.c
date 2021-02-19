@@ -160,8 +160,6 @@ char** load_multiple_txt(char *c_file, int *k, size_t *n) {
     ssize_t size = getline(&c_buffer[i], &len, f_in);
     if (size == -1){
       *k = i;
-      fprintf (stderr, "getline '%s' failed: %s.\n", c_file, strerror (errno));
-      exit(EXIT_FAILURE);
       break;		
     }
     c_buffer[i][size-1] = 0;
