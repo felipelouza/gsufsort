@@ -212,10 +212,10 @@ char** load_multiple_fastq(char *c_file, int *k, size_t *n){
     (*n) += size;
 
     len = 0; buf = NULL;
-    getline(&buf, &len, f_in); // +'s line
+    size = getline(&buf, &len, f_in); // +'s line
     free(buf);
     len = 0; buf = NULL;
-    getline(&buf, &len, f_in); // @'s line
+    size = getline(&buf, &len, f_in); // @'s line
     free(buf);
 
     if(i==n_alloc-1){
@@ -254,10 +254,10 @@ char** load_multiple_qs(char *c_file, int *k, size_t *n){
     }
 
     len = 0; buf = NULL;
-    getline(&buf, &len, f_in); // read line
+    size = getline(&buf, &len, f_in); // read line
     free(buf);
     len = 0; buf = NULL;
-    getline(&buf, &len, f_in); // +'s line
+    size = getline(&buf, &len, f_in); // +'s line
     free(buf);
 
     len = 0; c_buffer[i] = NULL;
@@ -293,7 +293,8 @@ char** load_multiple_fasta(char *c_file, int *k, size_t *n){
   char *buf = NULL;
   size_t len = 0;
 
-  getline(&buf, &len, f_in);// first sequence
+  ssize_t size = getline(&buf, &len, f_in);// first sequence
+  if (size == -1) perror("file_load");
   free(buf);
 
   int count=0;
@@ -663,7 +664,8 @@ void mkdir(const char* c_file){
   strcpy (c_aux,"mkdir -p ");
   strcat (c_aux, c_file);
 
-  system (c_aux);//remove .bin
+  if(system(c_aux) == -1)
+    perror ("mkdir");
 
 }
 
@@ -721,7 +723,8 @@ int_t file_text_read(unsigned char** str, char* c_file, const char* ext){
   int_t n = size/sizeof(unsigned char);
 
   *str = (unsigned char*) malloc(n*sizeof(unsigned char));
-  fread(*str, sizeof(unsigned char), n, f_in);
+  if(fread(*str, sizeof(unsigned char), n, f_in)==EOF)
+    perror("file_text_read");
 
   file_close(f_in);
   free(c_in);
@@ -744,7 +747,8 @@ int_t file_text_int_read(int_t** str_int, char* c_file, const char* ext){
   int_t n = size/sizeof(int_t);
 
   *str_int = (int_t*) malloc(n*sizeof(int_t));
-  fread(*str_int, sizeof(int_t), n, f_in);
+  if(fread(*str_int, sizeof(int_t), n, f_in)==EOF)
+    perror("file_text_int_read");
 
   file_close(f_in);
   free(c_in);
