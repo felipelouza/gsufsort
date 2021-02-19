@@ -122,22 +122,27 @@ unsigned char* cat_all(unsigned char** R, int k, size_t *n, int verbose, int upp
       int_t m = strlen((char*)R[i]);
       if(m>max) max=m;
       for(j=0; j<m; j++){
-        if(R[i][j]<255){
+        if(R[i][j]<255 && R[i][j]>1){
           str[l++] = R[i][j]+1;
           if(R[i][j]>=lb && R[i][j]<=rb) str[l-1]+=diff;
         }
       }
-      if(m) str[l++] = 1; //add 1 as separator (ignores empty entries)
+      if(m)
+        if(str[l-1]>1) str[l++] = 1; //add 1 as separator (ignores empty entries)
     }
   }
   else{
     for(i=0; i<k; i++){
       int_t m = strlen((char*)R[i]);
+      printf("%" PRIdN "\t", m);
       if(m>max) max=m;
       for(j=0; j<m; j++){
-        if(R[i][j]<255) str[l++] = R[i][j]+1;
+        if(R[i][j]<255 && R[i][j]>1) str[l++] = R[i][j]+1;
+        printf("%d\t", R[i][j]);
       }
-      if(m) str[l++] = 1; //add 1 as separator (ignores empty entries)
+      printf("\n");
+      if(m)
+        if(str[l-1]>1) str[l++] = 1; //add 1 as separator (ignores empty entries)
     }
   }
 
