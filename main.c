@@ -24,7 +24,7 @@
 #define SIGMA 256
 
 #ifndef DEBUG
-  #define DEBUG 0 
+#define DEBUG 0 
 #endif
 
 #define WORD (size_t)(pow(256,sizeof(int_t))/2.0)
@@ -103,7 +103,7 @@ int main(int argc, char** argv){
   int output=0; //output
   int verbose=0, print=0;
 
-/********/
+  /********/
   //int digit_optind = 0;
 
   while (1) {
@@ -145,10 +145,10 @@ int main(int argc, char** argv){
 
     c = getopt_long(argc, argv, "S:vtP:d:L:D:g:lG:B:bhtfqo:ic:Qum", long_options, &option_index);
 
-     if (c == -1) break;
+    if (c == -1) break;
 
     switch (c) {
-       case 0:
+      case 0:
         printf("option %s", long_options[option_index].name);
         if (optarg) printf(" with arg %s", optarg);
         printf("\n");
@@ -227,7 +227,7 @@ int main(int argc, char** argv){
     }
   }
 
-/********/
+  /********/
 
   if(optind+1==argc) {
     c_input=argv[optind++];
@@ -236,7 +236,7 @@ int main(int argc, char** argv){
 
 
   if(time){
-     time_start(&t_total, &c_total);
+    time_start(&t_total, &c_total);
   }
 
   if(lcp_max || lcp_avg || lcp_max_text) lcp=1;
@@ -271,7 +271,7 @@ int main(int argc, char** argv){
 
     unsigned char **R;
     size_t n=0;
-  
+
     //disk access
     if(dir){
       R = (unsigned char**) file_load_multiple_dir(c_input, &d, &n, in_type, verbose);
@@ -287,18 +287,18 @@ int main(int argc, char** argv){
       fprintf(stderr, "####\n");
       exit(EXIT_FAILURE);
     }
-  
+
     //concatenate all string
     unsigned char *T = cat_all(R, d, &n, verbose, upper);
-  
-    #if DEBUG
-      printf("R:\n");
-      for(i=0; i<d && i<10; i++)
-        printf("%" PRIdN ") %s (%zu)\n", i, R[i], strlen((char*)R[i]));
-      printf("####\n");
-      for(i=0; i<n; i++) printf("[%d]", T[i]);
-      printf("\n");
-    #endif
+
+#if DEBUG
+    printf("R:\n");
+    for(i=0; i<d && i<10; i++)
+      printf("%" PRIdN ") %s (%zu)\n", i, R[i], strlen((char*)R[i]));
+    printf("####\n");
+    for(i=0; i<n; i++) printf("[%d]", T[i]);
+    printf("\n");
+#endif
 
     //quality score sequence
     unsigned char **QS; 
@@ -310,26 +310,26 @@ int main(int argc, char** argv){
       //concatenate all string
       qs = cat_all(QS, d, &n, 0, 0);
 
-      #if DEBUG
-        printf("QS:\n");
-        for(i=0; i<d && i<10; i++)
-          printf("%" PRIdN ") %s (%zu)\n", i, QS[i], strlen((char*)QS[i]));
-        printf("####\n");
-        for(i=0; i<n; i++) printf("[%d]", qs[i]);
-        printf("\n");
-      #endif
+#if DEBUG
+      printf("QS:\n");
+      for(i=0; i<d && i<10; i++)
+        printf("%" PRIdN ") %s (%zu)\n", i, QS[i], strlen((char*)QS[i]));
+      printf("####\n");
+      for(i=0; i<n; i++) printf("[%d]", qs[i]);
+      printf("\n");
+#endif
 
       //free memory
       for(i=0; i<d; i++)
         free(QS[i]);
       free(QS);
     }
-  
+
     //free memory
     for(i=0; i<d; i++)
       free(R[i]);
     free(R);
-  
+
     int_t *SA = NULL;
     SA = (int_t*) malloc(n*sizeof(int_t));
     assert(SA);
@@ -341,14 +341,14 @@ int main(int argc, char** argv){
       ISA = (int_t*) malloc(n*sizeof(int_t));
       assert(ISA);
     }
-  
+
     int_t *LCP = NULL;  
     if(lcp || gesa || lcp_max || lcp_avg || lcp_max_text){
       LCP = (int_t*) malloc(n*sizeof(int_t));
       assert(LCP);
       for(i=0; i<n; i++) LCP[i]=0;
     }
-  
+
     int_da *DA = NULL;  
     rankbv_t* rbv = NULL;
 
@@ -359,7 +359,7 @@ int main(int argc, char** argv){
         for(i=0; i<n; i++) DA[i]=0;
       }
     }
-  
+
     if(verbose){
       printf("########\n");
       printf("INPUT = %s\n", c_input);
@@ -380,14 +380,14 @@ int main(int argc, char** argv){
         if(light) printf("DA = lightweight\n");
         else printf("sizeof(int_da) = %zu bytes\n", sizeof(int_da));
       }
-      #if TERMINATOR
-        printf("TERMINATOR\n");
-      #endif
+#if TERMINATOR
+      printf("TERMINATOR\n");
+#endif
       printf("########\n");
     }
-  
-  /********/
-  
+
+    /********/
+
     printf("## gsufsort ##\n");
 
     if(time){
@@ -403,11 +403,11 @@ int main(int argc, char** argv){
           for(i=0; i<n; i++) if(LCP[i]>trlcp) LCP[i]=trlcp;
         }
         printf("## store_to_disk ##\n");
-        #if TERMINATOR  
-          store_to_disk(NULL, NULL, NULL, NULL, LCP,  n, c_output,  "lcp",  0, 0, lcp_bytes);
-        #else
-          store_to_disk(NULL, NULL,  NULL, NULL,  LCP+1, n-1, c_output, "lcp",  0, 0, lcp_bytes);
-        #endif
+#if TERMINATOR  
+        store_to_disk(NULL, NULL, NULL, NULL, LCP,  n, c_output,  "lcp",  0, 0, lcp_bytes);
+#else
+        store_to_disk(NULL, NULL,  NULL, NULL,  LCP+1, n-1, c_output, "lcp",  0, 0, lcp_bytes);
+#endif
       }
       if(lcp && !gesa && !lcp_avg && !lcp_max && !lcp_max_text && !print) free(LCP);
       else if(verbose){ 
@@ -431,7 +431,7 @@ int main(int argc, char** argv){
     }
     else{
       gsacak(T, (uint_t*)SA, LCP, DA, n);
-    
+
       if(trlcp){
         for(i=0; i<n; i++) if(LCP[i]>trlcp) LCP[i]=trlcp;
       }
@@ -442,16 +442,16 @@ int main(int argc, char** argv){
       int_t i=0;
       for(;i<n;i++) ISA[SA[i]]=i; 
     }
-  
+
     if(time){
       double d_time = time_stop(t_start, c_start);
       if(verbose) fprintf(stderr,"%.6lf\n", d_time);
     }
-  
-  /********/
-  
+
+    /********/
+
     if(time){
-       time_start(&t_start, &c_start);
+      time_start(&t_start, &c_start);
     }
     if(light){
       if(!lcp)
@@ -459,56 +459,56 @@ int main(int argc, char** argv){
     }
     else
       printf("## store_to_disk ##\n");
-  
-    #if TERMINATOR  
-      //store to disk
-      if(str) store_to_disk(T,  NULL, NULL, NULL,  NULL, n, c_output, "str",  sizeof(char), 0, 0);
-      if(sa)  store_to_disk(NULL, NULL, NULL, SA,   NULL, n, c_output,  "sa",   0, sa_bytes, 0);
-      if(isa) store_to_disk(NULL, NULL, NULL, ISA,   NULL, n, c_output,  "isa", 0, isa_bytes, 0);
-      if(light==0)
-        if(lcp) store_to_disk(NULL, NULL, NULL, NULL, LCP,  n, c_output,  "lcp",  0, 0, lcp_bytes);
-      if(da)  store_to_disk(NULL, DA,   rbv,  SA,   NULL, n, c_output,  "da",   da_bytes, 0, 0);
-      if(gsa) store_to_disk(NULL, DA,   rbv,  SA,   NULL, n, c_output,  "gsa",  t_bytes, s_bytes, 0);
-      if(gesa) store_to_disk(T, DA,   rbv,  SA,   LCP,  n, c_output,  "gesa", t_bytes, s_bytes, lcp_bytes);
-      if(bwt) store_to_disk(T,  NULL, NULL, SA,   NULL, n, c_output,  "bwt",  sizeof(char), 0, 0);
-      if(q)   store_to_disk(qs,  NULL, NULL, SA,   NULL, n, c_output,  "bwt.qs",  sizeof(char), 0, 0);
-    #else
-      //store to disk (+1 ignores last terminator)
-      if(str) store_to_disk(T,  NULL,  NULL, NULL,  NULL,  n-1, c_output, "str",  sizeof(char), 0, 0);
-      if(sa)  store_to_disk(NULL, NULL,  NULL, SA+1,  NULL,  n-1, c_output, "sa",   0, sa_bytes, 0);
-      if(isa) store_to_disk(NULL, NULL,  NULL, ISA+1,  NULL,  n-1, c_output, "isa", 0, isa_bytes, 0);
-      if(light==0)
-        if(lcp) store_to_disk(NULL, NULL,  NULL, NULL,  LCP+1, n-1, c_output, "lcp",  0, 0, lcp_bytes);
-      if(da)  store_to_disk(NULL, DA+1,  rbv,  SA+1,  NULL,  n-1, c_output, "da",   da_bytes, 0, 0);
-      if(gsa) store_to_disk(NULL, DA+1,  rbv,  SA+1,  NULL,  n-1, c_output, "gsa",  t_bytes, s_bytes, 0);
-      if(gesa) store_to_disk(T, DA+1,  rbv,  SA+1,  LCP+1, n-1, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
-      if(bwt) store_to_disk(T,  NULL,  NULL, SA+1,  NULL,  n-1, c_output, "bwt", sizeof(char), 0, 0); 
-      if(q)   store_to_disk(qs,  NULL,  NULL, SA+1,  NULL,  n-1, c_output, "bwt.qs", sizeof(char), 0, 0); 
-    #endif
-  
+
+#if TERMINATOR  
+    //store to disk
+    if(str) store_to_disk(T,  NULL, NULL, NULL,  NULL, n, c_output, "str",  sizeof(char), 0, 0);
+    if(sa)  store_to_disk(NULL, NULL, NULL, SA,   NULL, n, c_output,  "sa",   0, sa_bytes, 0);
+    if(isa) store_to_disk(NULL, NULL, NULL, ISA,   NULL, n, c_output,  "isa", 0, isa_bytes, 0);
+    if(light==0)
+      if(lcp) store_to_disk(NULL, NULL, NULL, NULL, LCP,  n, c_output,  "lcp",  0, 0, lcp_bytes);
+    if(da)  store_to_disk(NULL, DA,   rbv,  SA,   NULL, n, c_output,  "da",   da_bytes, 0, 0);
+    if(gsa) store_to_disk(NULL, DA,   rbv,  SA,   NULL, n, c_output,  "gsa",  t_bytes, s_bytes, 0);
+    if(gesa) store_to_disk(T, DA,   rbv,  SA,   LCP,  n, c_output,  "gesa", t_bytes, s_bytes, lcp_bytes);
+    if(bwt) store_to_disk(T,  NULL, NULL, SA,   NULL, n, c_output,  "bwt",  sizeof(char), 0, 0);
+    if(q)   store_to_disk(qs,  NULL, NULL, SA,   NULL, n, c_output,  "bwt.qs",  sizeof(char), 0, 0);
+#else
+    //store to disk (+1 ignores last terminator)
+    if(str) store_to_disk(T,  NULL,  NULL, NULL,  NULL,  n-1, c_output, "str",  sizeof(char), 0, 0);
+    if(sa)  store_to_disk(NULL, NULL,  NULL, SA+1,  NULL,  n-1, c_output, "sa",   0, sa_bytes, 0);
+    if(isa) store_to_disk(NULL, NULL,  NULL, ISA+1,  NULL,  n-1, c_output, "isa", 0, isa_bytes, 0);
+    if(light==0)
+      if(lcp) store_to_disk(NULL, NULL,  NULL, NULL,  LCP+1, n-1, c_output, "lcp",  0, 0, lcp_bytes);
+    if(da)  store_to_disk(NULL, DA+1,  rbv,  SA+1,  NULL,  n-1, c_output, "da",   da_bytes, 0, 0);
+    if(gsa) store_to_disk(NULL, DA+1,  rbv,  SA+1,  NULL,  n-1, c_output, "gsa",  t_bytes, s_bytes, 0);
+    if(gesa) store_to_disk(T, DA+1,  rbv,  SA+1,  LCP+1, n-1, c_output, "gesa", t_bytes, s_bytes, lcp_bytes);
+    if(bwt) store_to_disk(T,  NULL,  NULL, SA+1,  NULL,  n-1, c_output, "bwt", sizeof(char), 0, 0); 
+    if(q)   store_to_disk(qs,  NULL,  NULL, SA+1,  NULL,  n-1, c_output, "bwt.qs", sizeof(char), 0, 0); 
+#endif
+
     if(time){
       double d_time = time_stop(t_start, c_start);
       if(verbose) fprintf(stderr,"%.6lf\n", d_time);
     }
-  
-  /********/
-  
+
+    /********/
+
     if(print){
       printf("## print ##\n");
       if(!p)p=n;
-      #if TERMINATOR
-        print_array(T, DA, rbv, light, SA, ISA, LCP, str=1, da, sa, isa, lcp, bwt || gesa, gsa || gesa, gesa, n, min(n,p), 1);
-      #else
-        print_array(T, DA+1, rbv, light, SA+1, ISA+1, LCP+1, str=1, da, sa, isa, lcp, bwt || gesa, gsa || gesa, gesa, n-1, min(n-1,p), 0);
-      #endif
+#if TERMINATOR
+      print_array(T, DA, rbv, light, SA, ISA, LCP, str=1, da, sa, isa, lcp, bwt || gesa, gsa || gesa, gesa, n, min(n,p), 1);
+#else
+      print_array(T, DA+1, rbv, light, SA+1, ISA+1, LCP+1, str=1, da, sa, isa, lcp, bwt || gesa, gsa || gesa, gesa, n-1, min(n-1,p), 0);
+#endif
     }
 
     if(lcp_max || lcp_avg || lcp_max_text){
       int_t max=0,total=n, j=0;
       double avg=0.0;
-      #if TERMINATOR == 0
-        total=n-1;
-      #endif
+#if TERMINATOR == 0
+      total=n-1;
+#endif
       for(i=0; i<n; i++){
         if(LCP[i]>max){
           max=LCP[i];
@@ -562,7 +562,7 @@ int main(int argc, char** argv){
       if(gesa)  printf("GESA = (%d, %d, %d, 1) bytes\n", t_bytes, s_bytes, lcp_bytes);
       printf("########\n");
     }
-  
+
     unsigned char *T = NULL;
     unsigned char *BWT = NULL;
     int_t  *SA = NULL;
@@ -571,7 +571,7 @@ int main(int argc, char** argv){
     int_da *DA = NULL;
     int_da *GSA_text = NULL;
     int_t  *GSA_suff = NULL;
-  
+
     size_t n=0;
     if(str)  n = load_from_disk(&T, NULL, NULL, NULL, c_input, "str", 1, 0, 0);
     if(sa)   n = load_from_disk(NULL, NULL, &SA,  NULL, c_input, "sa", 0, sa_bytes,  0);
@@ -581,7 +581,7 @@ int main(int argc, char** argv){
     if(gsa)  n = load_from_disk(NULL, &GSA_text, &GSA_suff, NULL, c_input, "gsa", t_bytes, s_bytes, 0);
     if(gesa) n = load_from_disk(&BWT, &GSA_text, &GSA_suff, &LCP, c_input, "gesa", t_bytes, s_bytes, lcp_bytes);
     if(bwt)  n = load_from_disk(&BWT, NULL,  NULL, NULL, c_input, "bwt", 1, 0, 0);
-  
+
     if(trlcp){
       for(i=0; i<n; i++) if(LCP[i]>trlcp) LCP[i]=trlcp;
     }
@@ -645,10 +645,10 @@ int main(int argc, char** argv){
         if(str && sa){
           int_t j=SA[i];
           while(j<n){
-             if(T[j]=='\n'){ printf("$"); break;}
-             else printf("%c", T[j]);
-             j++;
-           }
+            if(T[j]=='\n'){ printf("$"); break;}
+            else printf("%c", T[j]);
+            j++;
+          }
         }
         printf("\n");
       }
@@ -664,14 +664,14 @@ int main(int argc, char** argv){
       free(GSA_text);
       free(GSA_suff);
     }
-  
+
   }
   else if(ibwt){
     printf("## inverse_bwt ##\n");
 
     unsigned char *BWT = NULL;
     unsigned char *T = NULL;
-  
+
     size_t n = load_from_disk(&BWT, NULL,  NULL, NULL, c_input, "ibwt", 1, 0, 0);
 
     //compute LF
@@ -699,21 +699,21 @@ int main(int argc, char** argv){
     //TODO --qs
     unsigned char *QS = NULL;
     unsigned char *qs = NULL;
-  
+
     if(q){
       if(load_from_disk(&QS, NULL,  NULL, NULL, c_input, "qs", 1, 0, 0)!=n)
         exit(EXIT_FAILURE);
-    
+
       qs = (unsigned char*) malloc(n*sizeof(unsigned char));
     }
 
     size_t j;
-    #if TERMINATOR
-      j=0;
-      docs++;
-    #else
-      j=--docs;
-    #endif
+#if TERMINATOR
+    j=0;
+    docs++;
+#else
+    j=--docs;
+#endif
 
     for(i=2; i <n+1; i++){
 
@@ -732,16 +732,16 @@ int main(int argc, char** argv){
       printf("%s\n", T);
 
     printf("## store_to_disk ##\n");
-  
-    #if TERMINATOR
-      store_to_disk(T,  NULL, NULL, NULL,  NULL, n-1, (c_output), "ibwt",  sizeof(char), 0, 0);
-      if(q)
-        store_to_disk(qs,  NULL, NULL, NULL,  NULL, n-1, (c_output), "iqs",  sizeof(char), 0, 0);
-    #else
-      store_to_disk(T,  NULL, NULL, NULL,  NULL, n, (c_output), "ibwt",  sizeof(char), 0, 0);
-      if(q)
-        store_to_disk(qs,  NULL, NULL, NULL,  NULL, n, (c_output), "iqs",  sizeof(char), 0, 0);
-    #endif
+
+#if TERMINATOR
+    store_to_disk(T,  NULL, NULL, NULL,  NULL, n-1, (c_output), "ibwt",  sizeof(char), 0, 0);
+    if(q)
+      store_to_disk(qs,  NULL, NULL, NULL,  NULL, n-1, (c_output), "iqs",  sizeof(char), 0, 0);
+#else
+    store_to_disk(T,  NULL, NULL, NULL,  NULL, n, (c_output), "ibwt",  sizeof(char), 0, 0);
+    if(q)
+      store_to_disk(qs,  NULL, NULL, NULL,  NULL, n, (c_output), "iqs",  sizeof(char), 0, 0);
+#endif
 
     free(BWT);     
     free(T);     
@@ -761,7 +761,7 @@ int main(int argc, char** argv){
   if(!output)
     free(c_output);
 
-return 0;
+  return 0;
 }
 
 /******************************************************************************/
@@ -802,11 +802,11 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
       int_t da_value = (light)?rankbv_rank1(rbv,SA[i]):DA[i];
       fwrite(&da_value, wsize1, 1, f_out);
 
-      #if TERMINATOR
-        int_t value = (da_value==0)?SA[i]:SA[i]-SA[da_value]-1;
-      #else
-        int_t value = (da_value==0)?SA[i]:SA[i]-SA[da_value-1]-1;
-      #endif
+#if TERMINATOR
+      int_t value = (da_value==0)?SA[i]:SA[i]-SA[da_value]-1;
+#else
+      int_t value = (da_value==0)?SA[i]:SA[i]-SA[da_value-1]-1;
+#endif
       fwrite(&value, wsize2, 1, f_out);
     }
   }
@@ -815,41 +815,41 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
       //GSA
       int_t da_value = (light)?rankbv_rank1(rbv,SA[i]):DA[i];
       fwrite(&da_value, wsize1, 1, f_out);
-      #if TERMINATOR
-        int_t value = (da_value==0)?SA[i]:SA[i]-SA[da_value]-1;
-      #else
-        int_t value = (da_value==0)?SA[i]:SA[i]-SA[da_value-1]-1;
-      #endif
+#if TERMINATOR
+      int_t value = (da_value==0)?SA[i]:SA[i]-SA[da_value]-1;
+#else
+      int_t value = (da_value==0)?SA[i]:SA[i]-SA[da_value-1]-1;
+#endif
       fwrite(&value, wsize2, 1, f_out);
 
       //LCP
       fwrite(&LCP[i], wsize3, 1, f_out); //LCP==C
       //BWT
-      #if TERMINATOR
-        char c = (!SA[i])?terminator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 1, and terminator = 0
-      #else
-        char c = (!SA[i])?separator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 0, no terminator
-      #endif
+#if TERMINATOR
+      char c = (!SA[i])?terminator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 1, and terminator = 0
+#else
+      char c = (!SA[i])?separator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 0, no terminator
+#endif
       fwrite(&c, sizeof(char), 1, f_out);
     }
   }
   else if(strcmp(ext, "bwt")==0){
     for(i=0; i<n; i++){ //SA==B
-      #if TERMINATOR
-        char c = (!SA[i])?terminator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 1, and terminator = 0
-      #else
-        char c = (!SA[i])?separator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 0, no terminator
-      #endif
+#if TERMINATOR
+      char c = (!SA[i])?terminator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 1, and terminator = 0
+#else
+      char c = (!SA[i])?separator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 0, no terminator
+#endif
       fwrite(&c, wsize1, 1, f_out); 
     }
   }
   else if(strcmp(ext, "bwt.qs")==0){
     for(i=0; i<n; i++){ //SA==B
-      #if TERMINATOR
-        char c = (!SA[i])?terminator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 1, and terminator = 0
-      #else
-        char c = (!SA[i])?separator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 0, no terminator
-      #endif
+#if TERMINATOR
+      char c = (!SA[i])?terminator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 1, and terminator = 0
+#else
+      char c = (!SA[i])?separator:((T[SA[i]-1]>1)?T[SA[i]-1]-1:separator); //separators = 0, no terminator
+#endif
       fwrite(&c, wsize1, 1, f_out); 
     }
   }
@@ -887,7 +887,7 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
 
   file_close(f_out);
 
-return 0;
+  return 0;
 }
 
 /******************************************************************************/
@@ -920,10 +920,10 @@ size_t load_from_disk(unsigned char **T, int_da **DA, int_t **SA, int_t **LCP, c
     f_in = file_open(c_in, "rb");
 
   if(f_in==NULL){
-     exit(EXIT_FAILURE);
+    exit(EXIT_FAILURE);
   }
   size_t size = file_size(f_in);
-                                                            
+
   size_t wsize = wsize1+wsize2+wsize3;
   if(strcmp(ext, "gesa")==0) wsize++;
 
@@ -936,7 +936,7 @@ size_t load_from_disk(unsigned char **T, int_da **DA, int_t **SA, int_t **LCP, c
     fread(*T, wsize1, n, f_in);
   }
   else{
-                                       
+
     if(DA!=NULL){
       *DA = (int_da*) malloc(n*sizeof(int_da));
     }
@@ -977,7 +977,7 @@ size_t load_from_disk(unsigned char **T, int_da **DA, int_t **SA, int_t **LCP, c
 
   file_close(f_in);
 
-return n;
+  return n;
 }
 
 /******************************************************************************/
