@@ -14,11 +14,11 @@ MALLOC_COUNT=
 MALLOC_COUNT64=
  
 ifeq ($(SYSTEM),Darwin)
-  LDFLAGS=-lz -mpopcnt
+  LDFLAGS= -mpopcnt
 else
 	MALLOC_COUNT=external/malloc_count/malloc_count.o
 	MALLOC_COUNT64=external/malloc_count/malloc_count.64.o
-  LDFLAGS=-lz -lm -ldl -mpopcnt
+  LDFLAGS= -lm -ldl -mpopcnt
 endif
 
 LIBOBJ = \
@@ -48,6 +48,9 @@ endif
 DEFINES += -DTERMINATOR=$(TERMINATOR)
 GZ = 1
 CFLAGS += $(DEFINES) -DGZ=$(GZ)
+ifeq ($(GZ),1)
+  LDFLAGS += -lz
+endif
 ##
 
 DIR = dataset/
