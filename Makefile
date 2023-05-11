@@ -1,7 +1,7 @@
 CC?=gcc
 
 #WFLAGS= -Wall -Wextra  -DNDEBUG -Wno-ignored-qualifiers
-WFLAGS= -Wall -Werror -Wno-unused-function
+WFLAGS= -Wall -Wno-unused-function -Werror 
 OPT_FLAGS= -O3 -ffast-math -funroll-loops -m64 -fomit-frame-pointer -D_FILE_OFFSET_BITS=64
 CFLAGS = $(WFLAGS) $(OPT_FLAGS)
 SYSTEM?=$(shell uname -s)
