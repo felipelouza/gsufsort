@@ -85,9 +85,9 @@ where INPUT is a single file or directory with a string collection.
 --str                 write the collection concatenation (T^{cat}) to INPUT.1.str
 --print [p]           print the first p elements of arrays to stdout, defaults to the collection length
 --qs                  write QS sequences in fastq permuted according to the BWT to INPUT.bwt.qs
---lcp_max             print maximum LCP value
---lcp_max_text        print maximum LCP value (text order)
---lcp_avg             print average LCP value
+--lcp_max             write the maximum LCP value, write to INPUT.w.lcp_max
+--lcp_max_text        write the maximum LCP value text, write to INPUT.lcp_max.txt
+--lcp_avg             write the average LCP value, write to INPUT.w.lcp_avg
 --time                print the running time in seconds
 --verbose             verbose output
 --help                this help message

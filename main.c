@@ -54,9 +54,9 @@ void usage(char *name){
   puts("\t--str                 output concatenated input T^{cat} (FILENAME.1.str)");
   puts("\t--docs    d           number of strings (def all FILENAME)");
   puts("\t--print   p           print arrays (stdout) A[1,p]");
-  puts("\t--lcp_max             output maximum LCP");
-  puts("\t--lcp_max_text        output maximum LCP (text)");
-  puts("\t--lcp_avg             output average LCP");
+  puts("\t--lcp_max             output maximum LCP (FILENAME.lcp_max)");
+  puts("\t--lcp_max_text        output maximum LCP in text (FILENAME.lcp_max.txt)");
+  puts("\t--lcp_avg             output average LCP (FILENAME.lcp_avg)");
   puts("\t--trlcp   k           output k-truncated LCP array (FILENAME.w.lcp)");
   puts("\t--lower               convert input symbols to lowercase");
   puts("\t--upper               convert input symbols to uppercase");
@@ -516,15 +516,25 @@ int main(int argc, char** argv){
         }
         avg+=(double)LCP[i]/(double)total;
       }
-      if(lcp_max) printf("LCP max: %" PRIdN "\n", max);
+      if(lcp_max){
+        //printf("LCP max: %" PRIdN "\n", max);
+        store_to_disk(NULL,  NULL, NULL, NULL, &max, 1, c_output,  "lcp_max", 0, 0,  lcp_bytes);
+      }
       if(lcp_max_text){
+        /**
         printf("Longest LCP: "); 
         for(i=SA[j]; i<SA[j]+max && T[i]!=1; i++){
           printf("%c", T[i]-1);
         }
         printf("\n");
+        **/
+        store_to_disk(&T[SA[j]],  NULL,  NULL, NULL,  NULL,  SA[j]+max, c_output, "lcp_max.txt",  sizeof(char), 0, 0);
       }
-      if(lcp_avg) printf("LCP avg: %lf\n", avg);
+      if(lcp_avg){
+        //printf("LCP avg: %lf\n", avg);
+        int_t AVG = (int_t)avg;
+        store_to_disk(NULL,  NULL, NULL, NULL, &AVG, 1, c_output,  "lcp_avg", 0, 0,  lcp_bytes);
+      }
     }
 
     //free memory
@@ -779,14 +789,16 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
     sprintf(c_out, "%s.%d.%s", c_file, wsize2, ext);
   else if(strcmp(ext, "lcp")==0)
     sprintf(c_out, "%s.%d.%s", c_file, wsize3, ext);
-  else if(strcmp(ext, "bwt")==0 || strcmp(ext, "ibwt")==0 || strcmp(ext, "bwt.qs")==0|| strcmp(ext, "iqs")==0)
+  else if(strcmp(ext, "bwt")==0 || strcmp(ext, "ibwt")==0 || strcmp(ext, "bwt.qs")==0|| strcmp(ext, "iqs")==0 || strcmp(ext, "lcp_max.txt")==0)
     sprintf(c_out, "%s.%s", c_file, ext);
+  else if(strcmp(ext, "lcp_avg")==0 || strcmp(ext, "lcp_max")==0)
+    sprintf(c_out, "%s.%d.%s", c_file, wsize3, ext);
   else
     sprintf(c_out, "%s.%d.%s", c_file, wsize1, ext);
 
   FILE *f_out = NULL;
 
-  if(strcmp(ext, "str")==0 || strcmp(ext, "bwt")==0 || strcmp(ext, "ibwt")==0 || strcmp(ext, "bwt.qs")==0|| strcmp(ext, "iqs")==0) 
+  if(strcmp(ext, "str")==0 || strcmp(ext, "bwt")==0 || strcmp(ext, "ibwt")==0 || strcmp(ext, "bwt.qs")==0|| strcmp(ext, "iqs")==0 || strcmp(ext, "lcp_max.txt")) 
     f_out = file_open(c_out, "w");
   else 
     f_out = file_open(c_out, "wb");
@@ -883,6 +895,16 @@ int store_to_disk(unsigned char *T, int_da *DA, rankbv_t* rbv, int_t *SA, int_t 
   }
   else if(strcmp(ext, "ibwt")==0 || strcmp(ext, "iqs")==0){
     fwrite(T, wsize1, n, f_out);
+  }
+  else if(strcmp(ext, "lcp_avg")==0 || strcmp(ext, "lcp_max")==0){
+    fwrite(LCP, wsize3, 1, f_out);
+  }
+  else if(strcmp(ext, "lcp_max.txt")==0){
+    for(i=0; i<n && T[i]!=1 ; i++){
+      char c = (T[i]>0)?T[i]-1:'\n';
+      if(c==0) c = '\n';
+      fwrite(&c, wsize1, 1, f_out);
+    }
   }
 
   file_close(f_out);
